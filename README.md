@@ -28,13 +28,3 @@ dotnet run --project apps/windows/VolturaWeekNumber.csproj
 Packages are written to `artifacts/publish`: a small runtime-acquiring installer, a self-contained offline installer, and a portable ZIP. The small installer verifies the Microsoft .NET Desktop Runtime installer before requesting elevation. The application itself installs per user and runs without elevation.
 
 Installed settings live in `%LOCALAPPDATA%\Voltura\WeekNumber`; portable settings live in `Data` beside the portable executable. Old WeekNumber XML settings are intentionally not imported. A damaged settings file is preserved and requires a valid import or a manual repair.
-
-## Release status
-
-Current artifacts are local development packages. They are not published and have no Authenticode publisher signature. A dedicated update-verification public key has not yet been configured. Installed development builds therefore fail closed when checking updates.
-
-Before a first production build, run `scripts/initialize-signing-key.ps1 -PrivateKeyPath <outside-repository-path>` in an interactive PowerShell terminal. It asks for a passphrase and writes only the public key into the project. Back up the encrypted private key and retain its passphrase separately. Then rebuild and use `scripts/release.ps1 -KeyPath <private-key-path>` to prepare signed update metadata locally.
-
-Publishing additionally requires the public GitHub repository, an existing release tag, release notes, and the explicit `-Publish` switch. No script commits, pushes, creates a GitHub repository, or generates a release tag.
-
-See [architecture](docs/architecture.md), [feature parity](docs/feature-parity.md), and [validation](docs/validation.md).
