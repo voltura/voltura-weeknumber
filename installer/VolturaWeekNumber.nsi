@@ -19,6 +19,9 @@ Name "Voltura WeekNumber"
 OutFile "${OUTPUT}"
 InstallDir "$LOCALAPPDATA\Programs\VolturaWeekNumber"
 RequestExecutionLevel user
+XPStyle on
+ManifestDPIAware true
+ManifestSupportedOS all
 SetCompressor /SOLID lzma
 VIProductVersion "${VERSION}.0"
 VIAddVersionKey /LANG=1033 "ProductName" "Voltura WeekNumber"
