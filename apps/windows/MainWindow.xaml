@@ -1,0 +1,111 @@
+<Window x:Class="VolturaWeekNumber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui"
+  Title="Voltura WeekNumber" Width="640" Height="520" MinWidth="360" MinHeight="280" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <DockPanel Margin="20">
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Foreground="{DynamicResource MutedBrush}" FontSize="12" MinHeight="20" Margin="0,10,0,0" AutomationProperties.LiveSetting="Polite"/>
+    <TabControl x:Name="Tabs" Background="Transparent" BorderThickness="0">
+      <TabItem Header="{Binding [WeekTab], Source={x:Static ui:Strings.Current}}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ui:SpacingStackPanel Spacing="18" Margin="0,20,0,4">
+            <TextBlock Text="{Binding [Intro], Source={x:Static ui:Strings.Current}}" Style="{StaticResource Caption}"/>
+            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="16" Padding="22">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Image Source="{Binding Preview}" Width="96" Height="96" Stretch="Uniform" AutomationProperties.Name="{Binding WeekText}"/>
+                <ui:SpacingStackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding WeekText}" FontSize="32" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding DateText}"/>
+                  <TextBlock Text="{Binding WeekYearText}" Style="{StaticResource Caption}"/>
+                </ui:SpacingStackPanel>
+              </Grid>
+            </Border>
+            <ui:SpacingStackPanel Spacing="8">
+              <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <DatePicker x:Name="DateInput" SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Long" MinHeight="36" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
+                <Button Grid.Column="2" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+              </Grid>
+              <TextBlock Text="{Binding ConventionText}" Style="{StaticResource Caption}"/>
+            </ui:SpacingStackPanel>
+          </ui:SpacingStackPanel>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="{Binding [Preferences], Source={x:Static ui:Strings.Current}}">
+        <DockPanel Margin="0,14,0,0">
+          <ui:SpacingStackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Content="{Binding [Save], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="save"/>
+            <Button Content="{Binding [Cancel], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="discard"/>
+          </ui:SpacingStackPanel>
+          <ScrollViewer x:Name="PreferencesScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ui:SpacingStackPanel Spacing="8">
+              <Expander Header="{Binding [General], Source={x:Static ui:Strings.Current}}" IsExpanded="True">
+                <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
+                  <TextBlock Text="{Binding [Language], Source={x:Static ui:Strings.Current}}"/>
+                  <ComboBox ItemsSource="{Binding Languages}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Language}" AutomationProperties.Name="{Binding [Language], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock Text="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
+                  <ComboBox ItemsSource="{Binding Themes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Theme}" AutomationProperties.Name="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
+                  <CheckBox IsChecked="{Binding StartWithWindows}" Content="{Binding [Autostart], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Expander>
+              <Expander Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
+                  <ComboBox ItemsSource="{Binding Modes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Mode}" AutomationProperties.Name="{Binding [Convention], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock Text="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}"/>
+                  <ComboBox ItemsSource="{Binding Days}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding FirstDay}" IsEnabled="{Binding CustomCalendar}" AutomationProperties.Name="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock Text="{Binding [Rule], Source={x:Static ui:Strings.Current}}"/>
+                  <ComboBox ItemsSource="{Binding Rules}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Rule}" IsEnabled="{Binding CustomCalendar}" AutomationProperties.Name="{Binding [Rule], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Expander>
+              <Expander Header="{Binding [Icon], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
+                  <CheckBox IsChecked="{Binding AutomaticIcon}" Content="{Binding [AutoIcon], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock Text="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBox Text="{Binding Foreground, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CustomIcon}" MaxLength="9" AutomationProperties.Name="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                  <Button Content="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="foreground" IsEnabled="{Binding CustomIcon}" HorizontalAlignment="Left"/>
+                  <TextBlock Text="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBox Text="{Binding Background, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CustomIcon}" MaxLength="9" AutomationProperties.Name="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                  <Button Content="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="background" IsEnabled="{Binding CustomIcon}" HorizontalAlignment="Left"/>
+                  <TextBlock Text="{Binding [ColorHelp], Source={x:Static ui:Strings.Current}}" Style="{StaticResource Caption}"/>
+                  <Button Content="{Binding [ResetIcon], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="reset-icon" HorizontalAlignment="Left"/>
+                  <Button Content="{Binding [ExportIcon], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="export-icon" HorizontalAlignment="Left"/>
+                </ui:SpacingStackPanel>
+              </Expander>
+              <Expander Header="{Binding [Notifications], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Spacing="4" DataContext="{Binding Editor}">
+                  <CheckBox IsChecked="{Binding StartupNotification}" Content="{Binding [StartupNote], Source={x:Static ui:Strings.Current}}"/>
+                  <CheckBox IsChecked="{Binding WeekNotification}" Content="{Binding [WeekNote], Source={x:Static ui:Strings.Current}}"/>
+                  <CheckBox IsChecked="{Binding SilentNotifications}" Content="{Binding [Silent], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Expander>
+              <Expander Header="{Binding [Data], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Spacing="8">
+                  <CheckBox IsChecked="{Binding Editor.Logging}" Content="{Binding [Logging], Source={x:Static ui:Strings.Current}}"/>
+                  <Button Content="{Binding [OpenLog], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="log" HorizontalAlignment="Left"/>
+                  <Button Content="{Binding [Import], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="import" HorizontalAlignment="Left"/>
+                  <Button Content="{Binding [Export], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="export" HorizontalAlignment="Left"/>
+                </ui:SpacingStackPanel>
+              </Expander>
+            </ui:SpacingStackPanel>
+          </ScrollViewer>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="{Binding [About], Source={x:Static ui:Strings.Current}}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ui:SpacingStackPanel Spacing="12" Margin="0,20,0,0">
+            <TextBlock Text="{Binding VersionText}" Style="{StaticResource SectionTitle}"/>
+            <TextBlock Text="© 2026 Voltura AB · MIT" Style="{StaticResource Caption}"/>
+            <TextBlock Text="{Binding [Updates], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
+            <CheckBox x:Name="AutomaticUpdateCheck" IsChecked="{Binding Editor.AutomaticUpdates}" Content="{Binding [AutoUpdates], Source={x:Static ui:Strings.Current}}" Checked="AutomaticUpdatesChanged" Unchecked="AutomaticUpdatesChanged"/>
+            <TextBlock x:Name="UpdateStatus" Style="{StaticResource Caption}" AutomationProperties.LiveSetting="Polite"/>
+            <Button x:Name="CheckUpdateButton" Content="{Binding [CheckUpdates], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="check-update" HorizontalAlignment="Left"/>
+            <Button x:Name="InstallButton" Content="{Binding [Install], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="install-update" HorizontalAlignment="Left" Visibility="Collapsed"/>
+            <WrapPanel>
+              <Button Content="{Binding [Project], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="project"/>
+              <Button Content="{Binding [License], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="license"/>
+              <Button Content="{Binding [Donate], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="donate"/>
+              <Button Content="{Binding [Coffee], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="coffee"/>
+            </WrapPanel>
+          </ui:SpacingStackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

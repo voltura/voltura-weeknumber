@@ -1,0 +1,20 @@
+<Window x:Class="VolturaWeekNumber.Ui.ColorPickerWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui"
+    Width="400" Height="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+  <DockPanel Margin="20">
+    <ui:SpacingStackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,16,0,0">
+      <Button Content="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}" IsCancel="True"/>
+      <Button Content="{Binding [UseColor], Source={x:Static ui:Strings.Current}}" IsDefault="True" Click="AcceptClick"/>
+    </ui:SpacingStackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ui:SpacingStackPanel Spacing="10">
+      <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="10" Padding="12"><ui:SpacingStackPanel Orientation="Horizontal" Spacing="14">
+        <Border x:Name="Swatch" Width="48" Height="48" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+        <TextBlock x:Name="Hex" VerticalAlignment="Center" FontSize="18" FontWeight="SemiBold"/>
+      </ui:SpacingStackPanel></Border>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="R"/><Slider x:Name="Red" Grid.Column="1" Maximum="255" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="ChannelChanged" AutomationProperties.Name="Red"/></Grid>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="G"/><Slider x:Name="Green" Grid.Column="1" Maximum="255" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="ChannelChanged" AutomationProperties.Name="Green"/></Grid>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="B"/><Slider x:Name="Blue" Grid.Column="1" Maximum="255" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="ChannelChanged" AutomationProperties.Name="Blue"/></Grid>
+      <TextBlock Text="{Binding [Opacity], Source={x:Static ui:Strings.Current}}"/>
+      <Slider x:Name="Alpha" Maximum="255" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="ChannelChanged" AutomationProperties.Name="{Binding [Opacity], Source={x:Static ui:Strings.Current}}"/>
+    </ui:SpacingStackPanel></ScrollViewer>
+  </DockPanel>
+</Window>

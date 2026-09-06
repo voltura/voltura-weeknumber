@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="apps/windows/VolturaWeekNumber.csproj" />
+  <Project Path="tests/VolturaWeekNumber.Tests/VolturaWeekNumber.Tests.csproj" />
+</Solution>
