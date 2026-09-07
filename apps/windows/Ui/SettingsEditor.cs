@@ -15,8 +15,10 @@ public sealed class Choice<T>(T value, string label) : INotifyPropertyChanged
 public sealed class SettingsEditor : INotifyPropertyChanged
 {
     private AppSettings _value = new();
+    private AppSettings _saved = new();
     public event PropertyChangedEventHandler? PropertyChanged;
     public AppSettings Value => _value;
+    public bool HasChanges => _value != _saved;
     public string Language { get => _value.Language; set => Change(_value with { Language = value }); }
     public string Theme { get => _value.Theme; set => Change(_value with { Theme = value }); }
     public CalendarMode Mode { get => _value.Calendar.Mode; set => Change(_value with { Calendar = _value.Calendar with { Mode = value } }); }
@@ -33,7 +35,13 @@ public sealed class SettingsEditor : INotifyPropertyChanged
     public bool SilentNotifications { get => _value.SilentNotifications; set => Change(_value with { SilentNotifications = value }); }
     public bool Logging { get => _value.Logging; set => Change(_value with { Logging = value }); }
     public bool AutomaticUpdates { get => _value.AutomaticUpdates; set => Change(_value with { AutomaticUpdates = value }); }
-    public void Load(AppSettings settings) => Change(settings);
+    public void Load(AppSettings settings)
+    {
+        _saved = settings;
+        _value = settings;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+    }
+    public void Edit(AppSettings settings) => Change(settings);
     private void Change(AppSettings settings) { if (_value == settings) return; _value = settings; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null)); }
     // Stable option identities preserve SelectedValue while language and other settings change.
     public IReadOnlyList<Choice<string>> Languages { get; } = [new("system", ""), new("en", "English"), new("sv", "Svenska"), new("de", "Deutsch")];

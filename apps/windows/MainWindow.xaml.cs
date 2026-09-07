@@ -27,11 +27,12 @@ public partial class MainWindow : Window
     }
     public void Open(MainPage tab = MainPage.WeekNumber)
     {
-        Tabs.SelectedIndex = (int)tab;
         Show();
         if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
         WindowWorkAreaPlacement.EnsureVisibleOnCurrentMonitor(this);
         Activate();
+        // Showing the window restores focus and can reselect the previously focused tab.
+        Tabs.SelectedIndex = (int)tab;
         FocusDatePageHeader();
     }
     private void OnPageChanged(object sender, SelectionChangedEventArgs args)

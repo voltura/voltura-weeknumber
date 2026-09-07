@@ -11,6 +11,7 @@
     <Style x:Key="SectionTitle" TargetType="TextBlock"><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="FontSize" Value="17"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
     <!-- Shared flat button primitive adapted from Voltura Air's native-title-bar WPF UI. -->
     <Style TargetType="Button">
+      <Setter Property="Width" Value="240"/><Setter Property="Height" Value="40"/>
       <Setter Property="Padding" Value="14,8"/><Setter Property="MinHeight" Value="36"/>
       <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
       <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>

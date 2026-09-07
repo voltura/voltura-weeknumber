@@ -1,35 +1,56 @@
 # Validation
 
-## Repeatable local gates
+Run commands from the repository root on Windows. See [Contributing](../CONTRIBUTING.md) for prerequisites.
 
-`scripts/build.ps1` runs the warning-free Release build with locked dependencies and the Microsoft.Testing.Platform xUnit suite. `scripts/package.ps1` builds both installers with NSIS `/WX`, plus the self-contained portable ZIP. `scripts/test-installer.ps1` exercises the real maintenance helper under a uniquely marked isolated directory and records its results in `artifacts/installer-test-results.json`; it does not change real installation, startup, or uninstall registry entries.
-
-The unit suite covers calendar boundaries and rule combinations, DST midnight scheduling, notification deduplication, settings validation and atomic replacement, all week/icon frame combinations, stable settings-choice identities, work-area geometry/recovery, and signed update download/staging/recovery through a simulated HttpMessageHandler.
-
-The application supports isolated review modes (a separate data directory is mandatory):
+## Build and automated checks
 
 ```powershell
-./apps/windows/bin/Debug/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode C:\temp\weeknumber-review --render-review C:\temp\weeknumber-images
-./apps/windows/bin/Debug/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode C:\temp\weeknumber-idle --autostart --measure-idle C:\temp\weeknumber-idle.json
+./scripts/build.ps1
 ```
 
-Review mode generates the full icon sheet and actual WPF client-area renders in light/dark and compact localized layouts. It applies settings through the production settings path. The idle probe measures startup, CPU, working set, handles, render count, and effective native DPI awareness over 90 seconds.
+This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
 
-The calendar icon direction was approved during implementation. The requested Today/Idag button correction uses one shared themed button style throughout the application.
+For installer or packaging changes:
 
-All three local packages were built with NSIS `/WX` for the installers. The 16 isolated installer scenarios passed under both PowerShell 7.6.5 and Windows PowerShell 5.1, including NSIS manifest preparation for both variants, interrupted installation/removal, corrupt payload rejection, and rollback. The final portable executable passed its health check; the ZIP contains the portable marker and bundled runtime license notices. PowerShell script syntax checks passed. These results supplement the operating-system acceptance checks below.
+```powershell
+./scripts/package.ps1
+./scripts/test-installer.ps1
+```
 
-Following the reported installer failure, the actual small NSIS installer completed a per-user installation with exit code 0. Its prerequisite, manifest preparation, and maintenance stages each returned 0; the installed executable passed its health check, and uninstall registration and the Start menu shortcut were verified. The failure was reproduced in Windows PowerShell 5.1: wrapping the `ConvertFrom-Json` pipeline in an array subexpression nested the manifest entries when appending the generated uninstaller. NSIS now calls a shared preparation script, which is exercised by the regression suite. Setup also selects Windows PowerShell's own module directory to avoid incompatible inherited PowerShell 7 modules. The bounded setup output is retained at `%LOCALAPPDATA%\Voltura\WeekNumber\setup.log` and replaced on each installation attempt.
+Packaging runs build and tests before creating both NSIS installers with warnings treated as errors and a self-contained portable ZIP in `artifacts/publish`. Installer tests exercise the maintenance helper in marked isolated directories and write `artifacts/installer-test-results.json`. They do not replace clean-machine testing of the actual installer and Windows integration.
 
-## Manual Windows acceptance still required
+## UI captures
 
-Recorded local results: the Release suite passed 43 tests with zero build warnings. The executable manifest contains PerMonitorV2; both the native tray window and visible WPF window reported PerMonitorV2 at 216 DPI. A second launch exited successfully and activated the original WPF window. An external 90-second idle observation showed unchanged CPU time, handles settling from 486 to 480, and stable working set (about 148 MiB). The separate icon-render counter remained at one. In-process diagnostic sampling produced different handle counts, so the external observation is the idle resource baseline.
+Use a separate profile for review so normal settings are unaffected:
 
-- On mixed-DPI displays, move the visible window and taskbar, change the primary display, disconnect/reconnect a display, and verify title-bar scale, sharp tray output, work-area recovery, and preservation of manual sizing.
-- Restart Explorer and verify tray restoration; test keyboard-only tray opening, window reopening, notification clicks, and Exit.
-- Exercise actual startup/new-week/silent notifications and Windows quiet-mode behavior. Resume across midnight/week boundaries and change the clock/time zone.
-- In a clean Windows Sandbox or VM, test both actual NSIS wizards, missing-runtime download, UAC cancellation, offline failure, reboot-required outcomes, autostart, upgrade, and uninstall with/without settings removal. Isolated helper tests do not prove these operating-system interactions.
-- Exercise high contrast, date-picker keyboard validation, custom transparent icon colors, and native Open/Save dialogs.
-- Configure the production update key, rebuild, sign the metadata, and test an actual installed-version upgrade from the intended release channel before first public release.
+```powershell
+$reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
+./apps/windows/bin/Release/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode "$reviewRoot/profile" --render-review "$reviewRoot/images"
+```
 
-The actual installer validation created the per-user installation, uninstall entry, and Start menu shortcut. No physical display topology, Windows notification policy, real user autostart, UAC prerequisite installation, or public release was changed.
+The mode exits after capturing the actual WPF UI, icon sheet, light/dark date lookups, English/Swedish/German pages, compact layouts, and color picker. It also writes `window-dpi.json`. Inspect images for clipping, text contrast, date entry, focus states, and consistent control spacing. The README screenshot is stored in `docs/images/voltura-weeknumber.png`; refresh it from an English `window-light.png` capture when the main page changes.
+
+## Display and idle diagnostics
+
+For a monitor or TV/receiver reconnection check, launch with `--isolated-test-mode <absolute-profile-directory> --trace-dpi`. The profile's bounded `application.log` records display events, native and monitor DPI, WPF scale, bounds, and visibility without polling.
+
+For a 90-second idle measurement:
+
+```powershell
+$reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
+./apps/windows/bin/Release/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode "$reviewRoot/idle-profile" --autostart --measure-idle "$reviewRoot/idle.json"
+```
+
+The report includes startup time, CPU, memory, handles, icon render count, and DPI awareness. This diagnostic launch does not register Windows autostart.
+
+## Manual acceptance
+
+Choose checks relevant to the changed behavior and record the build, environment, and observed result:
+
+- **Calendar and appearance:** test date entry and invalid input, year boundaries, each calendar mode, all three languages, light/dark/high-contrast appearance, keyboard navigation, custom icon transparency, and export/import dialogs.
+- **Tray and notifications:** restart Explorer; reopen the window; activate a second instance; test notification clicks, Exit, startup/new-week notifications, sound settings, and Windows quiet mode. Resume across midnight and change the clock or time zone.
+- **Displays:** move the window and taskbar between different DPI displays, change the primary monitor, disconnect/reconnect a display, and power-cycle relevant TV/receiver hardware. Check scale, icon sharpness, visible placement, and manual window sizing.
+- **Installation:** use a clean Windows Sandbox or VM for both installer wizards, missing-runtime download, UAC cancellation, offline failure, reboot-required outcomes, autostart, upgrade, and uninstall with and without settings removal. Check the portable ZIP separately.
+- **Updates:** test a real installed-version upgrade with authorized signed release metadata, both package variants, failure/retry behavior, and settings retention. Confirm that portable copies use manual updates.
+
+Generated output belongs under ignored `artifacts/`; retain only intentional documentation images in Git. A passing automated suite does not establish hardware or operating-system acceptance.

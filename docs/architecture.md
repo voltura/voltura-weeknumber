@@ -1,17 +1,31 @@
 # Architecture
 
-The WPF application and xUnit test assembly are the only .NET projects. Shared build metadata reads `version.json`. Application resources and platform helpers are local copies with attribution; no sibling repository is required.
+Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The solution contains the application in `apps/windows` and the xUnit test project in `tests/VolturaWeekNumber.Tests`. Shared build metadata reads `version.json`. No sibling repository is required to build or run it.
 
-`App` owns single-instance activation and awaited runtime shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, window activation, and declarative composition. `CalendarViewModel` owns selected-date presentation; `SettingsEditor` owns a draft until Save. Stable choice objects keep WPF selections intact across localization changes.
+## Application and UI
 
-The calendar calculator accepts a date, explicit options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET ISOWeek. Other combinations use the regional calendar. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. One dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a single pending refresh.
+`App` owns single-instance activation and awaited shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, activation, and layout. `CalendarViewModel` presents the selected date; `DateLookupViewModel` handles day-of-year and Julian-day conversions. `SettingsEditor` keeps a draft until Save. Stable choice objects preserve selections when the display language changes.
 
-`NativeTray` owns the hidden native window, Shell notification identity, tray menu, and SafeHandle-backed HICON. It renders only when week, appearance, or icon pixel size changes. Explorer recreation republishes the icon. Unicode native notifications use `NIIF_NOSOUND` without modifying Windows sound preferences. WPF Fluent controls are retained; the shared flat button primitive follows the Voltura Air style and includes keyboard focus states.
+## Calendar and tray
 
-`SettingsStore` validates bounded JSON before changing current state and promotes a unique sibling temporary file atomically. Settings remain outside installed files. Optional logs use one bounded channel, one writer, and two files capped at about 1 MiB each. Registry autostart changes are scoped to the application's command and rolled back if settings persistence fails.
+`WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the regional calendar. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
 
-`UpdateService` owns its HttpClient, schedule, cancellation, gate, and installer-process reference. Installed eligibility is checked against the running path and per-user uninstall registration. Portable, development, and isolated profiles do not auto-update. A pinned RSA public key verifies exact manifest bytes; the selected installer must match the signed version, variant, name, size, and SHA-256. Download origins and redirects are allowlisted, reads are bounded, and partial metadata never becomes ready. The package is reverified before launch. Setup stops the installed process only after staging verification, so cancellation before that point leaves the app running.
+`NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.
 
-NSIS extracts a package and invokes `maintain.ps1`. The helper rejects unowned targets and reparse points, validates each payload file, stages a replacement, journals backup/promotion/health/registration, and restores the prior installation on failure. Once uninstall begins deleting files, recovery finishes removal rather than restoring a partial directory. A recovery uninstaller remains registered while deletion is pending.
+The executable declares PerMonitorV2 DPI awareness. Window placement respects monitor work areas. Display changes, activation, and tray reopening trigger recovery checks; a stale window DPI is handled through a native move and bounds restoration so Windows can deliver its DPI-change message.
 
-Production public-key configuration and authorized signing are prerequisites for release. No private key or passphrase belongs in this repository. Application updates use RSA-PSS manifests; this is separate from optional Windows Authenticode publisher signing.
+## Settings and diagnostics
+
+`SettingsStore` validates bounded JSON before replacing current state and writes through a unique temporary file followed by atomic promotion. Installed data lives in `%LOCALAPPDATA%\Voltura\WeekNumber`; portable data lives in `Data` beside the executable. Autostart registration uses an application-owned command under the current user's registry and rolls back if settings persistence fails.
+
+Optional application logging uses a bounded channel, one writer, and two rotating files of approximately 1 MiB each. See [Privacy](../PRIVACY.md) for stored data and network behavior, and [Validation](validation.md) for isolated diagnostic modes.
+
+## Updates and installation
+
+`UpdateService` owns its HTTP client, schedule, cancellation, synchronization gate, and installer-process reference. Update eligibility requires the running path to match the per-user uninstall registration. Portable, development, and isolated profiles use manual updates.
+
+A pinned RSA public key verifies signed manifest bytes. The selected installer must match the signed version, package variant, filename, size, and SHA-256. Downloads and redirects are restricted to allowed HTTPS origins; reads are bounded. The package is verified again before launch, and installation requires a user action.
+
+NSIS extracts a package and invokes `installer/maintain.ps1`. Maintenance rejects unowned targets and reparse points, validates the payload, stages replacements, and journals backup, promotion, health checks, and registration. Failed installations restore the prior installation where possible. Interrupted removal finishes deletion rather than restoring a partially removed application; a recovery uninstaller remains registered while deletion is pending.
+
+`scripts/package.ps1` produces standard and self-contained installers and a self-contained portable ZIP. Self-contained packages include runtime license and notice files. Release manifests use RSA-PSS signatures, separately from Windows Authenticode publisher signing. Private signing keys and passphrases must remain outside the repository.

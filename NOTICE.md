@@ -1,5 +1,7 @@
 # Attribution
 
-Voltura WeekNumber is developed by Voltura AB. Its spacing panel and monitor placement implementation are adapted from Voltura Air (MIT, copyright 2026 Voltura AB). Calendar icon styling and feature behavior draw on WeekNumber and WeekNumber Lite 2+, by Joakim Skoglund. The application does not depend on those repositories at build or runtime.
+Voltura WeekNumber is developed by Voltura AB and distributed under the MIT License. Copyright (c) 2026 Voltura AB.
 
-Self-contained distributions include Microsoft .NET runtime license and third-party notice files supplied by the .NET SDK.
+The spacing panel and monitor placement helpers include Voltura Air code, also under the MIT License, copyright (c) 2026 Voltura AB. Calendar icon design and application contributions are by Joakim Skoglund.
+
+See `THIRD-PARTY-NOTICES.md` for runtime attribution. Self-contained distributions include the applicable Microsoft .NET license and notice files in `ThirdPartyNotices`.

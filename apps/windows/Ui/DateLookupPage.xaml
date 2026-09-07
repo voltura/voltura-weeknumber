@@ -11,19 +11,21 @@
       </Border>
       <ui:SpacingStackPanel Spacing="8">
         <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
-        <DatePicker SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Long" MinHeight="36" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
-        <Button Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick" HorizontalAlignment="Left"/>
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <DatePicker SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Long" Height="40" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
+          <Button Grid.Column="2" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+        </Grid>
       </ui:SpacingStackPanel>
       <ui:SpacingStackPanel Spacing="8">
         <TextBlock Text="{Binding [FindDate], Source={x:Static ui:Strings.Current}}" Style="{StaticResource SectionTitle}"/>
         <WrapPanel>
           <ui:SpacingStackPanel Spacing="6" Margin="0,0,12,8" Visibility="{Binding ShowYear, Converter={StaticResource BooleanVisibility}}">
             <TextBlock Text="{Binding [Year], Source={x:Static ui:Strings.Current}}"/>
-            <TextBox Text="{Binding YearInput, UpdateSourceTrigger=PropertyChanged}" Width="100" MaxLength="4" MinHeight="36" AutomationProperties.Name="{Binding [Year], Source={x:Static ui:Strings.Current}}"/>
+            <TextBox x:Name="YearInput" Text="{Binding YearInput, UpdateSourceTrigger=PropertyChanged}" Width="100" MaxLength="4" MinHeight="36" AutomationProperties.Name="{Binding [Year], Source={x:Static ui:Strings.Current}}" PreviewTextInput="NumberTextInput" PreviewKeyDown="NumberKeyDown" DataObject.Pasting="NumberPasting" TextChanged="OrdinalTextChanged" LostKeyboardFocus="OrdinalLostFocus" AllowDrop="False" InputMethod.IsInputMethodEnabled="False"/>
           </ui:SpacingStackPanel>
           <ui:SpacingStackPanel Spacing="6" Margin="0,0,0,8">
             <TextBlock Text="{Binding NumberLabel}"/>
-            <TextBox Text="{Binding NumberInput, UpdateSourceTrigger=PropertyChanged}" Width="140" MaxLength="10" MinHeight="36" AutomationProperties.Name="{Binding NumberLabel}"/>
+            <TextBox x:Name="NumberInput" Text="{Binding NumberInput, UpdateSourceTrigger=PropertyChanged}" Width="140" MaxLength="10" MinHeight="36" AutomationProperties.Name="{Binding NumberLabel}" PreviewTextInput="NumberTextInput" PreviewKeyDown="NumberKeyDown" DataObject.Pasting="NumberPasting" TextChanged="OrdinalTextChanged" LostKeyboardFocus="OrdinalLostFocus" AllowDrop="False" InputMethod.IsInputMethodEnabled="False"/>
           </ui:SpacingStackPanel>
         </WrapPanel>
         <Button Content="{Binding [Convert], Source={x:Static ui:Strings.Current}}" Click="ConvertClick" HorizontalAlignment="Left"/>

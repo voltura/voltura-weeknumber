@@ -17,5 +17,6 @@
     <EmbeddedResource Include="Features/Updates/update-signing-public.pem" Condition="Exists('Features/Updates/update-signing-public.pem')" />
     <None Include="../../LICENSE" Link="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../NOTICE.md" Link="NOTICE.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -198,10 +198,10 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "auto-updates":
                 var draft = Model.Editor.Value;
                 await SaveAsync(_settings.Current with { AutomaticUpdates = draft.AutomaticUpdates });
-                Model.Editor.Load(draft);
+                Model.Editor.Edit(draft);
                 break;
             case "discard": Model.Editor.Load(_settings.Current); Model.Status = string.Empty; break;
-            case "reset-icon": Model.Editor.Load(Model.Editor.Value with { AutomaticIcon = true, Foreground = "#FFFFFFFF", Background = "#FF151B26" }); break;
+            case "reset-icon": Model.Editor.Edit(Model.Editor.Value with { AutomaticIcon = true, Foreground = "#FFFFFFFF", Background = "#FF151B26" }); break;
             case "foreground":
             case "background":
                 var foreground = action == "foreground";

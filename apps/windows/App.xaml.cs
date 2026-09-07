@@ -99,6 +99,17 @@ public partial class App : System.Windows.Application
                         }
                     }
                     Ui.ThemeManager.Apply("light");
+                    _runtime.Window.Width = 720; _runtime.Window.Height = 640;
+                    _runtime.Window.Open(MainPage.About);
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    _runtime.Window.UpdateLayout();
+                    Capture(_runtime.Window, Path.Combine(output, "about-" + language + ".png"));
+                    _runtime.Window.Open(MainPage.Preferences);
+                    _runtime.Window.PrepareReview();
+                    await Task.Delay(350);
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    _runtime.Window.UpdateLayout();
+                    Capture(_runtime.Window, Path.Combine(output, "preferences-" + language + ".png"));
                     _runtime.Window.Width = 480; _runtime.Window.Height = 400;
                     _runtime.Window.Open(MainPage.Preferences);
                     _runtime.Window.PrepareReview();
