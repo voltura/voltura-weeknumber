@@ -10,6 +10,10 @@ Keep the current week number in your Windows notification area, and look up any 
 
 ## Your week, at a glance
 
+![Voltura WeekNumber notification-area calendar icon showing week 53](docs/images/voltura-weeknumber-tray-icon.png)
+
+The tray icon displays the current week number (week 53 shown here).
+
 - **Always within reach.** See the current week on a calendar icon in the notification area beside the Windows clock.
 - **Look up a date.** Find its week number, day of the year, or Julian day number. Convert a year and day number—or a Julian day number—back to a date.
 - **Use your calendar rules.** Follow Windows regional settings, choose ISO 8601, or set your own first day of the week and first-week rule.
