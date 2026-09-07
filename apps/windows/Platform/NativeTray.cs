@@ -12,6 +12,7 @@ internal sealed partial class NativeTray : IDisposable
     private const int Callback = 0x8001;
     private readonly HwndSource _source;
     private readonly uint _taskbarCreated;
+    private readonly TrayIconVisibilityPromoter? _visibilityPromoter;
     private readonly Forms.ContextMenuStrip _menu = new();
     private SafeIconHandle? _icon;
     private bool _added;
@@ -27,11 +28,12 @@ internal sealed partial class NativeTray : IDisposable
     internal uint CurrentDpi => GetDpiForWindow(_source.Handle);
     internal int RenderCount { get; private set; }
 
-    public NativeTray()
+    public NativeTray(bool promoteVisibility = true)
     {
         _source = new HwndSource(new HwndSourceParameters("VolturaWeekNumber.Tray") { Width = 0, Height = 0, WindowStyle = 0 });
         _source.AddHook(WndProc);
         _taskbarCreated = RegisterWindowMessage("TaskbarCreated");
+        if (promoteVisibility) _visibilityPromoter = new TrayIconVisibilityPromoter(_source.Dispatcher, RefreshVisibility);
         RebuildMenu();
     }
 
@@ -45,9 +47,16 @@ internal sealed partial class NativeTray : IDisposable
         _menu.Items.Add(new Forms.ToolStripSeparator());
         _menu.Items.Add(text["Exit"], null, (_, _) => ExitRequested?.Invoke());
         var dark = Ui.ThemeManager.IsTaskbarDark();
-        _menu.BackColor = dark ? System.Drawing.Color.FromArgb(27, 36, 49) : System.Drawing.Color.White;
-        _menu.ForeColor = dark ? System.Drawing.Color.WhiteSmoke : System.Drawing.Color.FromArgb(23, 37, 59);
-        _menu.Renderer = new Forms.ToolStripProfessionalRenderer(new TrayColors(dark));
+        var renderer = new TrayMenuRenderer(dark);
+        _menu.BackColor = renderer.Surface;
+        _menu.ForeColor = renderer.Text;
+        _menu.Renderer = renderer;
+        _menu.ShowImageMargin = false;
+        foreach (Forms.ToolStripItem item in _menu.Items)
+        {
+            item.BackColor = renderer.Surface;
+            item.ForeColor = renderer.Text;
+        }
     }
 
     public void Update(int week, IconAppearance appearance, string tooltip)
@@ -84,7 +93,7 @@ internal sealed partial class NativeTray : IDisposable
         _ = ShellNotifyIcon(1, ref data);
     }
 
-    private void Publish(string tooltip, bool imageChanged)
+    private void Publish(string tooltip, bool imageChanged, bool promoteVisibility = true)
     {
         _tooltip = Limit(tooltip, 127);
         var data = Data();
@@ -98,8 +107,18 @@ internal sealed partial class NativeTray : IDisposable
         {
             data.TimeoutOrVersion = 4;
             _ = ShellNotifyIcon(4, ref data);
+            if (promoteVisibility) _visibilityPromoter?.Start();
         }
         _added = true;
+    }
+
+    private void RefreshVisibility()
+    {
+        if (_disposed || !_added) return;
+        var data = Data();
+        _ = ShellNotifyIcon(2, ref data);
+        _added = false;
+        Publish(_tooltip, true, promoteVisibility: false);
     }
 
     private NotifyIconData Data() => new()
@@ -147,6 +166,7 @@ internal sealed partial class NativeTray : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _visibilityPromoter?.Dispose();
         var data = Data();
         _ = ShellNotifyIcon(2, ref data);
         _source.RemoveHook(WndProc);
@@ -181,13 +201,6 @@ internal sealed partial class NativeTray : IDisposable
     [LibraryImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool SetForegroundWindow(nint window);
     [LibraryImport("user32.dll", SetLastError = true)] private static partial nint CreateIconFromResourceEx(byte[] data, uint size, [MarshalAs(UnmanagedType.Bool)] bool icon, uint version, int width, int height, uint flags);
 
-    private sealed class TrayColors(bool dark) : Forms.ProfessionalColorTable
-    {
-        public override System.Drawing.Color MenuItemSelected => dark ? System.Drawing.Color.FromArgb(53, 65, 85) : System.Drawing.Color.FromArgb(228, 237, 251);
-        public override System.Drawing.Color ImageMarginGradientBegin => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color ImageMarginGradientMiddle => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color ImageMarginGradientEnd => System.Drawing.Color.Transparent;
-    }
 }
 
 internal sealed partial class SafeIconHandle : SafeHandleZeroOrMinusOneIsInvalid

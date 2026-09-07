@@ -1,0 +1,34 @@
+<UserControl x:Class="VolturaWeekNumber.Ui.DateLookupPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui">
+  <UserControl.Resources><BooleanToVisibilityConverter x:Key="BooleanVisibility"/></UserControl.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ui:SpacingStackPanel Spacing="18" Margin="0,20,0,4">
+      <TextBlock Text="{Binding Help}" Style="{StaticResource Caption}"/>
+      <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="16" Padding="22">
+        <ui:SpacingStackPanel Spacing="6">
+          <TextBlock Text="{Binding Result}" FontSize="32" FontWeight="SemiBold" AutomationProperties.LiveSetting="Polite"/>
+          <TextBlock Text="{Binding DateText}"/>
+        </ui:SpacingStackPanel>
+      </Border>
+      <ui:SpacingStackPanel Spacing="8">
+        <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
+        <DatePicker SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Long" MinHeight="36" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
+        <Button Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick" HorizontalAlignment="Left"/>
+      </ui:SpacingStackPanel>
+      <ui:SpacingStackPanel Spacing="8">
+        <TextBlock Text="{Binding [FindDate], Source={x:Static ui:Strings.Current}}" Style="{StaticResource SectionTitle}"/>
+        <WrapPanel>
+          <ui:SpacingStackPanel Spacing="6" Margin="0,0,12,8" Visibility="{Binding ShowYear, Converter={StaticResource BooleanVisibility}}">
+            <TextBlock Text="{Binding [Year], Source={x:Static ui:Strings.Current}}"/>
+            <TextBox Text="{Binding YearInput, UpdateSourceTrigger=PropertyChanged}" Width="100" MaxLength="4" MinHeight="36" AutomationProperties.Name="{Binding [Year], Source={x:Static ui:Strings.Current}}"/>
+          </ui:SpacingStackPanel>
+          <ui:SpacingStackPanel Spacing="6" Margin="0,0,0,8">
+            <TextBlock Text="{Binding NumberLabel}"/>
+            <TextBox Text="{Binding NumberInput, UpdateSourceTrigger=PropertyChanged}" Width="140" MaxLength="10" MinHeight="36" AutomationProperties.Name="{Binding NumberLabel}"/>
+          </ui:SpacingStackPanel>
+        </WrapPanel>
+        <Button Content="{Binding [Convert], Source={x:Static ui:Strings.Current}}" Click="ConvertClick" HorizontalAlignment="Left"/>
+        <TextBlock Text="{Binding Error}" AutomationProperties.LiveSetting="Polite"/>
+      </ui:SpacingStackPanel>
+    </ui:SpacingStackPanel>
+  </ScrollViewer>
+</UserControl>

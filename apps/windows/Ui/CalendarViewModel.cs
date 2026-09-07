@@ -13,6 +13,8 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     private AppSettings _settings = new();
     private string _status = string.Empty;
     public event PropertyChangedEventHandler? PropertyChanged;
+    public DateLookupViewModel DayOfYear { get; } = new(false);
+    public DateLookupViewModel JulianDay { get; } = new(true);
     public SettingsEditor Editor { get; } = new();
     public DateTime? SelectedDate { get => _date; set { _date = value; Refresh(); } }
     public string WeekText { get; private set; } = string.Empty;
@@ -25,6 +27,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     public void Apply(AppSettings settings) { _settings = settings; Editor.Load(settings); Editor.RefreshLabels(); Refresh(); }
     public void Refresh()
     {
+        DayOfYear.Refresh(DateTime.Today); JulianDay.Refresh(DateTime.Today);
         var strings = Strings.Current;
         if (_date is { } date)
         {

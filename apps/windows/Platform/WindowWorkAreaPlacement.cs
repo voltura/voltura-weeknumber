@@ -58,6 +58,18 @@ internal static partial class WindowWorkAreaPlacement
 
         window.SourceInitialized += OnSourceInitialized;
         window.Closed += OnClosed;
+        window.Activated += OnActivated;
+        window.StateChanged += OnActivated;
+
+        void OnActivated(object? sender, EventArgs eventArgs) => QueuePlacement();
+
+        void QueuePlacement()
+        {
+            if (source is not { IsDisposed: false } ||
+                pendingPlacement?.Status is DispatcherOperationStatus.Pending or DispatcherOperationStatus.Executing) return;
+            pendingPlacement = window.Dispatcher.InvokeAsync(
+                () => EnsureVisible(window, source.Handle, state), DispatcherPriority.ContextIdle);
+        }
 
         void OnSourceInitialized(object? sender, EventArgs eventArgs)
         {
@@ -68,13 +80,8 @@ internal static partial class WindowWorkAreaPlacement
 
         nint FilterWindowMessage(nint windowHandle, int message, nint wordParameter, nint longParameter, ref bool handled)
         {
-            if ((message == WindowMessageDisplayChange || message == WindowMessageDpiChanged) &&
-                pendingPlacement?.Status is not DispatcherOperationStatus.Pending and not DispatcherOperationStatus.Executing)
-            {
-                pendingPlacement = window.Dispatcher.InvokeAsync(
-                    () => EnsureVisible(window, windowHandle, state),
-                    DispatcherPriority.ContextIdle);
-            }
+            if (message is WindowMessageDisplayChange or WindowMessageDpiChanged or 0x001A or 0x0218)
+                QueuePlacement();
 
             return 0;
         }
@@ -83,6 +90,8 @@ internal static partial class WindowWorkAreaPlacement
         {
             window.SourceInitialized -= OnSourceInitialized;
             window.Closed -= OnClosed;
+            window.Activated -= OnActivated;
+            window.StateChanged -= OnActivated;
             source?.RemoveHook(FilterWindowMessage);
             if (pendingPlacement?.Status == DispatcherOperationStatus.Pending)
             {
@@ -143,7 +152,7 @@ internal static partial class WindowWorkAreaPlacement
 
     private static void EnsureVisible(Window window, nint windowHandle, PlacementState state)
     {
-        if (window.WindowState != WindowState.Normal ||
+        if (window.WindowState == WindowState.Minimized ||
             !GetWindowRect(windowHandle, out var windowRect))
         {
             return;
@@ -159,6 +168,8 @@ internal static partial class WindowWorkAreaPlacement
             return;
         }
 
+        RecoverStaleDpi(windowHandle, monitor, windowRect, monitorInfo.WorkArea);
+        if (window.WindowState != WindowState.Normal) return;
         UpdateManagedSizeForWorkArea(window, windowHandle, monitorInfo.WorkArea, state);
         if (!GetWindowRect(windowHandle, out windowRect))
         {
@@ -180,6 +191,24 @@ internal static partial class WindowWorkAreaPlacement
             0,
             0,
             SetWindowPositionNoSize | SetWindowPositionNoZOrder | SetWindowPositionNoActivate);
+    }
+
+    internal static bool NeedsDpiRecovery(uint windowDpi, uint monitorDpi) =>
+        windowDpi != 0 && monitorDpi != 0 && windowDpi != monitorDpi;
+
+    private static void RecoverStaleDpi(nint handle, nint monitor, NativeRect bounds, NativeRect workArea)
+    {
+        // TV/receiver reconnection can leave a PMv2 HWND at the disconnected display's DPI.
+        // A real position change makes Windows deliver its own WM_DPICHANGED; a frame-only
+        // refresh does not. Preserve physical bounds rather than magnifying the stale DIP size.
+        if (!AreDpiAwarenessContextsEqual(GetWindowDpiAwarenessContext(handle), new nint(-4)) ||
+            GetDpiForMonitor(monitor, 0, out var dpi, out _) != 0 ||
+            !NeedsDpiRecovery(GetDpiForWindow(handle), dpi)) return;
+        var offset = bounds.Left < workArea.Right - 1 ? 1 : -1;
+        if (!SetWindowPos(handle, 0, bounds.Left + offset, bounds.Top, 0, 0,
+            SetWindowPositionNoSize | SetWindowPositionNoZOrder | SetWindowPositionNoActivate)) return;
+        _ = SetWindowPos(handle, 0, bounds.Left, bounds.Top, bounds.Right - bounds.Left, bounds.Bottom - bounds.Top,
+            SetWindowPositionNoZOrder | SetWindowPositionNoActivate);
     }
 
     private static void UpdateManagedSizeForWorkArea(
@@ -267,6 +296,16 @@ internal static partial class WindowWorkAreaPlacement
     [LibraryImport("user32.dll")]
     private static partial uint GetDpiForWindow(nint windowHandle);
 
+    [LibraryImport("shcore.dll")]
+    private static partial int GetDpiForMonitor(nint monitor, int kind, out uint x, out uint y);
+
+    [LibraryImport("user32.dll")]
+    private static partial nint GetWindowDpiAwarenessContext(nint windowHandle);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool AreDpiAwarenessContextsEqual(nint first, nint second);
+
     [LibraryImport("user32.dll")]
     private static partial nint MonitorFromRect(in NativeRect rectangle, uint flags);
 
@@ -285,4 +324,3 @@ internal static partial class WindowWorkAreaPlacement
         int height,
         uint flags);
 }
-

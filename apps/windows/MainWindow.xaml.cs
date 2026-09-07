@@ -2,10 +2,13 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
+using System.Windows.Threading;
 using VolturaWeekNumber.Platform;
 using VolturaWeekNumber.Ui;
 
 namespace VolturaWeekNumber;
+
+public enum MainPage { WeekNumber, DayOfYear, JulianDay, Preferences, About }
 
 public partial class MainWindow : Window
 {
@@ -19,15 +22,32 @@ public partial class MainWindow : Window
         WindowWorkAreaPlacement.ConstrainAndCenterOnFirstLoad(this);
         WindowWorkAreaPlacement.KeepVisibleAfterDisplayChanges(this);
         Closing += OnClosing;
+        Tabs.SelectionChanged += OnPageChanged;
         AddHandler(Expander.ExpandedEvent, new RoutedEventHandler(OnExpanded));
     }
-    public void Open(int tab = 0)
+    public void Open(MainPage tab = MainPage.WeekNumber)
     {
-        Tabs.SelectedIndex = tab;
+        Tabs.SelectedIndex = (int)tab;
         Show();
         if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
         WindowWorkAreaPlacement.EnsureVisibleOnCurrentMonitor(this);
         Activate();
+        FocusDatePageHeader();
+    }
+    private void OnPageChanged(object sender, SelectionChangedEventArgs args)
+    {
+        if (args.OriginalSource == Tabs) FocusDatePageHeader();
+    }
+    private void FocusDatePageHeader()
+    {
+        if (Tabs.SelectedIndex is < 0 or > (int)MainPage.JulianDay) return;
+        var selectedPage = Tabs.SelectedItem as TabItem;
+        // Let TabControl finish its automatic content focus before keeping focus on navigation.
+        _ = Dispatcher.InvokeAsync(() =>
+        {
+            if (IsActive && selectedPage is not null && Tabs.SelectedItem == selectedPage)
+                selectedPage.Focus();
+        }, DispatcherPriority.Loaded);
     }
     public void UpdateLanguage() => Language = XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
     public void UpdateState(string status, bool ready, bool eligible)

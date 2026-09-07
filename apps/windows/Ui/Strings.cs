@@ -11,6 +11,15 @@ public sealed class Strings : INotifyPropertyChanged
     private int _column;
     private static readonly Dictionary<string, string[]> Entries = new(StringComparer.Ordinal)
     {
+        ["OrdinalTab"] = ["Day of year", "Dag på året", "Tag des Jahres"],
+        ["JulianTab"] = ["Julian day", "Juliansk dag", "Julianischer Tag"],
+        ["OrdinalHelp"] = ["Days counted from January 1: 001–365, or 366 in a leap year.", "Dagar räknade från 1 januari: 001–365, eller 366 under skottår.", "Tage ab dem 1. Januar: 001–365, im Schaltjahr bis 366."],
+        ["JulianHelp"] = ["Julian day number at noon Universal Time on the selected Gregorian date. Gregorian rules apply to all years.", "Julianskt dagnummer vid middagstid universell tid på valt gregorianskt datum. Gregorianska regler gäller för alla år.", "Julianische Tagesnummer um 12 Uhr Universalzeit am gewählten gregorianischen Datum. Gregorianische Regeln gelten für alle Jahre."],
+        ["FindDate"] = ["Find a date", "Hitta ett datum", "Datum ermitteln"],
+        ["Year"] = ["Year", "År", "Jahr"],
+        ["Convert"] = ["Convert", "Omvandla", "Umrechnen"],
+        ["InvalidOrdinal"] = ["Enter a year from 1 to 9999 and a day from 1 to 365 (366 in a leap year).", "Ange ett år från 1 till 9999 och en dag från 1 till 365 (366 under skottår).", "Jahr von 1 bis 9999 und Tag von 1 bis 365 eingeben (366 im Schaltjahr)."],
+        ["InvalidJulian"] = ["Enter a whole Julian day number from 1721426 to 5373484.", "Ange ett helt julianskt dagnummer från 1721426 till 5373484.", "Eine ganze julianische Tagesnummer von 1721426 bis 5373484 eingeben."],
         ["WeekTab"] = ["Week number", "Veckonummer", "Kalenderwoche"],
         ["Preferences"] = ["Preferences", "Inställningar", "Einstellungen"],
         ["About"] = ["About", "Om", "Über"],

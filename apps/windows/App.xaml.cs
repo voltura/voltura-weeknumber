@@ -31,7 +31,7 @@ public partial class App : System.Windows.Application
             var paths = AppPaths.Resolve(e.Args);
             _instance = new SingleInstance(paths.Data);
             if (!_instance.IsFirst) { _instance.Dispose(); _instance = null; Shutdown(); return; }
-            _runtime = new AppRuntime(paths);
+            _runtime = new AppRuntime(paths, e.Args.Contains("--trace-dpi", StringComparer.Ordinal));
             _instance.Listen(() => Dispatcher.BeginInvoke(() => _runtime?.Open()));
             await _runtime.StartAsync(e.Args.Contains("--autostart", StringComparer.Ordinal));
             var measureIndex = Array.IndexOf(e.Args, "--measure-idle");
@@ -56,7 +56,7 @@ public partial class App : System.Windows.Application
                 var report = new { startupMilliseconds, idleSeconds = 90, idleCpuMilliseconds = process.TotalProcessorTime.TotalMilliseconds - cpu,
                     handlesBefore = handles, handlesAfter = process.HandleCount, workingSetBefore = memory, workingSetAfter = process.WorkingSet64,
                     iconRendersBefore = renders, iconRendersAfter = _runtime.IconRenderCount, samples,
-                    perMonitorV2 = _runtime.IsPerMonitorV2, dpi = _runtime.CurrentDpi };
+                    perMonitorV2 = _runtime.IsPerMonitorV2, dpi = _runtime.CurrentDpi, window = WindowDpiDiagnostics.Capture(_runtime.Window) };
                 var reportPath = Path.GetFullPath(e.Args[measureIndex + 1]);
                 Directory.CreateDirectory(Path.GetDirectoryName(reportPath)!);
                 await File.WriteAllTextAsync(reportPath, JsonSerializer.Serialize(report, ReportJson));
@@ -77,17 +77,36 @@ public partial class App : System.Windows.Application
                     await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                     Capture(_runtime.Window, Path.Combine(output, "window-" + theme + ".png"));
                 }
+                await File.WriteAllTextAsync(Path.Combine(output, "window-dpi.json"), JsonSerializer.Serialize(WindowDpiDiagnostics.Capture(_runtime.Window), ReportJson));
                 foreach (var language in new[] { "en", "sv", "de" })
                 {
                     await _runtime.ApplyReviewSettingsAsync(new AppSettings { Language = language, Theme = "light" });
                     _runtime.Window.Width = 480; _runtime.Window.Height = 400;
-                    _runtime.Window.Open(1);
+                    foreach (var page in new[] { MainPage.DayOfYear, MainPage.JulianDay })
+                    {
+                        foreach (var reviewTheme in new[] { "light", "dark" })
+                        {
+                            Ui.ThemeManager.Apply(reviewTheme);
+                            _runtime.Window.Width = 640; _runtime.Window.Height = 700;
+                            _runtime.Window.Open(page);
+                            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                            _runtime.Window.UpdateLayout();
+                            Capture(_runtime.Window, Path.Combine(output, page + "-" + language + "-" + reviewTheme + ".png"));
+                            _runtime.Window.Width = 360; _runtime.Window.Height = 520;
+                            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                            _runtime.Window.UpdateLayout();
+                            Capture(_runtime.Window, Path.Combine(output, page + "-" + language + "-" + reviewTheme + "-compact.png"));
+                        }
+                    }
+                    Ui.ThemeManager.Apply("light");
+                    _runtime.Window.Width = 480; _runtime.Window.Height = 400;
+                    _runtime.Window.Open(MainPage.Preferences);
                     _runtime.Window.PrepareReview();
                     await Task.Delay(350);
                     await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                     _runtime.Window.UpdateLayout();
                     Capture(_runtime.Window, Path.Combine(output, "preferences-" + language + "-compact.png"));
-                    _runtime.Window.Open(2);
+                    _runtime.Window.Open(MainPage.About);
                     await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                     _runtime.Window.UpdateLayout();
                     Capture(_runtime.Window, Path.Combine(output, "about-" + language + "-compact.png"));

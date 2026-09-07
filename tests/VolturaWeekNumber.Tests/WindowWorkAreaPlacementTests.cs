@@ -7,6 +7,15 @@ namespace VolturaWeekNumber.Tests;
 
 public sealed class WindowWorkAreaPlacementTests
 {
+    [Theory]
+    [InlineData(96u, 216u, true)]
+    [InlineData(216u, 96u, true)]
+    [InlineData(216u, 216u, false)]
+    [InlineData(0u, 216u, false)]
+    [InlineData(216u, 0u, false)]
+    public void OnlyKnownMismatchedDpiRequiresRecovery(uint windowDpi, uint monitorDpi, bool expected) =>
+        Assert.Equal(expected, WindowWorkAreaPlacement.NeedsDpiRecovery(windowDpi, monitorDpi));
+
     [Fact]
     public void OversizedWindowIsConstrainedToWorkArea()
     {
@@ -135,4 +144,3 @@ public sealed class WindowWorkAreaPlacementTests
         Assert.Equal(new WpfSize(700, 420), size);
     }
 }
-

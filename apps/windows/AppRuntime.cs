@@ -16,6 +16,7 @@ namespace VolturaWeekNumber;
 internal sealed class AppRuntime : IAsyncDisposable
 {
     private readonly AppPaths _paths;
+    private readonly bool _traceDpi;
     private readonly SettingsStore _settings;
     private readonly ApplicationLog _log;
     private readonly UpdateService _updates;
@@ -35,14 +36,20 @@ internal sealed class AppRuntime : IAsyncDisposable
     internal uint CurrentDpi => _tray.CurrentDpi;
     internal int IconRenderCount => _tray.RenderCount;
 
-    public AppRuntime(AppPaths paths)
+    public AppRuntime(AppPaths paths, bool traceDpi = false)
     {
         _paths = paths;
+        _traceDpi = paths.Isolated && traceDpi;
         _settings = new SettingsStore(paths.Data);
         _log = new ApplicationLog(paths.Data);
         _updates = new UpdateService(paths);
         Window = new MainWindow(Model);
-        _tray = new NativeTray();
+        if (_traceDpi)
+        {
+            Window.Title += " · DPI test";
+            WindowDpiDiagnostics.Attach(Window, message => _log.Record(message));
+        }
+        _tray = new NativeTray(promoteVisibility: !paths.Isolated);
         _midnight = new DispatcherTimer(DispatcherPriority.Background, Window.Dispatcher);
         _midnight.Tick += OnMidnight;
         _tray.OpenRequested += Open;
@@ -74,13 +81,13 @@ internal sealed class AppRuntime : IAsyncDisposable
     }
 
     public void Open() { if (!_shuttingDown) Window.Open(); }
-    private void Preferences() => Window.Open(1);
+    private void Preferences() => Window.Open(MainPage.Preferences);
     internal Task ApplyReviewSettingsAsync(AppSettings value)
     {
         if (!_paths.Isolated) throw new InvalidOperationException("Review settings require an isolated profile.");
         return SaveAsync(value);
     }
-    private void NotificationClicked() => Window.Open(_updates.Ready ? 2 : 0);
+    private void NotificationClicked() => Window.Open(_updates.Ready ? MainPage.About : MainPage.WeekNumber);
     private void ApplySettings()
     {
         var settings = _settings.Current;
@@ -88,7 +95,7 @@ internal sealed class AppRuntime : IAsyncDisposable
         ThemeManager.Apply(settings.Theme);
         Model.Apply(settings);
         Window.UpdateLanguage();
-        _log.Enabled = settings.Logging;
+        _log.Enabled = settings.Logging || _traceDpi;
         _tray.RebuildMenu();
         _updates.Start(settings.AutomaticUpdates);
         UpdateChanged();
@@ -114,6 +121,8 @@ internal sealed class AppRuntime : IAsyncDisposable
             TimeZoneInfo.ClearCachedData();
             ThemeManager.Apply(_settings.Current.Theme);
             Refresh(true);
+            WindowWorkAreaPlacement.EnsureVisibleOnCurrentMonitor(Window);
+            if (_traceDpi) _log.Record("DPI system-refresh " + JsonSerializer.Serialize(WindowDpiDiagnostics.Capture(Window)));
         }, DispatcherPriority.ContextIdle);
     }
     private void Refresh(bool notify)
@@ -131,7 +140,8 @@ internal sealed class AppRuntime : IAsyncDisposable
         _calendarIdentity = identity;
         var result = WeekCalculator.Calculate(date, settings.Calendar, region);
         var text = $"{Strings.Current["Week"]} {result.Number:00}\n{date.ToString("dddd, d MMMM yyyy", Strings.Current.Culture)}";
-        _tray.Update(result.Number, IconAppearance.Resolve(settings, ThemeManager.IsTaskbarDark(), SystemParameters.HighContrast), text);
+        _tray.Update(result.Number, IconAppearance.Resolve(settings, ThemeManager.IsTaskbarDark(), SystemParameters.HighContrast),
+            _traceDpi ? "Voltura WeekNumber · DPI test\n" + text : text);
         if (_tracker.Observe(result, notify && rulesUnchanged) && settings.WeekNotification && !_paths.Isolated)
             _tray.Notify(Strings.Current["NewWeek"], text, settings.SilentNotifications);
         Model.Refresh();
