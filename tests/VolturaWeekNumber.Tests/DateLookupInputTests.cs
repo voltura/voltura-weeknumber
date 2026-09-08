@@ -1,4 +1,3 @@
-using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,54 +6,43 @@ using Xunit;
 
 namespace VolturaWeekNumber.Tests;
 
-public sealed class DateLookupInputTests
+[Collection("WPF")]
+public sealed class DateLookupInputTests(WpfTestFixture fixture)
 {
     private static readonly string[] InputCases = ["2461291a", "a", " ", "2461291\n", "2.5", "-1", "１２３", "١٢٣", "2461291", "0123456789"];
     [Fact]
     public void NumberFieldRejectsNonAsciiDigitsFromTypingAndPaste()
     {
-        Exception? failure = null;
-        var thread = new Thread(() =>
+        fixture.Run(() =>
         {
-            var app = new App();
-            try
+            var page = new DateLookupPage { DataContext = new DateLookupViewModel(true) };
+            var input = Assert.IsType<TextBox>(page.FindName("NumberInput"));
+            foreach (var text in InputCases)
             {
-                app.InitializeComponent();
-                var page = new DateLookupPage { DataContext = new DateLookupViewModel(true) };
-                var input = Assert.IsType<TextBox>(page.FindName("NumberInput"));
-                foreach (var text in InputCases)
-                {
-                    var valid = text is "2461291" or "0123456789";
-                    var typing = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
-                        new TextComposition(InputManager.Current, input, text))
-                    { RoutedEvent = TextCompositionManager.PreviewTextInputEvent };
-                    input.RaiseEvent(typing);
-                    Assert.Equal(!valid, typing.Handled);
+                var valid = text is "2461291" or "0123456789";
+                var typing = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
+                    new TextComposition(InputManager.Current, input, text))
+                { RoutedEvent = TextCompositionManager.PreviewTextInputEvent };
+                input.RaiseEvent(typing);
+                Assert.Equal(!valid, typing.Handled);
 
-                    var paste = new DataObjectPastingEventArgs(new DataObject(DataFormats.UnicodeText, text), false, DataFormats.UnicodeText);
-                    input.RaiseEvent(paste);
-                    Assert.Equal(!valid, paste.CommandCancelled);
-                }
-                var source = new System.Windows.Interop.HwndSource(new System.Windows.Interop.HwndSourceParameters("Number input test"));
-                using (source)
-                {
-                    var space = new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Space)
-                    { RoutedEvent = Keyboard.PreviewKeyDownEvent };
-                    input.RaiseEvent(space);
-                    Assert.True(space.Handled);
-                }
-                Assert.False(input.AllowDrop);
-                Assert.False(InputMethod.GetIsInputMethodEnabled(input));
-                VerifyOrdinalInput();
-                VerifyPreferencesNavigation();
+                var paste = new DataObjectPastingEventArgs(new DataObject(DataFormats.UnicodeText, text), false, DataFormats.UnicodeText);
+                input.RaiseEvent(paste);
+                Assert.Equal(!valid, paste.CommandCancelled);
             }
-            catch (Exception error) { failure = error; }
-            finally { app.Shutdown(); }
+            var source = new System.Windows.Interop.HwndSource(new System.Windows.Interop.HwndSourceParameters("Number input test"));
+            using (source)
+            {
+                var space = new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Space)
+                { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+                input.RaiseEvent(space);
+                Assert.True(space.Handled);
+            }
+            Assert.False(input.AllowDrop);
+            Assert.False(InputMethod.GetIsInputMethodEnabled(input));
+            VerifyOrdinalInput();
+            VerifyPreferencesNavigation();
         });
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
-        if (failure is not null) ExceptionDispatchInfo.Capture(failure).Throw();
     }
 
     private static void VerifyPreferencesNavigation()

@@ -101,8 +101,6 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            new WpfSize(853, 459),
-            new WpfSize(853, 459),
             new WpfSize(1920, 1032));
 
         Assert.Equal(new WpfSize(1160, 760), size);
@@ -113,8 +111,6 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            new WpfSize(853, 459),
-            new WpfSize(853, 459),
             new WpfSize(1000, 700));
 
         Assert.Equal(new WpfSize(1000, 700), size);
@@ -125,19 +121,15 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            null,
-            new WpfSize(1160, 760),
             new WpfSize(853, 459));
 
         Assert.Equal(new WpfSize(853, 459), size);
     }
 
     [Fact]
-    public void ManuallyResizedWindowIsNotRestoredAutomatically()
+    public void UserPreferredSizeIsRetainedWhenWorkAreaRecovers()
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
-            new WpfSize(1160, 760),
-            new WpfSize(853, 459),
             new WpfSize(700, 420),
             new WpfSize(1920, 1032));
 

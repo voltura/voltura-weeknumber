@@ -14,6 +14,8 @@ Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The 
 
 The executable declares PerMonitorV2 DPI awareness. Window placement respects monitor work areas. Display changes, activation, and tray reopening trigger recovery checks; a stale window DPI is handled through a native move and bounds restoration so Windows can deliver its DPI-change message.
 
+`WindowWorkAreaPlacement` retains the requested logical size while hidden and across display changes. Only an interactive user resize updates that preference; native bounds changes do not. Recovery fits the retained size to the current work area.
+
 ## Settings and diagnostics
 
 `SettingsStore` validates bounded JSON before replacing current state and writes through a unique temporary file followed by atomic promotion. Installed data lives in `%LOCALAPPDATA%\Voltura\WeekNumber`; portable data lives in `Data` beside the executable. Autostart registration uses an application-owned command under the current user's registry and rolls back if settings persistence fails.
