@@ -73,7 +73,12 @@ internal sealed partial class NativeTray : IDisposable
         _menu.Items.Add(text["WeekTab"], null, (_, _) => OpenRequested?.Invoke());
         _menu.Items.Add(text["Preferences"], null, (_, _) => PreferencesRequested?.Invoke());
         _menu.Items.Add(new Forms.ToolStripSeparator());
-        _menu.Items.Add(text["Exit"], null, (_, _) => ExitRequested?.Invoke());
+
+        var exit = text.Culture.TwoLetterISOLanguageName == "en"
+            ? text["Exit"]
+            : $"{text["Exit"]} / Exit";
+
+        _menu.Items.Add(exit, null, (_, _) => ExitRequested?.Invoke());
 
         var renderer = new TrayMenuRenderer(dark);
 

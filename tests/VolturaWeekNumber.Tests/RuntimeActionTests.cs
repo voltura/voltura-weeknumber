@@ -9,9 +9,12 @@ namespace VolturaWeekNumber.Tests;
 public sealed class RuntimeActionTests(WpfTestFixture fixture)
 {
     [Theory]
-    [InlineData("foreground")]
-    [InlineData("background")]
-    public async Task IncompleteColorShowsValidationInsteadOfEscapingTheDispatcher(string action)
+    [InlineData("foreground", "#FFFFFFFF")]
+    [InlineData("background", "#FF151B26")]
+    public async Task IncompleteColorStartsPickerFromDefaultWithoutEscapingTheDispatcher(
+        string action,
+        string expectedColor
+    )
     {
         var root = Path.Combine(
             Path.GetTempPath(),
@@ -19,7 +22,7 @@ public sealed class RuntimeActionTests(WpfTestFixture fixture)
             Guid.NewGuid().ToString("N")
         );
         AppRuntime? runtime = null;
-        var completed = new TaskCompletionSource<string>(
+        var completed = new TaskCompletionSource<bool>(
             TaskCreationOptions.RunContinuationsAsynchronously
         );
         DispatcherUnhandledExceptionEventHandler unhandled = (_, args) =>
@@ -34,27 +37,44 @@ public sealed class RuntimeActionTests(WpfTestFixture fixture)
             {
                 runtime = new AppRuntime(new(root, false, true));
                 runtime.Window.Dispatcher.UnhandledException += unhandled;
+                runtime.Window.Open(MainPage.Preferences);
                 runtime.Model.Editor.Foreground = "#";
                 runtime.Model.Editor.Background = "#";
-                runtime.Model.PropertyChanged += (_, args) =>
+
+                _ = runtime.Window.Dispatcher.BeginInvoke(() =>
                 {
-                    if (args.PropertyName == nameof(CalendarViewModel.Status))
+                    try
                     {
-                        completed.TrySetResult(runtime.Model.Status);
+                        var picker = Assert.Single(
+                            runtime.Window.OwnedWindows.OfType<ColorPickerWindow>()
+                        );
+
+                        Assert.Equal(expectedColor, picker.SelectedColor);
+                        picker.Close();
+                        completed.TrySetResult(true);
                     }
-                };
+                    catch (Exception error)
+                    {
+                        foreach (var picker in runtime.Window.OwnedWindows.OfType<ColorPickerWindow>())
+                        {
+                            picker.Close();
+                        }
+
+                        completed.TrySetException(error);
+                    }
+                }, DispatcherPriority.ApplicationIdle);
 
                 typeof(AppRuntime)
                     .GetMethod("ActionRequested", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .Invoke(runtime, [action]);
             });
 
-            var status = await completed.Task.WaitAsync(
+            await completed.Task.WaitAsync(
                 TimeSpan.FromSeconds(10),
                 TestContext.Current.CancellationToken
             );
 
-            Assert.StartsWith(Strings.Current["Invalid"], status, StringComparison.Ordinal);
+            fixture.Run(() => Assert.Equal(string.Empty, runtime!.Model.Status));
         }
         finally
         {

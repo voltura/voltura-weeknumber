@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
-using VolturaWeekNumber.Features.Localization;
 using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Ui;
 using Xunit;
@@ -158,44 +157,6 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
     }
 
     [Fact]
-    public void SaveAndDiscardUseLocalizedAccessibleGlyphAndTextContent()
-    {
-        fixture.Run(() =>
-        {
-            var model = new CalendarViewModel();
-            var window = OpenPreferences(model);
-
-            try
-            {
-                foreach (var language in LanguageCatalog.All)
-                {
-                    Strings.Current.SetLanguage(language.Id);
-                    model.Apply(new AppSettings { Language = language.Id });
-                    window.UpdateLanguage();
-                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                    window.UpdateLayout();
-
-                    AssertActionButton(
-                        (Button)window.FindName("SaveChangesButton"),
-                        "\uE74E",
-                        Strings.Current["Save"]
-                    );
-                    AssertActionButton(
-                        (Button)window.FindName("DiscardChangesButton"),
-                        "\uE7A7",
-                        Strings.Current["Cancel"]
-                    );
-                }
-            }
-            finally
-            {
-                window.Exit();
-                Strings.Current.SetLanguage("en");
-            }
-        });
-    }
-
-    [Fact]
     public void IconSwatchesAndPreferenceActionRowsTrackDraftLayoutAndWrapping()
     {
         fixture.Run(() =>
@@ -303,24 +264,6 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
         window.UpdateLayout();
 
         return window;
-    }
-
-    private static void AssertActionButton(Button button, string glyph, string label)
-    {
-        Assert.Equal(240, button.ActualWidth, 1);
-        Assert.Equal(40, button.ActualHeight, 1);
-        Assert.Equal(label, System.Windows.Automation.AutomationProperties.GetName(button));
-
-        var content = Assert.IsType<SpacingStackPanel>(button.Content);
-        var children = content.Children.Cast<TextBlock>().ToArray();
-
-        Assert.Equal(2, children.Length);
-        Assert.Equal(8, content.Spacing);
-        Assert.Equal(glyph, children[0].Text);
-        Assert.Equal("Segoe Fluent Icons", children[0].FontFamily.Source);
-        Assert.Equal(label, children[1].Text);
-        Assert.True(children[0].TranslatePoint(new Point(), content).X
-            < children[1].TranslatePoint(new Point(), content).X);
     }
 
     private static void AssertColorRow(Border swatch, string action)

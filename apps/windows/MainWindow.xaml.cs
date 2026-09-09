@@ -120,9 +120,11 @@ public partial class MainWindow : Window
         AutomaticUpdateCheck.Visibility = eligible
             ? Visibility.Visible
             : Visibility.Collapsed;
+
         var checkUpdateLabel = Strings.Current[eligible
             ? "CheckUpdates"
             : "Downloads"];
+
         CheckUpdateLabel.Text = checkUpdateLabel;
         CheckUpdateGlyph.Text = eligible
             ? "\uE72C"

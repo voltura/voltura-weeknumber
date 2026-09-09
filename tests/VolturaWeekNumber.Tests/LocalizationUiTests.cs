@@ -81,7 +81,12 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
 
                         Assert.Equal(strings["WeekTab"], menu.Items[0].Text);
                         Assert.Equal(strings["Preferences"], menu.Items[1].Text);
-                        Assert.Equal(strings["Exit"], menu.Items[3].Text);
+                        Assert.Equal(
+                            language.Id == "en"
+                                ? strings["Exit"]
+                                : $"{strings["Exit"]} / Exit",
+                            menu.Items[3].Text
+                        );
 
                         foreach (var status in Enum.GetValues<UpdateStatus>())
                         {
@@ -174,6 +179,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                                 new Typeface(button.FontFamily, button.FontStyle, button.FontWeight, button.FontStretch),
                                 button.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(button).PixelsPerDip);
                             var contentWidth = label.Value.Container?.DesiredSize.Width ?? text.Width;
+
                             if (contentWidth > button.ActualWidth - button.Padding.Left - button.Padding.Right + 2)
                             {
                                 failures.Add($"{language.Id}/{page}: {label.Value.Text} ({contentWidth:F1}px in {button.ActualWidth}px button)");
