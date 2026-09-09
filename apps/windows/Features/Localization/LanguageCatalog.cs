@@ -49,7 +49,9 @@ internal static class LanguageCatalog
 
         var parts = windowsCulture.Name.Split('-');
         var root = parts[0].ToLowerInvariant();
+
         bool Has(string part) => parts.Contains(part, StringComparer.OrdinalIgnoreCase);
+
         var resolved = root switch
         {
             "yue" => "yue",
@@ -66,6 +68,7 @@ internal static class LanguageCatalog
         for (var culture = windowsCulture; ; culture = culture.Parent)
         {
             var match = All.FirstOrDefault(language => language.Id == resolved);
+
             if (match is not null)
             {
                 return match;

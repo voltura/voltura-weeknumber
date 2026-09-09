@@ -13,7 +13,9 @@ public sealed class UpdateTests
     public void SignedManifestSelectsExactVariantAndRejectsTampering(bool full)
     {
         using var rsa = RSA.Create(2048);
-        var name = $"VolturaWeekNumber-Setup-1.1.0-win-x64{(full ? "-full" : "")}.exe";
+        var name = $"VolturaWeekNumber-Setup-1.1.0-win-x64{(full
+            ? "-full"
+            : "")}.exe";
         var bytes = JsonSerializer.SerializeToUtf8Bytes(
             new
             {

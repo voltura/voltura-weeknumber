@@ -12,7 +12,9 @@ public sealed class Strings : INotifyPropertyChanged
     public CultureInfo Culture { get; private set; } = CultureInfo.GetCultureInfo("en-GB");
 
     public string this[string key] =>
-        _language.Entries.TryGetValue(key, out var value) ? value : key;
+        _language.Entries.TryGetValue(key, out var value)
+            ? value
+            : key;
 
     public string WeekNumber(int? number) => string.Format(
         Culture,

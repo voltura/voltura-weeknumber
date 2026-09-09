@@ -12,21 +12,27 @@ internal static partial class WindowDpiDiagnostics
     internal static void Attach(Window window, Action<string> record)
     {
         HwndSource? source = null;
+
         window.SourceInitialized += SourceInitialized;
         window.Activated += Activated;
         window.IsVisibleChanged += VisibilityChanged;
         window.Closed += Closed;
+
         void Snapshot(string reason) =>
             record("DPI " + reason + " " + JsonSerializer.Serialize(Capture(window)));
+
         void Activated(object? sender, EventArgs args) => Snapshot("activated");
+
         void VisibilityChanged(object sender, DependencyPropertyChangedEventArgs args) =>
             Snapshot("visibility");
+
         void SourceInitialized(object? sender, EventArgs args)
         {
             source = HwndSource.FromHwnd(new WindowInteropHelper(window).Handle);
             source?.AddHook(Message);
             Snapshot("source-initialized");
         }
+
         nint Message(nint handle, int message, nint word, nint data, ref bool handled)
         {
             if (message is 0x007E or 0x02E0 or 0x001A or 0x0218)
@@ -46,6 +52,7 @@ internal static partial class WindowDpiDiagnostics
 
             return 0;
         }
+
         void Closed(object? sender, EventArgs args)
         {
             source?.RemoveHook(Message);

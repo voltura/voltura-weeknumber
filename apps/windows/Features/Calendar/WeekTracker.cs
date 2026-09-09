@@ -7,6 +7,7 @@ public sealed class WeekTracker
     public bool Observe(WeekResult result, bool notify)
     {
         ArgumentNullException.ThrowIfNull(result);
+
         var changed = _lastStart is { } previous && previous != result.WeekStart;
 
         _lastStart = result.WeekStart;

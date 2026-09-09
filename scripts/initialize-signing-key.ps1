@@ -31,6 +31,7 @@ if ([string]::IsNullOrWhiteSpace($credential.Password))
 }
 
 $rsa = [Security.Cryptography.RSA]::Create(3072)
+
 try
 {
     $parameters = [Security.Cryptography.PbeParameters]::new(
@@ -38,6 +39,7 @@ try
         [Security.Cryptography.HashAlgorithmName]::SHA256,
         210000)
     $pem = $rsa.ExportEncryptedPkcs8PrivateKeyPem($credential.Password, $parameters)
+
     New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($keyFile)) -Force | Out-Null
     [IO.File]::WriteAllText($keyFile, $pem)
     [IO.File]::WriteAllText($publicFile, $rsa.ExportSubjectPublicKeyInfoPem())
@@ -47,6 +49,7 @@ finally
 {
     $rsa.Dispose()
     $password.Dispose()
+
     $credential = $null
     $pem = $null
 }

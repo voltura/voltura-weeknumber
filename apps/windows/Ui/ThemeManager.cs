@@ -39,7 +39,9 @@ internal static class ThemeManager
         }
 
 #pragma warning restore WPF0001
+
         _highContrast = highContrast;
+
         using var key = Registry.CurrentUser.OpenSubKey(
             @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
         );
@@ -57,27 +59,51 @@ internal static class ThemeManager
         // Resolve actual colors on every event, including palette changes while high contrast stays on.
         SetBrush(
             "WindowBrush",
-            highContrast ? SystemColors.WindowColor : Rgb(dark ? 0x111720u : 0xF4F6FAu)
+            highContrast
+                ? SystemColors.WindowColor
+                : Rgb(dark
+                    ? 0x111720u
+                    : 0xF4F6FAu)
         );
         SetBrush(
             "SurfaceBrush",
-            highContrast ? SystemColors.WindowColor : Rgb(dark ? 0x1B2431u : 0xFFFFFFu)
+            highContrast
+                ? SystemColors.WindowColor
+                : Rgb(dark
+                    ? 0x1B2431u
+                    : 0xFFFFFFu)
         );
         SetBrush(
             "TextBrush",
-            highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0xF1F5FBu : 0x17253Bu)
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0xF1F5FBu
+                    : 0x17253Bu)
         );
         SetBrush(
             "MutedBrush",
-            highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0xB4C2D3u : 0x52627Au)
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0xB4C2D3u
+                    : 0x52627Au)
         );
         SetBrush(
             "AccentBrush",
-            highContrast ? SystemColors.HighlightColor : Rgb(dark ? 0x87B5FFu : 0x245CB4u)
+            highContrast
+                ? SystemColors.HighlightColor
+                : Rgb(dark
+                    ? 0x87B5FFu
+                    : 0x245CB4u)
         );
         SetBrush(
             "BorderBrush",
-            highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0x354155u : 0xD9E0EBu)
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0x354155u
+                    : 0xD9E0EBu)
         );
     }
 
@@ -90,7 +116,6 @@ internal static class ThemeManager
 
         if (resources[key] is SolidColorBrush current && current.Color == color)
         {
-
             return;
         }
 

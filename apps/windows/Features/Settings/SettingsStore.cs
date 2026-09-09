@@ -72,6 +72,7 @@ public sealed class SettingsStore(string directory) : IDisposable
     {
         settings.Validate();
         await _gate.WaitAsync();
+
         try
         {
             await WriteAsync(FilePath, settings);
@@ -86,9 +87,11 @@ public sealed class SettingsStore(string directory) : IDisposable
     public static async Task WriteAsync(string path, AppSettings settings)
     {
         settings.Validate();
+
         var full = Path.GetFullPath(path);
 
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
+
         var temporary = full + "." + Guid.NewGuid().ToString("N") + ".pending";
 
         try
@@ -107,6 +110,7 @@ public sealed class SettingsStore(string directory) : IDisposable
                 await JsonSerializer.SerializeAsync(file, settings, JsonOptions);
                 await file.FlushAsync();
             }
+
             File.Move(temporary, full, true);
         }
         finally

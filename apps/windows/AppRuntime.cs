@@ -85,6 +85,7 @@ internal sealed class AppRuntime : IAsyncDisposable
             _settingsDamaged = true;
             Model.Status = Strings.Current["SettingsRecovery"];
         }
+
         ApplySettings();
 
         if (_settingsDamaged)
@@ -132,7 +133,9 @@ internal sealed class AppRuntime : IAsyncDisposable
     }
 
     private void NotificationClicked() =>
-        Window.Open(_updates.State.Ready ? MainPage.About : MainPage.WeekNumber);
+        Window.Open(_updates.State.Ready
+            ? MainPage.About
+            : MainPage.WeekNumber);
 
     private void ApplySettings()
     {
@@ -152,7 +155,6 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_hiddenExplained || _paths.Isolated)
         {
-
             return;
         }
 
@@ -179,7 +181,6 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_shuttingDown || Interlocked.Exchange(ref _refreshPending, 1) != 0)
         {
-
             return;
         }
 
@@ -190,7 +191,6 @@ internal sealed class AppRuntime : IAsyncDisposable
 
                 if (_shuttingDown)
                 {
-
                     return;
                 }
 
@@ -218,11 +218,11 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_shuttingDown)
         {
-
             return;
         }
 
         _midnight.Stop();
+
         var date = DateOnly.FromDateTime(now.LocalDateTime);
         var settings = _settings.Current;
         var region = CultureInfo.CurrentCulture;
@@ -237,7 +237,6 @@ internal sealed class AppRuntime : IAsyncDisposable
         var identity =
             $"{settings.Calendar.Mode}/{region.DateTimeFormat.Calendar.GetType().FullName}/{firstDay}/{rule}";
         var rulesUnchanged = _calendarIdentity == identity;
-
         WeekResult? result = null;
 
         try
@@ -251,7 +250,11 @@ internal sealed class AppRuntime : IAsyncDisposable
 
         // A failed calculation must neither leave a stale week in the tray nor
         // announce a new week when a supported date becomes available again.
-        _calendarIdentity = result is null ? null : identity;
+
+        _calendarIdentity = result is null
+            ? null
+            : identity;
+
         var text = result is null
             ? $"{Strings.Current.WeekNumber(null)}\n{Strings.Current["Invalid"]}"
             : $"{Strings.Current.WeekNumber(result.Number)}\n{date.ToString("D", Strings.Current.Culture)}";
@@ -263,7 +266,9 @@ internal sealed class AppRuntime : IAsyncDisposable
                 ThemeManager.IsTaskbarDark(),
                 SystemParameters.HighContrast
             ),
-            _traceDpi ? "Voltura WeekNumber · DPI test\n" + text : text
+            _traceDpi
+                ? "Voltura WeekNumber · DPI test\n" + text
+                : text
         );
 
         if (
@@ -285,7 +290,6 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_shuttingDown)
         {
-
             return;
         }
 
@@ -293,7 +297,6 @@ internal sealed class AppRuntime : IAsyncDisposable
         {
             if (_shuttingDown)
             {
-
                 return;
             }
 
@@ -315,9 +318,14 @@ internal sealed class AppRuntime : IAsyncDisposable
 
     private async void ActionRequested(string action)
     {
+        if (action == "about-update"
+            && (!_settings.Current.AutomaticUpdates || !_updates.Eligible))
+        {
+            return;
+        }
+
         if (_shuttingDown || !await _actions.WaitAsync(0))
         {
-
             return;
         }
 
@@ -342,7 +350,9 @@ internal sealed class AppRuntime : IAsyncDisposable
             _log.Record(action, error);
             Model.Status =
                 Strings.Current[
-                    error is InvalidDataException or ArgumentException ? "Invalid" : "Error"
+                    error is InvalidDataException or ArgumentException
+                        ? "Invalid"
+                        : "Error"
                 ]
                 + " "
                 + error.Message;
@@ -385,10 +395,13 @@ internal sealed class AppRuntime : IAsyncDisposable
 
             throw;
         }
+
         _settingsDamaged = false;
         ApplySettings();
         Refresh(false);
-        Model.Status = Strings.Current[imported ? "Imported" : "Saved"];
+        Model.Status = Strings.Current[imported
+            ? "Imported"
+            : "Saved"];
         _log.Record("Settings saved");
     }
 
@@ -427,11 +440,16 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "foreground":
             case "background":
                 var foreground = action == "foreground";
-                var color = foreground ? Model.Editor.Foreground : Model.Editor.Background;
+                var color = foreground
+                    ? Model.Editor.Foreground
+                    : Model.Editor.Background;
 
                 AppSettings.ValidateColor(color);
+
                 var colorPicker = new ColorPickerWindow(
-                    Strings.Current[foreground ? "Foreground" : "Background"],
+                    Strings.Current[foreground
+                        ? "Foreground"
+                        : "Background"],
                     color
                 )
                 {
@@ -520,6 +538,7 @@ internal sealed class AppRuntime : IAsyncDisposable
 
                 Launch(_log.FilePath);
                 break;
+            case "about-update":
             case "check-update":
 
                 if (_updates.Eligible)
@@ -563,7 +582,6 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_shuttingDown)
         {
-
             return;
         }
 

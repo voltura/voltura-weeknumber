@@ -35,10 +35,12 @@ public sealed partial class WindowWorkAreaPlacementUiTests(WpfTestFixture fixtur
 
             WindowWorkAreaPlacement.ConstrainAndCenterOnFirstLoad(window);
             WindowWorkAreaPlacement.KeepVisibleAfterDisplayChanges(window);
+
             try
             {
                 window.Show();
                 DoWpfEvents();
+
                 var preferred = new System.Windows.Size(window.Width, window.Height);
                 var handle = new WindowInteropHelper(window).Handle;
                 var scale = PlacementGetDpiForWindow(handle) / 96d;
@@ -67,6 +69,7 @@ public sealed partial class WindowWorkAreaPlacementUiTests(WpfTestFixture fixtur
                     );
                     _ = PlacementSendMessage(handle, 0x007E, 0, 0); // Display change during the drag
                     DoWpfEvents();
+
                     var duringDrag = new System.Windows.Size(window.Width, window.Height);
 
                     if (interactiveResize)

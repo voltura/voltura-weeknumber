@@ -16,6 +16,7 @@ if (-not (Test-Path -LiteralPath $publicPath))
 $passphrase = $null
 $credential = $null
 $rsa = [Security.Cryptography.RSA]::Create()
+
 try
 {
     if ([string]::IsNullOrWhiteSpace($env:VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE))
@@ -52,6 +53,7 @@ try
     $assets = @('', '-full') | ForEach-Object {
         $name = "VolturaWeekNumber-Setup-$version-win-x64$_.exe"
         $file = Get-Item -LiteralPath (Join-Path $publish $name)
+
         [ordered]@{
             name = $name
             size = $file.Length
@@ -67,15 +69,18 @@ try
         $bytes,
         [Security.Cryptography.HashAlgorithmName]::SHA256,
         [Security.Cryptography.RSASignaturePadding]::Pss)
+
     [IO.File]::WriteAllBytes((Join-Path $publish "VolturaWeekNumber-Update-$version.json"), $bytes)
     [IO.File]::WriteAllBytes((Join-Path $publish "VolturaWeekNumber-Update-$version.sig"), $signature)
 }
 finally
 {
     $rsa.Dispose()
+
     if ($null -ne $passphrase)
     {
         $passphrase.Dispose()
     }
+
     $credential = $null
 }

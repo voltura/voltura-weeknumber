@@ -11,6 +11,7 @@ public sealed partial class InstallerLocalizationTests
     {
         var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "InstallerLanguages.nsh"));
         var languages = LanguageDeclarations().Matches(source);
+
         Assert.Equal(LanguageCatalog.All.Count, languages.Count);
         Assert.Equal(languages.Count, languages.Select(match => match.Groups[2].Value).Distinct().Count());
         Assert.Equal(
@@ -18,10 +19,12 @@ public sealed partial class InstallerLocalizationTests
             languages.Select(match => (match.Groups[1].Value, match.Groups[3].Value)));
 
         var messages = MessageDeclarations().Matches(source);
+
         Assert.Equal(languages.Count, messages.Count);
         Assert.Equal(
             languages.Select(match => match.Groups[2].Value).Order(),
             messages.Select(match => match.Groups[1].Value).Order());
+
         foreach (Match message in messages)
         {
             // Each language must provide all four application-owned messages.

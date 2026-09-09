@@ -49,6 +49,7 @@ public sealed partial class WpfTestFixture : IDisposable
             {
                 ready.Set();
             }
+
             try
             {
                 if (failure is null)
@@ -64,6 +65,7 @@ public sealed partial class WpfTestFixture : IDisposable
         {
             IsBackground = true,
         };
+
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
         ready.Wait();

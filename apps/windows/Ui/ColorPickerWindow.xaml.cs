@@ -14,6 +14,7 @@ public partial class ColorPickerWindow : Window
         Language = System.Windows.Markup.XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
         Title = title;
         SelectedColor = value;
+
         var color = (Color)ColorConverter.ConvertFromString(value);
 
         Red.Value = color.R;

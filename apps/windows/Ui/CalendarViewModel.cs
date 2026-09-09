@@ -75,7 +75,9 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
 
         DayOfYear.Refresh(today);
         JulianDay.Refresh(today);
+
         var strings = Strings.Current;
+
         WeekYearText = string.Empty;
         ConventionText = strings[
             _settings.Calendar.Mode switch
@@ -102,6 +104,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
                     result.IsoYear is { } year && year != date.Year
                         ? $"{strings["IsoYear"]}: {year}"
                         : string.Empty;
+
                 var appearance = IconAppearance.Resolve(
                     _settings,
                     ThemeManager.IsTaskbarDark(),

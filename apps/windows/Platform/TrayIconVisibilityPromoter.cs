@@ -19,6 +19,7 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
         {
             Interval = TimeSpan.FromMilliseconds(250),
         };
+
         _timer.Tick += OnTick;
     }
 
@@ -26,7 +27,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
     {
         if (_disposed)
         {
-
             return;
         }
 
@@ -57,7 +57,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
     {
         if (_disposed)
         {
-
             return;
         }
 
@@ -72,7 +71,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
 
         if (Environment.ProcessPath is not { Length: > 0 } executablePath)
         {
-
             return true;
         }
 
@@ -85,7 +83,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
 
             if (root is null)
             {
-
                 return true;
             }
 
@@ -98,7 +95,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
                         or System.Security.SecurityException
             )
         {
-
             return true;
         }
     }
@@ -110,6 +106,7 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
     )
     {
         changed = false;
+
         var matchedEntry = false;
         var normalizedExecutablePath = NormalizePath(executablePath);
 
@@ -137,7 +134,6 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
 
     private static bool PathsEqual(string path, string? candidate)
     {
-
         return candidate is { Length: > 0 }
             && string.Equals(path, NormalizePath(candidate), StringComparison.OrdinalIgnoreCase);
     }
@@ -146,23 +142,19 @@ internal sealed class TrayIconVisibilityPromoter : IDisposable
     {
         try
         {
-
             return Path.GetFullPath(path)
                 .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
         catch (ArgumentException)
         {
-
             return path;
         }
         catch (NotSupportedException)
         {
-
             return path;
         }
         catch (PathTooLongException)
         {
-
             return path;
         }
     }

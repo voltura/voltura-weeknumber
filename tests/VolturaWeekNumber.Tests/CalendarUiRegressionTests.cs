@@ -19,8 +19,11 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             var model = new CalendarViewModel();
+
             model.Apply(new AppSettings { Calendar = new(CalendarMode.Iso) });
+
             var tomorrow = DateTime.Today.AddDays(1);
+
             model.Refresh(tomorrow);
             Assert.Equal(tomorrow, model.SelectedDate);
 
@@ -39,15 +42,21 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             var model = new CalendarViewModel();
+
             model.Apply(new AppSettings { Calendar = new(CalendarMode.Iso) });
+
             var window = new MainWindow(model);
+
             try
             {
                 window.Open();
+
                 var tomorrow = DateTime.Today.AddDays(1);
+
                 for (var offset = 0; offset < 2; offset++)
                 {
                     var date = tomorrow.AddDays(offset);
+
                     model.Refresh(date);
                     window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                     Assert.Equal(date, model.SelectedDate);
@@ -74,9 +83,11 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             var previous = CultureInfo.CurrentCulture;
+
             try
             {
                 var model = new CalendarViewModel();
+
                 model.Apply(new AppSettings { Calendar = new(CalendarMode.Iso) });
                 model.SelectedDate = new DateTime(2021, 1, 1);
                 Assert.NotEmpty(model.WeekYearText);
@@ -103,13 +114,17 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             var model = new CalendarViewModel();
+
             model.DayOfYear.SelectedDate = new DateTime(2024, 12, 31);
+
             var window = new MainWindow(model);
+
             try
             {
                 window.Open(MainPage.DayOfYear);
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 Assert.Equal("366", model.DayOfYear.NumberInput);
+
                 var tabs = Assert.IsType<TabControl>(window.FindName("Tabs"));
                 var page = Assert.IsType<DateLookupPage>(
                     Assert.IsType<TabItem>(tabs.SelectedItem).Content
@@ -128,7 +143,9 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
                 {
                     model.DayOfYear.SelectedDate = date;
                     window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
                     var expected = date.DayOfYear.ToString("D3", CultureInfo.InvariantCulture);
+
                     Assert.Equal(expected, model.DayOfYear.Result);
                     Assert.Equal(expected, model.DayOfYear.NumberInput);
                     Assert.Equal(expected, number.Text);

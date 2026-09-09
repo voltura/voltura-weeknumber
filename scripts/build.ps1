@@ -1,7 +1,11 @@
 $ErrorActionPreference = 'Stop'
+
 Push-Location (Split-Path $PSScriptRoot -Parent)
+
 try
 {
+    & "$PSScriptRoot/format.ps1" -Check
+
     dotnet build VolturaWeekNumber.slnx -c Release -p:RestoreLockedMode=true
 
     if ($LASTEXITCODE)

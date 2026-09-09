@@ -33,10 +33,12 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             handler,
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await service.CheckAsync();
+
         var installer = Directory
             .GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe")
             .Single();
@@ -72,7 +74,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             handler,
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
         Task check = Task.CompletedTask;
         var dispatcherThread = 0;
@@ -90,12 +93,14 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         Assert.All(callbackThreads, thread => Assert.NotEqual(dispatcherThread, thread));
         Assert.All(handler.RequestThreads, thread => Assert.NotEqual(dispatcherThread, thread));
         callbackThreads.Clear();
+
         await using var restart = new UpdateService(
             new(_root, false, true),
             new ReleaseHandler(key),
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         restart.Changed += () => callbackThreads.Add(Environment.CurrentManagedThreadId);
@@ -112,6 +117,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         using var handler = new WaitingHandler();
         var service = new UpdateService(new(_root, false, true), handler, eligible: true);
         Task check = Task.CompletedTask;
+
         try
         {
             fixture.Run(() => check = service.CheckAsync());
@@ -122,9 +128,11 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         finally
         {
             Task shutdown = Task.CompletedTask;
+
             fixture.Run(() => shutdown = service.DisposeAsync().AsTask());
             await shutdown.WaitAsync(TestContext.Current.CancellationToken);
         }
+
         await check;
         Assert.False(service.State.Ready);
     }
@@ -141,7 +149,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 new ReleaseHandler(key),
                 key.ExportSubjectPublicKeyInfoPem(),
                 true,
-                false
+                false,
+            current: new(1, 0, 0)
             )
         )
         {
@@ -149,16 +158,19 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             Assert.True(service.State.Ready);
             Assert.Equal(UpdateStatus.Ready, service.State.Status);
         }
+
         await using var restored = new UpdateService(
             paths,
             new ReleaseHandler(key),
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await restored.RestorePendingAsync();
         Assert.True(restored.State.Ready);
+
         var installer = Directory
             .GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe")
             .Single();
@@ -183,7 +195,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             new ReleaseHandler(key, failure),
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await service.CheckAsync();
@@ -204,12 +217,14 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             "incomplete",
             TestContext.Current.CancellationToken
         );
+
         await using var service = new UpdateService(
             new(_root, false, true),
             new ReleaseHandler(key),
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await service.RestorePendingAsync();
@@ -253,13 +268,15 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 new ReleaseHandler(key),
                 key.ExportSubjectPublicKeyInfoPem(),
                 true,
-                full
+                full,
+            current: new(1, 0, 0)
             )
         )
         {
             await previous.CheckAsync();
             Assert.True(previous.State.Ready);
         }
+
         var handler = new ReleaseHandler(key);
         await using var upgraded = new UpdateService(
             paths,
@@ -297,7 +314,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 new ReleaseHandler(key),
                 key.ExportSubjectPublicKeyInfoPem(),
                 true,
-                false
+                false,
+            current: new(1, 0, 0)
             )
         )
         {
@@ -309,12 +327,14 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             [9, 9, 9],
             TestContext.Current.CancellationToken
         );
+
         await using var restarted = new UpdateService(
             paths,
             new ReleaseHandler(key),
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await restarted.RestorePendingAsync();
@@ -334,7 +354,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             handler,
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await service.CheckAsync();
@@ -367,7 +388,8 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 handler,
                 key.ExportSubjectPublicKeyInfoPem(),
                 true,
-                false
+                false,
+            current: new(1, 0, 0)
             )
         )
         {
@@ -378,15 +400,18 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             Assert.Equal(UpdateStatus.UpdateDownloadFailed, service.State.Status);
             Assert.False(File.Exists(Path.Combine(_root, "Updates", "pending", "manifest.json")));
         }
+
         var retryHandler = new ReleaseHandler(key);
 
         retryHandler.SetRelease(key, "1.2.0");
+
         await using var restart = new UpdateService(
             paths,
             retryHandler,
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
 
         await restart.RestorePendingAsync();
@@ -402,22 +427,26 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         using var key = RSA.Create(2048);
         var paths = new AppPaths(_root, false, true);
         string installer;
+
         await using (
             var previous = new UpdateService(
                 paths,
                 new ReleaseHandler(key),
                 key.ExportSubjectPublicKeyInfoPem(),
                 true,
-                false
+                false,
+            current: new(1, 0, 0)
             )
         )
         {
             await previous.CheckAsync();
             installer = previous.State.Installer!;
         }
+
         var unrelated = Path.Combine(Path.GetDirectoryName(installer)!, "keep.txt");
 
         await File.WriteAllTextAsync(unrelated, "user data", TestContext.Current.CancellationToken);
+
         await using var upgraded = new UpdateService(
             paths,
             new ReleaseHandler(key),
@@ -434,6 +463,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             await upgraded.CheckAsync();
             Assert.Equal(UpdateStatus.Current, upgraded.State.Status);
         }
+
         await upgraded.CheckAsync();
         Assert.False(File.Exists(installer));
         Assert.Equal(
@@ -456,6 +486,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             key.ExportSubjectPublicKeyInfoPem(),
             true,
             false,
+            current: new(1, 0, 0),
             install: async (path, token) =>
             {
                 Assert.True(File.Exists(path));
@@ -466,6 +497,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         );
 
         await service.CheckAsync();
+
         var install = service.InstallAsync();
 
         try
@@ -475,6 +507,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 TestContext.Current.CancellationToken
             );
             Assert.True(service.State.Busy);
+
             var requests = handler.Requests.Count;
 
             await service.CheckAsync();
@@ -486,6 +519,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         {
             closed.TrySetResult();
         }
+
         Assert.True(await install);
         Assert.True(service.State.Ready);
         Assert.True(await service.InstallAsync());
@@ -504,9 +538,11 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             key.ExportSubjectPublicKeyInfoPem(),
             true,
             false,
+            current: new(1, 0, 0),
             install: (_, _) =>
             {
                 launches++;
+
                 return Task.CompletedTask;
             }
         );
@@ -518,10 +554,13 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             .GetValue(service)!;
         // Hold the same gate as an operation which has acquired it but has not
         // yet resumed after ForceYielding to publish its busy state.
+
         await gate.WaitAsync(TestContext.Current.CancellationToken);
+
         Task check;
         Task<bool> install;
         bool returnedImmediately;
+
         try
         {
             check = service.CheckAsync();
@@ -532,8 +571,11 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         {
             gate.Release();
         }
+
         await check;
+
         var installed = await install;
+
         Assert.True(returnedImmediately);
         Assert.False(installed);
         Assert.Empty(handler.Requests);
@@ -553,13 +595,19 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             handler,
             key.ExportSubjectPublicKeyInfoPem(),
             true,
-            false
+            false,
+            current: new(1, 0, 0)
         );
         MainWindow window = null!;
+
         fixture.Run(() =>
         {
             Strings.Current.SetLanguage(language);
-            window = new(new CalendarViewModel()) { Width = 560 };
+            window = new(new CalendarViewModel())
+            {
+                Width = 560
+            };
+
             window.Open(MainPage.About);
         });
         service.Changed += () =>
@@ -567,6 +615,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             {
                 window.UpdateState(service.State, service.Eligible);
                 window.UpdateLayout();
+
                 var status = Assert.IsType<TextBlock>(window.FindName("UpdateStatus"));
                 var check = Assert.IsType<Button>(window.FindName("CheckUpdateButton"));
                 var install = Assert.IsType<Button>(window.FindName("InstallButton"));
@@ -583,15 +632,16 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                         : Visibility.Collapsed,
                     install.Visibility
                 );
+
                 var output = Environment.GetEnvironmentVariable("VOLTURA_UPDATE_REVIEW_DIR");
 
                 if (output is null)
                 {
-
                     return;
                 }
 
                 Directory.CreateDirectory(output);
+
                 var bitmap = new RenderTargetBitmap(
                     (int)window.ActualWidth,
                     (int)window.ActualHeight,
@@ -606,6 +656,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                     CalendarIconRenderer.Png(bitmap)
                 );
             });
+
         try
         {
             await service.CheckAsync();
@@ -639,7 +690,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         }
     }
 
-    private sealed class ReleaseHandler : HttpMessageHandler
+    internal sealed class ReleaseHandler : HttpMessageHandler
     {
         private string _version = "1.1.0";
         private string Installer => $"VolturaWeekNumber-Setup-{_version}-win-x64.exe";
@@ -691,6 +742,7 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
 
             Requests.Add(name);
             RequestThreads.Add(Environment.CurrentManagedThreadId);
+
             byte[] body;
 
             if (name == "latest")
@@ -698,31 +750,19 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                 body =
                     Failure == "malformed"
                         ? "{}"u8.ToArray()
-                        : JsonSerializer.SerializeToUtf8Bytes(
-                            new
+                        : JsonSerializer.SerializeToUtf8Bytes(new
+                        {
+                            tag_name = "v" + _version,
+                            draft = false,
+                            prerelease = false,
+                            assets = new[] { Installer, Installer.Replace(".exe", "-full.exe", StringComparison.Ordinal), $"VolturaWeekNumber-Update-{_version}.json", $"VolturaWeekNumber-Update-{_version}.sig", }.Select(asset => new
                             {
-                                tag_name = "v" + _version,
-                                draft = false,
-                                prerelease = false,
-                                assets = new[]
-                                {
-                                    Installer,
-                                    Installer.Replace(
-                                        ".exe",
-                                        "-full.exe",
-                                        StringComparison.Ordinal
-                                    ),
-                                    $"VolturaWeekNumber-Update-{_version}.json",
-                                    $"VolturaWeekNumber-Update-{_version}.sig",
-                                }
-                                    .Select(asset => new
-                                    {
-                                        name = asset,
-                                        browser_download_url = $"https://{(Failure == "bad-origin" ? "example.com" : "github.com")}/voltura/voltura-weeknumber/releases/download/v{_version}/{asset}",
-                                    })
-                                    .ToArray(),
-                            }
-                        );
+                                name = asset,
+                                browser_download_url = $"https://{(Failure == "bad-origin"
+                            ? "example.com"
+                            : "github.com")}/voltura/voltura-weeknumber/releases/download/v{_version}/{asset}",
+                            }).ToArray(),
+                        });
             }
             else if (name.EndsWith(".json", StringComparison.Ordinal))
             {

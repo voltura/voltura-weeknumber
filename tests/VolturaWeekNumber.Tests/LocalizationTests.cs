@@ -17,22 +17,30 @@ public sealed class LocalizationTests
     {
         Assert.Equal(21, LanguageCatalog.All.Count);
         Assert.Equal(21, LanguageCatalog.All.Select(language => language.Id).Distinct().Count());
+
         var english = LanguageCatalog.All[0].Entries;
+
         Assert.Equal(91, english.Count);
+
         foreach (var language in LanguageCatalog.All)
         {
             Assert.IsType<GregorianCalendar>(CultureInfo.GetCultureInfo(language.CultureName).Calendar);
             Assert.Equal(english.Keys.Order(), language.Entries.Keys.Order());
             Assert.False(string.IsNullOrWhiteSpace(language.NativeName));
+
             foreach (var (key, value) in language.Entries)
             {
                 Assert.False(string.IsNullOrWhiteSpace(value), $"{language.Id}/{key}");
                 Assert.DoesNotContain('\uFFFD', value);
+
                 var format = CompositeFormat.Parse(value);
+
                 Assert.Equal(CompositeFormat.Parse(english[key]).MinimumArgumentCount, format.MinimumArgumentCount);
+
                 if (key == "WeekNumberFormat")
                 {
                     var formatted = string.Format(CultureInfo.InvariantCulture, value, "37");
+
                     Assert.Contains("37", formatted, StringComparison.Ordinal);
                 }
             }
@@ -44,21 +52,30 @@ public sealed class LocalizationTests
     public async Task LanguageSurvivesSaveRestartAndExportImport(string language)
     {
         var root = Path.Combine(Path.GetTempPath(), "VolturaWeekNumber-tests", Guid.NewGuid().ToString("N"));
+
         try
         {
             var settings = new AppSettings { Language = language };
+
             settings.Validate();
+
             using (var store = new SettingsStore(root))
             {
                 await store.SaveAsync(settings);
             }
+
             using var restarted = new SettingsStore(root);
+
             await restarted.LoadAsync();
             Assert.Equal(settings, restarted.Current);
             Assert.Equal(1, restarted.Current.Schema);
+
             var export = Path.Combine(root, "export.json");
+
             await SettingsStore.WriteAsync(export, restarted.Current);
+
             var imported = await SettingsStore.ReadAsync(export);
+
             await restarted.SaveAsync(imported);
             Assert.Equal(settings, restarted.Current);
         }
@@ -123,8 +140,10 @@ public sealed class LocalizationTests
     public void ExplicitSelectionOverridesWindowsAndKeepsChoiceIdentities(string language)
     {
         Assert.Equal(language, LanguageCatalog.Resolve(language, CultureInfo.GetCultureInfo("ar-SA")).Id);
+
         var editor = new SettingsEditor();
         var choices = editor.Languages.ToArray();
+
         Assert.Equal(22, choices.Length);
         Assert.Equal("system", choices[0].Value);
         Assert.Equal(LanguageCatalog.All.Select(item => item.Id), choices.Skip(1).Select(item => item.Value));
@@ -157,6 +176,7 @@ public sealed class LocalizationTests
     public void EastAsianWeekPhrasesAndMissingWeekKeepNaturalOrder()
     {
         var strings = new Strings();
+
         strings.SetLanguage("ja");
         Assert.Equal("第37週", strings.WeekNumber(37));
         strings.SetLanguage("ko");

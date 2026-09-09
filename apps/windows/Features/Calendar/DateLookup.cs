@@ -21,7 +21,9 @@ public static class DateLookup
     {
         var start = new DateOnly(year, 1, 1);
 
-        if (day < 1 || day > (DateTime.IsLeapYear(year) ? 366 : 365))
+        if (day < 1 || day > (DateTime.IsLeapYear(year)
+            ? 366
+            : 365))
         {
             throw new ArgumentOutOfRangeException(nameof(day));
         }

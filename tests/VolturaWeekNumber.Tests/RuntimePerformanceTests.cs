@@ -31,6 +31,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                 "AccentBrush",
                 "BorderBrush",
             ];
+
             try
             {
                 foreach (var choice in ThemeChoices)
@@ -47,6 +48,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                         app.ThemeMode
                     );
 #pragma warning restore WPF0001
+
                     var dictionaries = app.Resources.MergedDictionaries.ToArray();
                     var brushes = keys.Select(key => app.Resources[key]).ToArray();
 
@@ -54,11 +56,14 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                     {
                         ThemeManager.Apply(choice);
                     }
+
                     Assert.Equal(dictionaries.Length, app.Resources.MergedDictionaries.Count);
+
                     for (var i = 0; i < dictionaries.Length; i++)
                     {
                         Assert.Same(dictionaries[i], app.Resources.MergedDictionaries[i]);
                     }
+
                     for (var i = 0; i < keys.Length; i++)
                     {
                         Assert.Same(brushes[i], app.Resources[keys[i]]);
@@ -78,6 +83,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             ThemeManager.Apply("system");
+
             var resources = Application.Current.Resources;
             var dictionaries = resources.MergedDictionaries.ToArray();
             // Simulate the previous contrast state, without changing the user's Windows settings.
@@ -90,9 +96,11 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                 dictionaries,
                 dictionary => !resources.MergedDictionaries.Contains(dictionary)
             );
+
             var updated = resources.MergedDictionaries.ToArray();
 
             ThemeManager.Apply("system");
+
             for (var i = 0; i < updated.Length; i++)
             {
                 Assert.Same(updated[i], resources.MergedDictionaries[i]);
@@ -115,25 +123,32 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                 "AccentBrush",
                 "BorderBrush",
             ];
+
             try
             {
                 foreach (var dark in PaletteModes)
                 {
                     ThemeManager.ApplyPalette(dark, false);
+
                     var normal = keys.Select(key =>
                             Assert.IsType<SolidColorBrush>(resources[key]).Color
                         )
                         .ToArray();
 
                     Assert.Equal(
-                        (Color)ColorConverter.ConvertFromString(dark ? "#111720" : "#F4F6FA"),
+                        (Color)ColorConverter.ConvertFromString(dark
+                            ? "#111720"
+                            : "#F4F6FA"),
                         normal[0]
                     );
                     Assert.Equal(
-                        (Color)ColorConverter.ConvertFromString(dark ? "#F1F5FB" : "#17253B"),
+                        (Color)ColorConverter.ConvertFromString(dark
+                            ? "#F1F5FB"
+                            : "#17253B"),
                         normal[2]
                     );
                     ThemeManager.ApplyPalette(dark, true);
+
                     Color[] expected =
                     [
                         SystemColors.WindowColor,
@@ -143,6 +158,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                         SystemColors.HighlightColor,
                         SystemColors.WindowTextColor,
                     ];
+
                     for (var i = 0; i < keys.Length; i++)
                     {
                         Assert.Equal(
@@ -152,7 +168,9 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                         // A stale color must be repaired even though the selected palette mode has not changed.
                         resources[keys[i]] = new SolidColorBrush(Colors.Transparent);
                     }
+
                     ThemeManager.ApplyPalette(dark, true);
+
                     for (var i = 0; i < keys.Length; i++)
                     {
                         var brush = Assert.IsType<SolidColorBrush>(resources[keys[i]]);
@@ -160,7 +178,9 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                         Assert.Equal(expected[i], brush.Color);
                         Assert.True(brush.IsFrozen);
                     }
+
                     ThemeManager.ApplyPalette(dark, false);
+
                     for (var i = 0; i < keys.Length; i++)
                     {
                         Assert.Equal(
@@ -183,6 +203,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             Strings.Current.SetLanguage("en");
+
             try
             {
                 var settings = new AppSettings
@@ -194,15 +215,19 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
 
                 model.Apply(settings);
                 model.SelectedDate = new DateTime(2026, 9, 7);
+
                 var preview = model.Preview;
 
                 Assert.NotNull(preview);
                 Assert.True(preview.IsFrozen);
+
                 for (var i = 0; i < 100; i++)
                 {
                     model.Refresh();
                 }
+
                 Assert.Same(preview, model.Preview);
+
                 var dateText = model.DateText;
 
                 model.SelectedDate = new DateTime(2026, 9, 8);
@@ -230,6 +255,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                 )
                 {
                     preview = model.Preview;
+
                     var oldAppearance = IconAppearance.Resolve(
                         settings,
                         false,
@@ -280,6 +306,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
         AppRuntime? runtime = null;
         var refreshes = 0;
         Task operation = Task.CompletedTask;
+
         try
         {
             fixture.Run(() =>
@@ -292,6 +319,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                         refreshes++;
                     }
                 };
+
                 operation = runtime.StartAsync(true);
             });
             await operation;
@@ -336,6 +364,7 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
         fixture.Run(() =>
         {
             Strings.Current.SetLanguage("en");
+
             using var tray = new NativeTray(promoteVisibility: false);
 
             try
@@ -352,12 +381,14 @@ public sealed class RuntimePerformanceTests(WpfTestFixture fixture)
                 {
                     tray.RebuildMenu();
                 }
+
                 Assert.Same(firstItem, menu.Items[0]);
                 Assert.Same(renderer, menu.Renderer);
                 Strings.Current.SetLanguage("de");
                 tray.RebuildMenu();
                 Assert.True(firstItem.IsDisposed);
                 Assert.Equal("Kalenderwoche", menu.Items[0].Text);
+
                 var opened = 0;
 
                 tray.OpenRequested += () => opened++;

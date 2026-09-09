@@ -25,6 +25,7 @@ public partial class App : System.Windows.Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
         try
         {
             var startupWatch = Stopwatch.StartNew();
@@ -70,6 +71,7 @@ public partial class App : System.Windows.Application
 
                 await Task.Delay(2000);
                 process.Refresh();
+
                 var cpu = process.TotalProcessorTime.TotalMilliseconds;
                 var handles = process.HandleCount;
                 var memory = process.WorkingSet64;
@@ -91,7 +93,9 @@ public partial class App : System.Windows.Application
                         }
                     );
                 }
+
                 process.Refresh();
+
                 var report = new
                 {
                     startupMilliseconds,
@@ -108,6 +112,7 @@ public partial class App : System.Windows.Application
                     dpi = _runtime.CurrentDpi,
                     window = WindowDpiDiagnostics.Capture(_runtime.Window),
                 };
+
                 Directory.CreateDirectory(Path.GetDirectoryName(reportPath)!);
                 await File.WriteAllTextAsync(
                     reportPath,
@@ -153,6 +158,7 @@ public partial class App : System.Windows.Application
                     foreach (var reviewTheme in new[] { "light", "dark" })
                     {
                         Ui.ThemeManager.Apply(reviewTheme);
+
                         foreach (var page in Enum.GetValues<MainPage>())
                         {
                             foreach (var compact in new[] { false, true })
@@ -160,23 +166,32 @@ public partial class App : System.Windows.Application
                                 _runtime.Window.Open(page);
                                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                                 // Activation restores the user's preferred size; resize after it completes.
-                                _runtime.Window.Width = compact ? _runtime.Window.MinWidth : 720;
-                                _runtime.Window.Height = compact ? 400 : 640;
+                                _runtime.Window.Width = compact
+                                    ? _runtime.Window.MinWidth
+                                    : 720;
+                                _runtime.Window.Height = compact
+                                    ? 400
+                                    : 640;
                                 await Task.Delay(350); // Let Fluent layout animations finish before capture.
                                 _runtime.Window.PrepareReview();
                                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                                 _runtime.Window.UpdateLayout();
                                 Capture(
                                     _runtime.Window,
-                                    Path.Combine(output, $"{page}-{language.Id}-{reviewTheme}{(compact ? "-compact" : "")}.png")
+                                    Path.Combine(output, $"{page}-{language.Id}-{reviewTheme}{(compact
+                                        ? "-compact"
+                                        : "")}.png")
                                 );
+
                                 if (page == MainPage.About)
                                 {
                                     _runtime.Window.UpdateState(
                                         new Features.Updates.UpdateState(Features.Updates.UpdateStatus.Ready, "review-only"), true);
                                     _runtime.Window.UpdateLayout();
                                     Capture(_runtime.Window, Path.Combine(output,
-                                        $"about-update-ready-{language.Id}-{reviewTheme}{(compact ? "-compact" : "")}.png"));
+                                        $"about-update-ready-{language.Id}-{reviewTheme}{(compact
+                                            ? "-compact"
+                                            : "")}.png"));
                                     _runtime.Window.UpdateState(
                                         new Features.Updates.UpdateState(Features.Updates.UpdateStatus.ManualUpdates), false);
                                 }
@@ -189,6 +204,7 @@ public partial class App : System.Windows.Application
                         {
                             Owner = _runtime.Window
                         };
+
                         colorReview.Show();
                         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                         colorReview.UpdateLayout();
@@ -196,6 +212,7 @@ public partial class App : System.Windows.Application
                         colorReview.Close();
                     }
                 }
+
                 await StopAsync();
             }
         }
@@ -230,7 +247,6 @@ public partial class App : System.Windows.Application
     {
         if (_stopping)
         {
-
             return;
         }
 

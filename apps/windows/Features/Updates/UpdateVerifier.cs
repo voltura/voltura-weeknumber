@@ -49,7 +49,9 @@ public static class UpdateVerifier
             throw new InvalidDataException("Invalid update version.");
         }
 
-        var expected = $"VolturaWeekNumber-Setup-{versionText}-win-x64{(full ? "-full" : "")}.exe";
+        var expected = $"VolturaWeekNumber-Setup-{versionText}-win-x64{(full
+            ? "-full"
+            : "")}.exe";
         var matches = root.GetProperty("assets")
             .EnumerateArray()
             .Where(asset => asset.GetProperty("name").GetString() == expected)
@@ -80,6 +82,7 @@ public static class UpdateVerifier
     public static bool TryVersion(string text, out Version version)
     {
         version = new();
+
         var parts = text.Split('.');
 
         return parts.Length == 3

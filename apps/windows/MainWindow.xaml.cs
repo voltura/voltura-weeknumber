@@ -56,6 +56,11 @@ public partial class MainWindow : Window
         if (args.OriginalSource == Tabs)
         {
             FocusDatePageHeader();
+
+            if (Tabs.SelectedIndex == (int)MainPage.About)
+            {
+                ActionRequested?.Invoke("about-update");
+            }
         }
     }
 
@@ -63,7 +68,6 @@ public partial class MainWindow : Window
     {
         if (Tabs.SelectedIndex is < 0 or > (int)MainPage.JulianDay)
         {
-
             return;
         }
 
@@ -95,6 +99,7 @@ public partial class MainWindow : Window
             // WPF updates calendar language, but leaves unchanged dates formatted in the old language.
             picker.SetCurrentValue(DatePicker.TextProperty,
                 picker.SelectedDate?.ToString("d", Strings.Current.Culture) ?? string.Empty);
+
             return;
         }
 
@@ -110,10 +115,16 @@ public partial class MainWindow : Window
     internal void UpdateState(UpdateState state, bool eligible)
     {
         UpdateStatus.Text = Strings.Current[state.Status.ToString()];
-        AutomaticUpdateCheck.Visibility = eligible ? Visibility.Visible : Visibility.Collapsed;
-        CheckUpdateButton.Content = Strings.Current[eligible ? "CheckUpdates" : "Downloads"];
+        AutomaticUpdateCheck.Visibility = eligible
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CheckUpdateButton.Content = Strings.Current[eligible
+            ? "CheckUpdates"
+            : "Downloads"];
         CheckUpdateButton.IsEnabled = !state.Busy;
-        InstallButton.Visibility = state.Ready ? Visibility.Visible : Visibility.Collapsed;
+        InstallButton.Visibility = state.Ready
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     public void Exit()
@@ -128,7 +139,6 @@ public partial class MainWindow : Window
     {
         if (_exit)
         {
-
             return;
         }
 
@@ -160,7 +170,6 @@ public partial class MainWindow : Window
     {
         if (args.OriginalSource is not Expander expanded || expanded.Parent is not Panel parent)
         {
-
             return;
         }
 

@@ -35,18 +35,23 @@ public sealed class SettingsTests : IDisposable
         using var store = new SettingsStore(_directory);
 
         await store.SaveAsync(new());
+
         var original = await File.ReadAllTextAsync(
             store.FilePath,
             TestContext.Current.CancellationToken
         );
 
         await Assert.ThrowsAsync<InvalidDataException>(() =>
-            store.SaveAsync(new() { Schema = 99 })
+            store.SaveAsync(new()
+            {
+                Schema = 99
+            })
         );
         Assert.Equal(
             original,
             await File.ReadAllTextAsync(store.FilePath, TestContext.Current.CancellationToken)
         );
+
         var import = Path.Combine(_directory, "bad.json");
 
         await File.WriteAllTextAsync(import, "{broken", TestContext.Current.CancellationToken);
@@ -61,6 +66,7 @@ public sealed class SettingsTests : IDisposable
     public async Task OversizedSettingsAreRejected()
     {
         Directory.CreateDirectory(_directory);
+
         var file = Path.Combine(_directory, "large.json");
 
         await File.WriteAllBytesAsync(

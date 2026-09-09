@@ -1,7 +1,9 @@
 param([switch]$SkipTests)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
+
 Push-Location $root
+
 function Reset-BuildDirectory([string]$directory)
 {
     $resolved = [IO.Path]::GetFullPath($directory)
@@ -30,6 +32,7 @@ function Reset-BuildDirectory([string]$directory)
 
     New-Item -ItemType Directory -Path $resolved -Force | Out-Null
 }
+
 try
 {
     $version = (Get-Content version.json -Raw | ConvertFrom-Json).version
@@ -46,11 +49,13 @@ try
     }
 
     $publish = Join-Path $root 'artifacts\publish'
+
     New-Item -ItemType Directory -Path $publish -Force | Out-Null
 
     foreach ($variant in @('standard', 'full'))
     {
         $payload = Join-Path $root "artifacts\payload-$variant"
+
         Reset-BuildDirectory $payload
         dotnet publish apps/windows/VolturaWeekNumber.csproj `
             -c Release `
@@ -74,7 +79,6 @@ try
             {
                 Join-Path ([Environment]::GetFolderPath('UserProfile')) '.nuget\packages'
             }
-
             $runtimeConfig = Get-Content -LiteralPath (Join-Path $payload 'VolturaWeekNumber.runtimeconfig.json') -Raw |
                 ConvertFrom-Json
 
@@ -92,12 +96,14 @@ try
                 }
 
                 $noticeTarget = Join-Path $payload ('ThirdPartyNotices\' + $framework.name)
+
                 New-Item -ItemType Directory -Path $noticeTarget -Force | Out-Null
                 $noticeFiles | Copy-Item -Destination $noticeTarget
             }
         }
 
         Copy-Item installer/maintain.ps1 (Join-Path $payload 'maintain.ps1')
+
         $entries = @(Get-ChildItem -LiteralPath $payload -File -Recurse |
                 Where-Object { $_.Name -notin @(
                         'payload.json',
@@ -113,6 +119,7 @@ try
                         sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
                     }
                 })
+
         [IO.File]::WriteAllText(
             (Join-Path $payload 'payload.json'),
             (ConvertTo-Json -InputObject $entries -Depth 4))
@@ -125,8 +132,8 @@ try
         {
             ''
         }
-
         $output = Join-Path $publish "VolturaWeekNumber-Setup-$version-win-x64$suffix.exe"
+
         & $nsis /WX "/DVERSION=$version" "/DVARIANT=$variant" "/DPAYLOAD=$payload" "/DOUTPUT=$output" installer/VolturaWeekNumber.nsi
 
         if ($LASTEXITCODE)
@@ -136,6 +143,7 @@ try
     }
 
     $portable = Join-Path $root 'artifacts\portable'
+
     Reset-BuildDirectory $portable
     Get-ChildItem artifacts/payload-full |
         Where-Object { $_.Name -notin @('payload.json', 'maintain.ps1') } |

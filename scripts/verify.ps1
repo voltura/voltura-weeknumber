@@ -1,6 +1,8 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
+
 Push-Location $root
+
 try
 {
     & "$PSScriptRoot\build.ps1"
@@ -9,6 +11,7 @@ try
     {
         $tokens = $null
         $errors = $null
+
         [void][Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors)
 
         if ($errors.Count)

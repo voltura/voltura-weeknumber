@@ -16,11 +16,7 @@ public sealed record AppPaths(string Data, bool Portable, bool Isolated)
         return new(
             portable
                 ? Path.Combine(AppContext.BaseDirectory, "Data")
-                : Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Voltura",
-                    "WeekNumber"
-                ),
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Voltura", "WeekNumber"),
             portable,
             false
         );

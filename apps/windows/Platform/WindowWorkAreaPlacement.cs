@@ -26,6 +26,7 @@ internal static partial class WindowWorkAreaPlacement
     public static void ConstrainAndCenterOnFirstLoad(Window window)
     {
         ArgumentNullException.ThrowIfNull(window);
+
         var state = PlacementStates.GetValue(
             window,
             static currentWindow => new PlacementState(
@@ -55,6 +56,7 @@ internal static partial class WindowWorkAreaPlacement
     public static void KeepVisibleAfterDisplayChanges(Window window)
     {
         ArgumentNullException.ThrowIfNull(window);
+
         var state = PlacementStates.GetValue(
             window,
             static currentWindow => new PlacementState(
@@ -80,7 +82,6 @@ internal static partial class WindowWorkAreaPlacement
                         or DispatcherOperationStatus.Executing
             )
             {
-
                 return;
             }
 
@@ -107,6 +108,7 @@ internal static partial class WindowWorkAreaPlacement
         {
             // Native/DPI changes also update WPF Width/Height, even while hidden.
             // Only an interactive resize changes the size we should restore.
+
             if (message == WindowMessageEnterSizeMove)
             {
                 state.IsInSizeMove = true;
@@ -160,6 +162,7 @@ internal static partial class WindowWorkAreaPlacement
     public static void EnsureVisibleOnCurrentMonitor(Window window)
     {
         ArgumentNullException.ThrowIfNull(window);
+
         var windowHandle = new WindowInteropHelper(window).Handle;
 
         if (windowHandle != 0)
@@ -180,7 +183,6 @@ internal static partial class WindowWorkAreaPlacement
         WpfSize workAreaSize
     )
     {
-
         return new WpfSize(
             Math.Min(preferredSize.Width, workAreaSize.Width),
             Math.Min(preferredSize.Height, workAreaSize.Height)
@@ -217,7 +219,6 @@ internal static partial class WindowWorkAreaPlacement
     {
         if (state.IsInSizeMove)
         {
-
             return;
         }
 
@@ -226,7 +227,6 @@ internal static partial class WindowWorkAreaPlacement
             || !GetWindowRect(windowHandle, out var windowRect)
         )
         {
-
             return;
         }
 
@@ -235,7 +235,6 @@ internal static partial class WindowWorkAreaPlacement
 
         if (monitor == 0 || !GetMonitorInfo(monitor, ref monitorInfo))
         {
-
             return;
         }
 
@@ -243,7 +242,6 @@ internal static partial class WindowWorkAreaPlacement
 
         if (window.WindowState != WindowState.Normal)
         {
-
             return;
         }
 
@@ -251,7 +249,6 @@ internal static partial class WindowWorkAreaPlacement
 
         if (!GetWindowRect(windowHandle, out windowRect))
         {
-
             return;
         }
 
@@ -260,7 +257,6 @@ internal static partial class WindowWorkAreaPlacement
 
         if (position.X == windowBounds.Left && position.Y == windowBounds.Top)
         {
-
             return;
         }
 
@@ -288,17 +284,19 @@ internal static partial class WindowWorkAreaPlacement
         // TV/receiver reconnection can leave a PMv2 HWND at the disconnected display's DPI.
         // A real position change makes Windows deliver its own WM_DPICHANGED; a frame-only
         // refresh does not. Preserve physical bounds rather than magnifying the stale DIP size.
+
         if (
             !AreDpiAwarenessContextsEqual(GetWindowDpiAwarenessContext(handle), new nint(-4))
             || GetDpiForMonitor(monitor, 0, out var dpi, out _) != 0
             || !NeedsDpiRecovery(GetDpiForWindow(handle), dpi)
         )
         {
-
             return;
         }
 
-        var offset = bounds.Left < workArea.Right - 1 ? 1 : -1;
+        var offset = bounds.Left < workArea.Right - 1
+            ? 1
+            : -1;
 
         if (
             !SetWindowPos(
@@ -312,7 +310,6 @@ internal static partial class WindowWorkAreaPlacement
             )
         )
         {
-
             return;
         }
 
@@ -338,7 +335,6 @@ internal static partial class WindowWorkAreaPlacement
 
         if (dpi == 0)
         {
-
             return;
         }
 

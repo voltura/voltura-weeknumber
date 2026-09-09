@@ -23,6 +23,7 @@ public static class WeekCalculator
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(region);
+
         var calendar = region.DateTimeFormat.Calendar;
         var first =
             options.Mode == CalendarMode.Regional
@@ -53,7 +54,9 @@ public static class WeekCalculator
 
         return new(
             number,
-            iso ? ISOWeek.GetYear(value) : null,
+            iso
+                ? ISOWeek.GetYear(value)
+                : null,
             DateOnly.FromDayNumber(Math.Max(0, date.DayNumber - offset))
         );
     }

@@ -61,7 +61,6 @@ internal sealed partial class NativeTray : IDisposable
 
         if (_menuAppearance == appearance)
         {
-
             return;
         }
 
@@ -75,6 +74,7 @@ internal sealed partial class NativeTray : IDisposable
         _menu.Items.Add(text["Preferences"], null, (_, _) => PreferencesRequested?.Invoke());
         _menu.Items.Add(new Forms.ToolStripSeparator());
         _menu.Items.Add(text["Exit"], null, (_, _) => ExitRequested?.Invoke());
+
         var renderer = new TrayMenuRenderer(dark);
 
         _menu.BackColor = renderer.Surface;
@@ -95,7 +95,6 @@ internal sealed partial class NativeTray : IDisposable
     {
         if (_disposed)
         {
-
             return;
         }
 
@@ -105,6 +104,7 @@ internal sealed partial class NativeTray : IDisposable
         if (_rendered != key)
         {
             RenderCount++;
+
             var bytes = CalendarIconRenderer.EncodeIco(week, appearance, new[] { size });
             // .ico directory entry points to an independently encoded PNG image.
             var pngOffset = BitConverter.ToInt32(bytes, 18);
@@ -129,6 +129,7 @@ internal sealed partial class NativeTray : IDisposable
 
             _icon = replacement;
             _rendered = key;
+
             try
             {
                 Publish(tooltip, true);
@@ -151,18 +152,25 @@ internal sealed partial class NativeTray : IDisposable
         data.Flags = 0x10;
         data.InfoTitle = Limit(title, 63);
         data.Info = Limit(body, 255);
-        data.InfoFlags = 0x80u | (silent ? 0x10u : 0u);
+        data.InfoFlags = 0x80u | (silent
+            ? 0x10u
+            : 0u);
         _ = ShellNotifyIcon(1, ref data);
     }
 
     private void Publish(string tooltip, bool imageChanged, bool promoteVisibility = true)
     {
         _tooltip = Limit(tooltip, 127);
+
         var data = Data();
 
-        data.Flags = 1 | 4 | 0x80u | (imageChanged || !_added ? 2u : 0u);
+        data.Flags = 1 | 4 | 0x80u | (imageChanged || !_added
+            ? 2u
+            : 0u);
 
-        if (!ShellNotifyIcon(_added ? 1u : 0u, ref data))
+        if (!ShellNotifyIcon(_added
+            ? 1u
+            : 0u, ref data))
         {
             _added = false;
 
@@ -187,7 +195,6 @@ internal sealed partial class NativeTray : IDisposable
     {
         if (_disposed || !_added)
         {
-
             return;
         }
 
@@ -264,6 +271,7 @@ internal sealed partial class NativeTray : IDisposable
             {
                 RebuildMenu();
                 _ = SetForegroundWindow(_source.Handle);
+
                 var packed = wParam.ToInt64();
 
                 _menu.Show(
@@ -279,18 +287,20 @@ internal sealed partial class NativeTray : IDisposable
     }
 
     private static string Limit(string value, int length) =>
-        value.Length <= length ? value : value[..(length - 1)] + "…";
+        value.Length <= length
+            ? value
+            : value[..(length - 1)] + "…";
 
     public void Dispose()
     {
         if (_disposed)
         {
-
             return;
         }
 
         _disposed = true;
         _visibilityPromoter?.Dispose();
+
         var data = Data();
 
         _ = ShellNotifyIcon(2, ref data);

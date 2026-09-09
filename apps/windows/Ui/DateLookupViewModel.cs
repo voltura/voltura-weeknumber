@@ -36,21 +36,25 @@ public sealed class DateLookupViewModel : INotifyPropertyChanged
     public string NumberInput { get; set; } = string.Empty;
     public string Result =>
         _date is { } date
-            ? (
-                _julian
-                    ? DateLookup
-                        .ToJulianDay(DateOnly.FromDateTime(date))
-                        .ToString(CultureInfo.InvariantCulture)
-                    : date.DayOfYear.ToString("D3", CultureInfo.InvariantCulture)
-            )
+            ? (_julian
+                ? DateLookup.ToJulianDay(DateOnly.FromDateTime(date)).ToString(CultureInfo.InvariantCulture)
+                : date.DayOfYear.ToString("D3", CultureInfo.InvariantCulture))
             : "—";
     public string DateText =>
         _date?.ToString("D", Strings.Current.Culture)
         ?? Strings.Current["ChooseDate"];
-    public string Help => Strings.Current[_julian ? "JulianHelp" : "OrdinalHelp"];
-    public string NumberLabel => Strings.Current[_julian ? "JulianTab" : "OrdinalTab"];
+    public string Help => Strings.Current[_julian
+        ? "JulianHelp"
+        : "OrdinalHelp"];
+    public string NumberLabel => Strings.Current[_julian
+        ? "JulianTab"
+        : "OrdinalTab"];
     public string Error =>
-        _invalid ? Strings.Current[_julian ? "InvalidJulian" : "InvalidOrdinal"] : string.Empty;
+        _invalid
+            ? Strings.Current[_julian
+                ? "InvalidJulian"
+                : "InvalidOrdinal"]
+            : string.Empty;
 
     public void Today()
     {
@@ -67,6 +71,7 @@ public sealed class DateLookupViewModel : INotifyPropertyChanged
         {
             var inputsUnchanged = NumberInput == Result
                 && YearInput == _date?.Year.ToString(CultureInfo.InvariantCulture);
+
             _date = today.Date;
 
             if (inputsUnchanged)

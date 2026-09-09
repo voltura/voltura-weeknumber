@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 $runtimeExe = Join-Path $env:ProgramFiles 'dotnet\dotnet.exe'
+
 function Test-DesktopRuntime
 {
     if (-not (Test-Path -LiteralPath $runtimeExe -PathType Leaf))
     {
-
         return $false
     }
 
@@ -19,14 +19,17 @@ if (Test-DesktopRuntime)
 }
 
 $download = Join-Path ([IO.Path]::GetTempPath()) ('VolturaWeekNumber-runtime-' + [Guid]::NewGuid().ToString('N') + '.exe')
+
 try
 {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
     Invoke-WebRequest `
         -UseBasicParsing `
         -Uri 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe' `
         -OutFile $download `
         -TimeoutSec 300
+
     $signature = Get-AuthenticodeSignature -LiteralPath $download
 
     if ($signature.Status -ne 'Valid' -or
@@ -44,6 +47,7 @@ try
         -PassThru `
         -WindowStyle Hidden
     $result = $process.ExitCode
+
     $process.Dispose()
 
     if ($result -notin @(0, 3010, 1641))

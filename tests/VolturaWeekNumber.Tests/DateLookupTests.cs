@@ -12,6 +12,7 @@ public sealed class DateLookupTests
     public void FollowingTodayUpdatesUntouchedLookupInputsButPreservesDrafts(bool julian)
     {
         var model = new DateLookupViewModel(julian);
+
         model.Refresh(new DateTime(2026, 12, 31));
         Assert.Equal(model.Result, model.NumberInput);
         Assert.Equal("2026", model.YearInput);
@@ -59,6 +60,7 @@ public sealed class DateLookupTests
         Assert.Equal(2451545, DateLookup.ToJulianDay(new DateOnly(2000, 1, 1)));
         Assert.Equal(1721426, DateLookup.ToJulianDay(DateOnly.MinValue));
         Assert.Equal(5373484, DateLookup.ToJulianDay(DateOnly.MaxValue));
+
         for (var day = 0; day <= DateOnly.MaxValue.DayNumber; day++)
         {
             var date = DateOnly.FromDayNumber(day);

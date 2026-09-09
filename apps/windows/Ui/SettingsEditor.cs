@@ -112,7 +112,6 @@ public sealed class SettingsEditor : INotifyPropertyChanged
     {
         if (_value == settings)
         {
-
             return;
         }
 
@@ -121,33 +120,18 @@ public sealed class SettingsEditor : INotifyPropertyChanged
     }
 
     // Stable option identities preserve SelectedValue while language and other settings change.
-    public IReadOnlyList<Choice<string>> Languages
-    {
-        get;
-    } =
+    public IReadOnlyList<Choice<string>> Languages { get; } =
     [
         new("system", ""),
         .. LanguageCatalog.All.Select(language => new Choice<string>(language.Id, language.NativeName)),
     ];
-    public IReadOnlyList<Choice<string>> Themes
-    {
-        get;
-    } =
+    public IReadOnlyList<Choice<string>> Themes { get; } =
     [new("system", ""), new("light", ""), new("dark", "")];
-    public IReadOnlyList<Choice<CalendarMode>> Modes
-    {
-        get;
-    } =
+    public IReadOnlyList<Choice<CalendarMode>> Modes { get; } =
     [new(CalendarMode.Regional, ""), new(CalendarMode.Iso, ""), new(CalendarMode.Custom, "")];
-    public IReadOnlyList<Choice<DayOfWeek>> Days
-    {
-        get;
-    } =
+    public IReadOnlyList<Choice<DayOfWeek>> Days { get; } =
         Enum.GetValues<DayOfWeek>().Select(day => new Choice<DayOfWeek>(day, "")).ToArray();
-    public IReadOnlyList<Choice<CalendarWeekRule>> Rules
-    {
-        get;
-    } =
+    public IReadOnlyList<Choice<CalendarWeekRule>> Rules { get; } =
     [
         new(CalendarWeekRule.FirstDay, ""),
         new(CalendarWeekRule.FirstFullWeek, ""),

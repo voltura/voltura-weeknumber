@@ -6,9 +6,13 @@ namespace VolturaWeekNumber.Platform;
 // Flat menu painting and palette taken from Voltura Air's ThemedToolStripRenderer.
 internal sealed class TrayMenuRenderer(bool dark) : ToolStripProfessionalRenderer
 {
-    internal Color Surface { get; } = dark ? Color.FromArgb(23, 29, 33) : Color.White;
+    internal Color Surface { get; } = dark
+        ? Color.FromArgb(23, 29, 33)
+        : Color.White;
     internal Color Text { get; } =
-        dark ? Color.FromArgb(247, 242, 233) : Color.FromArgb(28, 34, 39);
+        dark
+            ? Color.FromArgb(247, 242, 233)
+            : Color.FromArgb(28, 34, 39);
     private readonly Color _raised = dark
         ? Color.FromArgb(32, 40, 46)
         : Color.FromArgb(237, 242, 245);
@@ -38,7 +42,9 @@ internal sealed class TrayMenuRenderer(bool dark) : ToolStripProfessionalRendere
 
     protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
     {
-        using var brush = new SolidBrush(e.Item.Selected ? _raised : Surface);
+        using var brush = new SolidBrush(e.Item.Selected
+            ? _raised
+            : Surface);
 
         e.Graphics.FillRectangle(brush, new Rectangle(Point.Empty, e.Item.Size));
     }

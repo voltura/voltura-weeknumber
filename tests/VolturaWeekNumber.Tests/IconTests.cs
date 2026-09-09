@@ -29,6 +29,7 @@ public sealed class IconTests
                         );
 
                         Assert.Equal(12, BitConverter.ToUInt16(bytes, 4));
+
                         for (var i = 0; i < CalendarIconRenderer.Sizes.Count; i++)
                         {
                             var length = BitConverter.ToInt32(bytes, 6 + i * 16 + 8);

@@ -20,23 +20,22 @@ public partial class DateLookupPage : UserControl
     {
         if (!ContainsOnlyDigits(text))
         {
-
             return false;
         }
 
         if (DataContext is not DateLookupViewModel { ShowYear: true })
         {
-
             return true;
         }
 
         if (text.Length == 0)
         {
-
             return true; // Allow clearing a field while replacing its value.
         }
 
-        var maximum = input == YearInput ? 9999 : MaximumDay();
+        var maximum = input == YearInput
+            ? 9999
+            : MaximumDay();
 
         return int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var value)
             && value >= 1
@@ -44,9 +43,7 @@ public partial class DateLookupPage : UserControl
     }
 
     private int MaximumDay() =>
-        int.TryParse((DataContext as DateLookupViewModel)?.YearInput, out var year)
-        && year is >= 1 and <= 9999
-        && DateTime.IsLeapYear(year)
+        int.TryParse((DataContext as DateLookupViewModel)?.YearInput, out var year) && year is >= 1 and <= 9999 && DateTime.IsLeapYear(year)
             ? 366
             : 365;
 
@@ -64,6 +61,7 @@ public partial class DateLookupPage : UserControl
     private void NumberKeyDown(object sender, KeyEventArgs args)
     {
         // WPF handles Space as a key command instead of text input.
+
         if (args.Key == Key.Space)
         {
             args.Handled = true;
@@ -85,13 +83,13 @@ public partial class DateLookupPage : UserControl
     {
         if (_updating || DataContext is not DateLookupViewModel { ShowYear: true } model)
         {
-
             return;
         }
 
         var input = (TextBox)sender;
 
         _updating = true;
+
         try
         {
             if (!ValidInput(input, input.Text))
@@ -100,14 +98,15 @@ public partial class DateLookupPage : UserControl
 
                 input.SetCurrentValue(
                     TextBox.TextProperty,
-                    input == YearInput ? _lastYear : _lastNumber
+                    input == YearInput
+                        ? _lastYear
+                        : _lastNumber
                 );
                 input.CaretIndex = Math.Min(caret, input.Text.Length);
             }
 
             if (input.Text.Length == 0)
             {
-
                 return;
             }
 
@@ -146,7 +145,9 @@ public partial class DateLookupPage : UserControl
         {
             input.SetCurrentValue(
                 TextBox.TextProperty,
-                input == YearInput ? _lastYear : _lastNumber
+                input == YearInput
+                    ? _lastYear
+                    : _lastNumber
             );
         }
     }

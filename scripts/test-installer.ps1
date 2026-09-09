@@ -2,14 +2,15 @@ param([string]$ShellPath)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $test = Join-Path $root ('artifacts\installer-tests\' + [Guid]::NewGuid().ToString('N'))
+
 New-Item -ItemType Directory -Path $test -Force | Out-Null
 [IO.File]::WriteAllText((Join-Path $test '.voltura-installer-test'), 'Isolated maintenance test')
+
 $payload = Join-Path $root 'artifacts\payload-standard'
 $version = (Get-Content (Join-Path $root 'version.json') -Raw | ConvertFrom-Json).version
 $setup = Join-Path $root "artifacts\publish\VolturaWeekNumber-Setup-$version-win-x64.exe"
 $helper = Join-Path $root 'installer\maintain.ps1'
 $target = Join-Path $test 'VolturaWeekNumber'
-
 $shell = if ($ShellPath)
 {
     $ShellPath
@@ -18,16 +19,19 @@ else
 {
     (Get-Process -Id $PID).Path
 }
-
 $variant = 'standard'
 $checks = [Collections.Generic.List[string]]::new()
+
 function Prepare-TestPayload([string]$source, [string]$name)
 {
     $prepared = Join-Path $test $name
+
     Copy-Item -LiteralPath $source -Destination $prepared -Recurse
+
     $originalEntries = Get-Content -LiteralPath (Join-Path $prepared 'payload.json') -Raw | ConvertFrom-Json
     # The maintenance helper copies/verifies this fixture; it never executes it.
     $uninstallerPath = Join-Path $prepared 'Uninstall.exe'
+
     [IO.File]::WriteAllBytes($uninstallerPath, [byte[]](77, 90, 1, 2, 3, 4))
     & $shell `
         -NoProfile `
@@ -70,7 +74,9 @@ function Prepare-TestPayload([string]$source, [string]$name)
 
     return $prepared
 }
+
 $payload = Prepare-TestPayload $payload 'prepared-standard'
+
 function Run-Maintenance([string]$mode, [string]$failure = '')
 {
     $arguments = @(
@@ -115,6 +121,7 @@ if ((Run-Maintenance 'Install') -ne 0)
 }
 
 $checks.Add('Fresh installation and health check')
+
 $original = (Get-FileHash -LiteralPath (Join-Path $target 'VolturaWeekNumber.exe')).Hash
 
 foreach ($point in @('AfterBackup', 'AfterPromotion', 'AfterHealth', 'AfterRegistration'))
@@ -143,7 +150,9 @@ if ((Run-Maintenance 'Install') -ne 0)
 }
 
 $checks.Add('Upgrade and health check')
+
 $rollbackOnly = Join-Path $target 'rollback-only.txt'
+
 [IO.File]::WriteAllText($rollbackOnly, 'Only the previous installation contains this file.')
 
 if ((Run-Maintenance 'Install' 'AfterCommit') -eq 0 -or
@@ -155,8 +164,10 @@ if ((Run-Maintenance 'Install' 'AfterCommit') -eq 0 -or
 }
 
 $checks.Add('Keep the new installation after a committed upgrade failure')
+
 $cleanPayload = $payload
 $payload = Join-Path $test 'corrupt-payload'
+
 Copy-Item -LiteralPath $cleanPayload -Destination $payload -Recurse
 [IO.File]::AppendAllText((Join-Path $payload 'VolturaWeekNumber.dll'), 'corrupted')
 
@@ -176,6 +187,7 @@ foreach ($keepMarker in @($true, $false))
 {
     $backup = Join-Path $test ('.VolturaWeekNumber-backup-' + [Guid]::NewGuid().ToString('N'))
     $stage = Join-Path $test ('.VolturaWeekNumber-stage-' + [Guid]::NewGuid().ToString('N'))
+
     New-Item -ItemType Directory -Path $backup | Out-Null
     [IO.File]::WriteAllText((Join-Path $backup 'remaining.txt'), 'Partially removed backup')
 
@@ -193,10 +205,12 @@ foreach ($keepMarker in @($true, $false))
         Phase = 'Committed'
     }
     $journalPath = Join-Path $test '.VolturaWeekNumber-maintenance\journal.json'
+
     [IO.File]::WriteAllText($journalPath, ($journal | ConvertTo-Json))
 
     # The corrupt payload stops the next install after recovery, so a fresh install
     # cannot conceal damage caused by restoring the incomplete backup.
+
     if ((Run-Maintenance 'Install') -eq 0 -or
         (Get-FileHash -LiteralPath (Join-Path $target 'VolturaWeekNumber.exe')).Hash -ne $original -or
         (Test-Path -LiteralPath $backup) -or
@@ -211,7 +225,9 @@ foreach ($keepMarker in @($true, $false))
 $payload = $cleanPayload
 $backup = Join-Path $test ('.VolturaWeekNumber-backup-' + [Guid]::NewGuid().ToString('N'))
 $stage = Join-Path $test ('.VolturaWeekNumber-stage-' + [Guid]::NewGuid().ToString('N'))
+
 Move-Item -LiteralPath $target -Destination $backup
+
 $journal = [ordered]@{
     Mode = 'Install'
     Stage = $stage
@@ -220,6 +236,7 @@ $journal = [ordered]@{
     PreviousVariant = 'standard'
     Phase = 'Staged'
 }
+
 [IO.File]::WriteAllText(
     (Join-Path $test '.VolturaWeekNumber-maintenance\journal.json'),
     ($journal | ConvertTo-Json))
@@ -244,8 +261,10 @@ if ((Run-Maintenance 'Install') -ne 0)
 }
 
 $backup = Join-Path $test ('.VolturaWeekNumber-backup-' + [Guid]::NewGuid().ToString('N'))
+
 Move-Item -LiteralPath $target -Destination $backup
 Remove-Item -LiteralPath (Join-Path $backup 'installation.marker')
+
 $journal = [ordered]@{
     Mode = 'Uninstall'
     Stage = $stage
@@ -254,6 +273,7 @@ $journal = [ordered]@{
     PreviousVariant = 'standard'
     Phase = 'Removing'
 }
+
 [IO.File]::WriteAllText(
     (Join-Path $test '.VolturaWeekNumber-maintenance\journal.json'),
     ($journal | ConvertTo-Json))
@@ -265,6 +285,7 @@ if ((Run-Maintenance 'Uninstall') -ne 0 -or
 }
 
 $checks.Add('Finish interrupted partial removal without restoring incomplete files')
+
 $payload = Prepare-TestPayload (Join-Path $root 'artifacts\payload-full') 'prepared-full'
 $setup = Join-Path $root "artifacts\publish\VolturaWeekNumber-Setup-$version-win-x64-full.exe"
 $variant = 'full'
@@ -301,6 +322,7 @@ if ([IO.File]::ReadAllText((Join-Path $target 'unrelated.txt')) -ne 'preserve')
 }
 
 $checks.Add('Reject unowned existing directory')
+
 $report = [ordered]@{
     passed = $checks.Count
     checks = @($checks)
@@ -308,6 +330,7 @@ $report = [ordered]@{
     root = $test
     utc = [DateTimeOffset]::UtcNow.ToString('O')
 }
+
 [IO.File]::WriteAllText(
     (Join-Path $root 'artifacts\installer-test-results.json'),
     ($report | ConvertTo-Json -Depth 4))

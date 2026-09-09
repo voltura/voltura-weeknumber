@@ -26,6 +26,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
         AppRuntime? runtime = null;
         Task operation = Task.CompletedTask;
         var selected = new DateTime(2020, 12, 31);
+
         try
         {
             fixture.Run(() =>
@@ -40,6 +41,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                 runtime.Model.DayOfYear.SelectedDate = selected;
                 runtime.Model.JulianDay.SelectedDate = selected;
             });
+
             foreach (var language in LanguageCatalog.All)
             {
                 foreach (var mode in Enum.GetValues<CalendarMode>())
@@ -54,12 +56,15 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                     {
                         var model = runtime!.Model;
                         var strings = Strings.Current;
+
                         Assert.Equal(selected, model.SelectedDate);
                         Assert.Equal(selected, model.DayOfYear.SelectedDate);
                         Assert.Equal(selected, model.JulianDay.SelectedDate);
                         model.Refresh();
+
                         var result = WeekCalculator.Calculate(
                             DateOnly.FromDateTime(selected), model.Editor.Value.Calendar, CultureInfo.CurrentCulture);
+
                         Assert.Equal(strings.WeekNumber(result.Number), model.WeekText);
                         Assert.Equal(selected.ToString("D", strings.Culture), model.DateText);
                         Assert.Equal(model.DateText, model.DayOfYear.DateText);
@@ -70,11 +75,14 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                         Assert.Equal(language.Id, model.Editor.Language);
                         Assert.Equal(strings.Culture.DateTimeFormat.GetDayName(DayOfWeek.Monday),
                             model.Editor.Days.Single(day => day.Value == DayOfWeek.Monday).Label);
+
                         var tray = (NativeTray)typeof(AppRuntime).GetField("_tray", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(runtime)!;
                         var menu = (System.Windows.Forms.ContextMenuStrip)typeof(NativeTray).GetField("_menu", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(tray)!;
+
                         Assert.Equal(strings["WeekTab"], menu.Items[0].Text);
                         Assert.Equal(strings["Preferences"], menu.Items[1].Text);
                         Assert.Equal(strings["Exit"], menu.Items[3].Text);
+
                         foreach (var status in Enum.GetValues<UpdateStatus>())
                         {
                             runtime.Window.UpdateState(new UpdateState(status), true);
@@ -90,6 +98,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
             fixture.Run(() => operation = runtime?.DisposeAsync().AsTask() ?? Task.CompletedTask);
             await operation;
             fixture.Run(() => Strings.Current.SetLanguage("en"));
+
             if (Directory.Exists(root))
             {
                 Directory.Delete(root, true);
@@ -105,6 +114,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
             var model = new CalendarViewModel();
             var window = new MainWindow(model) { Width = 560, Height = 400 };
             var failures = new List<string>();
+
             try
             {
                 foreach (var language in LanguageCatalog.All)
@@ -112,34 +122,42 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                     Strings.Current.SetLanguage(language.Id);
                     model.Apply(new AppSettings { Language = language.Id });
                     window.UpdateLanguage();
+
                     foreach (var page in Enum.GetValues<MainPage>())
                     {
                         window.Open(page);
                         window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                         window.Width = window.MinWidth;
                         window.Height = 400;
+
                         if (page == MainPage.About)
                         {
                             window.UpdateState(new UpdateState(UpdateStatus.Ready, "review-only"), true);
                         }
+
                         foreach (var expander in Descendants(window).OfType<Expander>())
                         {
                             expander.IsExpanded = true;
                         }
+
                         window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                         window.UpdateLayout();
                         Assert.Equal(window.MinWidth, window.ActualWidth, 1);
+
                         foreach (var datePicker in Descendants(window).OfType<DatePicker>())
                         {
                             Assert.Equal(DatePickerFormat.Short, datePicker.SelectedDateFormat);
                             Assert.Equal(datePicker.SelectedDate?.ToString("d", Strings.Current.Culture), datePicker.Text);
+
                             var input = Descendants(datePicker).OfType<System.Windows.Controls.Primitives.DatePickerTextBox>().Single();
                             var dateText = new FormattedText(input.Text, Strings.Current.Culture, FlowDirection.LeftToRight,
                                 new Typeface(input.FontFamily, input.FontStyle, input.FontWeight, input.FontStretch),
                                 input.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(input).PixelsPerDip);
+
                             Assert.True(dateText.Width <= input.ActualWidth - input.Padding.Left - input.Padding.Right,
                                 $"{language.Id}/{page}: date input is too narrow");
                         }
+
                         foreach (var button in Descendants(window).OfType<Button>())
                         {
                             if (button.Content is not string label || button.ActualWidth == 0
@@ -147,9 +165,11 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                             {
                                 continue;
                             }
+
                             var text = new FormattedText(label, Strings.Current.Culture, FlowDirection.LeftToRight,
                                 new Typeface(button.FontFamily, button.FontStyle, button.FontWeight, button.FontStretch),
                                 button.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(button).PixelsPerDip);
+
                             if (text.Width > button.ActualWidth - button.Padding.Left - button.Padding.Right + 2)
                             {
                                 failures.Add($"{language.Id}/{page}: {label} ({text.Width:F1}px in {button.ActualWidth}px button)");
@@ -157,6 +177,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                         }
                     }
                 }
+
                 Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures.Distinct()));
             }
             finally
@@ -174,9 +195,11 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
         {
             var model = new CalendarViewModel();
             var window = new MainWindow(model);
+
             try
             {
                 ThemeManager.ApplyPalette(false, true);
+
                 foreach (var language in LanguageCatalog.All)
                 {
                     Strings.Current.SetLanguage(language.Id);
@@ -184,15 +207,19 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                     window.UpdateLanguage();
                     window.Open(MainPage.Preferences);
                     window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
                     var picker = Descendants(window).OfType<ComboBox>()
                         .Single(combo => ReferenceEquals(combo.ItemsSource, model.Editor.Languages));
+
                     Assert.Equal(language.Id, picker.SelectedValue);
                     Assert.True(picker.Focusable && picker.IsTabStop);
                     Assert.Equal(Strings.Current["Language"], System.Windows.Automation.AutomationProperties.GetName(picker));
                     model.Editor.Theme = "dark";
                     window.UpdateLayout();
+
                     var save = (Button)window.FindName("SaveChangesButton");
                     var discard = (Button)window.FindName("DiscardChangesButton");
+
                     Assert.True(save.IsEnabled && discard.IsEnabled);
                     Assert.True(save.Focus());
                     Assert.True(save.MoveFocus(new System.Windows.Input.TraversalRequest(
@@ -200,12 +227,17 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                     Assert.True(discard.IsKeyboardFocusWithin);
                     Assert.Equal(SystemColors.WindowColor, ((SolidColorBrush)window.Background).Color);
                     Assert.Equal(SystemColors.WindowTextColor, ((SolidColorBrush)window.Foreground).Color);
+
                     var colors = new ColorPickerWindow(Strings.Current["Background"], "#FF123456");
+
                     try
                     {
                         foreach (var channel in ColorChannels)
                         {
-                            var slider = (Slider)colors.FindName(channel == "Opacity" ? "Alpha" : channel);
+                            var slider = (Slider)colors.FindName(channel == "Opacity"
+                                ? "Alpha"
+                                : channel);
+
                             slider.GetBindingExpression(System.Windows.Automation.AutomationProperties.NameProperty)!.UpdateTarget();
                             Assert.Equal(Strings.Current[channel], System.Windows.Automation.AutomationProperties.GetName(slider));
                         }
@@ -230,7 +262,9 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
         for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
         {
             var child = VisualTreeHelper.GetChild(root, index);
+
             yield return child;
+
             foreach (var descendant in Descendants(child))
             {
                 yield return descendant;

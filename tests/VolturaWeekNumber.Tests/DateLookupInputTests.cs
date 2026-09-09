@@ -44,6 +44,7 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
 
                 input.RaiseEvent(typing);
                 Assert.Equal(!valid, typing.Handled);
+
                 var paste = new DataObjectPastingEventArgs(
                     new DataObject(DataFormats.UnicodeText, text),
                     false,
@@ -68,6 +69,7 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
                 input.RaiseEvent(space);
                 Assert.True(space.Handled);
             }
+
             Assert.False(input.AllowDrop);
             Assert.False(InputMethod.GetIsInputMethodEnabled(input));
             VerifyOrdinalInput();
@@ -82,12 +84,14 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
         try
         {
             window.Open(MainPage.WeekNumber);
+
             var dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
 
             dispatcher.Invoke(
                 () => { },
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle
             );
+
             var tabs = Assert.IsType<TabControl>(window.FindName("Tabs"));
 
             Assert.IsType<TabItem>(tabs.Items[0]).Focus();
@@ -115,6 +119,7 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
             () => { },
             System.Windows.Threading.DispatcherPriority.ApplicationIdle
         );
+
         var year = Assert.IsType<TextBox>(page.FindName("YearInput"));
         var day = Assert.IsType<TextBox>(page.FindName("NumberInput"));
 
@@ -153,6 +158,7 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
     private static void VerifyReplacement(TextBox input, string text, bool valid)
     {
         input.SelectAll();
+
         var typing = new TextCompositionEventArgs(
             Keyboard.PrimaryDevice,
             new TextComposition(InputManager.Current, input, text)
@@ -163,6 +169,7 @@ public sealed class DateLookupInputTests(WpfTestFixture fixture)
 
         input.RaiseEvent(typing);
         Assert.Equal(!valid, typing.Handled);
+
         var paste = new DataObjectPastingEventArgs(
             new DataObject(DataFormats.UnicodeText, text),
             false,

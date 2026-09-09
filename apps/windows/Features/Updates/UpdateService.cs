@@ -54,6 +54,7 @@ internal sealed class UpdateService : IAsyncDisposable
         {
             Timeout = TimeSpan.FromMinutes(5),
         };
+
         using var key = Registry.CurrentUser.OpenSubKey(
             @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VolturaWeekNumber"
         );
@@ -73,6 +74,7 @@ internal sealed class UpdateService : IAsyncDisposable
                     )
             );
         _full = full ?? (key?.GetValue("PackageVariant") as string == "full");
+
         using var resource = Assembly
             .GetExecutingAssembly()
             .GetManifestResourceStream(
@@ -106,7 +108,6 @@ internal sealed class UpdateService : IAsyncDisposable
         {
             if (!Eligible)
             {
-
                 return;
             }
 
@@ -130,13 +131,13 @@ internal sealed class UpdateService : IAsyncDisposable
     {
         if (!Eligible || State.Busy || !await _gate.WaitAsync(0, _stop.Token))
         {
-
             return;
         }
 
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
 
         timeout.CancelAfter(TimeSpan.FromMinutes(10));
+
         var token = timeout.Token;
         var failure = UpdateStatus.UpdateCheckFailed;
 
@@ -144,6 +145,7 @@ internal sealed class UpdateService : IAsyncDisposable
         {
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
             SetState(UpdateStatus.Checking);
+
             var metadata = await DownloadBytesAsync(
                 new Uri("https://api.github.com/repos/voltura/voltura-weeknumber/releases/latest"),
                 256 * 1024,
@@ -173,7 +175,9 @@ internal sealed class UpdateService : IAsyncDisposable
 
             var cached = await RecoverPendingAsync(token);
             var expected =
-                $"VolturaWeekNumber-Setup-{tag[1..]}-win-x64{(_full ? "-full" : "")}.exe";
+                $"VolturaWeekNumber-Setup-{tag[1..]}-win-x64{(_full
+                    ? "-full"
+                    : "")}.exe";
 
             if (cached is not null && Path.GetFileName(cached) == expected)
             {
@@ -210,7 +214,9 @@ internal sealed class UpdateService : IAsyncDisposable
 
                 return uri;
             }
+
             failure = UpdateStatus.UpdateDownloadFailed;
+
             var manifest = await DownloadBytesAsync(
                 AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.json"),
                 64 * 1024,
@@ -223,6 +229,7 @@ internal sealed class UpdateService : IAsyncDisposable
             );
 
             failure = UpdateStatus.UpdateVerificationFailed;
+
             var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, _full);
 
             if (verified.Version != tag[1..])
@@ -236,6 +243,7 @@ internal sealed class UpdateService : IAsyncDisposable
             // One package, with the manifest as its commit marker. Invalidate before replacement.
             File.Delete(Path.Combine(_pending, "manifest.json"));
             DiscardPending();
+
             var part = Path.Combine(_pending, "installer.pending");
 
             await using (
@@ -260,6 +268,7 @@ internal sealed class UpdateService : IAsyncDisposable
             failure = UpdateStatus.UpdateVerificationFailed;
             await UpdateVerifier.VerifyFileAsync(part, verified.Asset, token);
             failure = UpdateStatus.UpdateDownloadFailed;
+
             var installer = Path.Combine(_pending, verified.Asset.Name);
 
             File.Move(part, installer, true);
@@ -295,24 +304,25 @@ internal sealed class UpdateService : IAsyncDisposable
     {
         if (!Eligible)
         {
-
             return;
         }
 
         await _gate.WaitAsync(_stop.Token);
+
         try
         {
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
 
             if (State.Status != UpdateStatus.Idle)
             {
-
                 return; // Do not overwrite a completed manual check.
             }
 
             var installer = await RecoverPendingAsync(_stop.Token);
 
-            SetState(installer is null ? UpdateStatus.Idle : UpdateStatus.Ready, installer);
+            SetState(installer is null
+                ? UpdateStatus.Idle
+                : UpdateStatus.Ready, installer);
         }
         finally
         {
@@ -324,7 +334,6 @@ internal sealed class UpdateService : IAsyncDisposable
     {
         try
         {
-
             return await ReadPendingAsync(token);
         }
         catch (Exception error)
@@ -377,7 +386,6 @@ internal sealed class UpdateService : IAsyncDisposable
     {
         if (!Eligible || State.Busy || !await _gate.WaitAsync(0, _stop.Token))
         {
-
             return false;
         }
 
@@ -387,6 +395,7 @@ internal sealed class UpdateService : IAsyncDisposable
         {
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
             SetState(UpdateStatus.Installing);
+
             var installer =
                 await ReadPendingAsync(_stop.Token)
                 ?? throw new InvalidDataException("No newer cached update.");
@@ -400,7 +409,6 @@ internal sealed class UpdateService : IAsyncDisposable
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested)
         {
-
             return false;
         }
         catch (Exception error)
@@ -437,7 +445,6 @@ internal sealed class UpdateService : IAsyncDisposable
         {
             if (!Directory.Exists(_pending))
             {
-
                 return;
             }
 
@@ -494,7 +501,9 @@ internal sealed class UpdateService : IAsyncDisposable
                 && response.Headers.Location is { } location
             )
             {
-                uri = location.IsAbsoluteUri ? location : new Uri(uri, location);
+                uri = location.IsAbsoluteUri
+                    ? location
+                    : new Uri(uri, location);
                 response.Dispose();
                 continue;
             }
@@ -509,6 +518,7 @@ internal sealed class UpdateService : IAsyncDisposable
 
             return response;
         }
+
         throw new InvalidDataException("Too many redirects.");
     }
 

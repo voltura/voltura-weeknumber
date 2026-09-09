@@ -34,11 +34,21 @@ public sealed class UiStateTests
         var saved = new AppSettings { AutomaticIcon = false };
 
         editor.Load(saved);
-        editor.Edit(saved with { AutomaticIcon = true });
+        editor.Edit(saved with
+        {
+            AutomaticIcon = true
+        });
         Assert.True(editor.HasChanges);
-        var draft = editor.Value with { AutomaticUpdates = false };
 
-        editor.Load(saved with { AutomaticUpdates = false });
+        var draft = editor.Value with
+        {
+            AutomaticUpdates = false
+        };
+
+        editor.Load(saved with
+        {
+            AutomaticUpdates = false
+        });
         editor.Edit(draft);
         Assert.True(editor.HasChanges);
         editor.AutomaticIcon = false;

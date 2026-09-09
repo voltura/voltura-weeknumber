@@ -18,13 +18,11 @@ public sealed record IconAppearance(Color Foreground, Color Background)
     {
         if (highContrast)
         {
-
             return new(SystemColors.WindowTextColor, SystemColors.WindowColor);
         }
 
         if (!settings.AutomaticIcon)
         {
-
             return new(Parse(settings.Foreground), Parse(settings.Background));
         }
 
@@ -44,6 +42,7 @@ public static class CalendarIconRenderer
     {
         // Leap years in lunisolar calendars can contain up to 385 days.
         // Null represents a date outside the active calendar's supported range.
+
         if (week is < 1 or > 56)
         {
             throw new ArgumentOutOfRangeException(nameof(week));
@@ -55,6 +54,7 @@ public static class CalendarIconRenderer
         }
 
         ArgumentNullException.ThrowIfNull(appearance);
+
         var visual = new DrawingVisual();
 
         using (var dc = visual.RenderOpen())
@@ -70,9 +70,14 @@ public static class CalendarIconRenderer
                 bg,
                 pen,
                 new Rect(inset, top + inset, size - stroke, size - top - stroke),
-                size < 24 ? 1 : size * .08,
-                size < 24 ? 1 : size * .08
+                size < 24
+                    ? 1
+                    : size * .08,
+                size < 24
+                    ? 1
+                    : size * .08
             );
+
             var header = Math.Round(size * .29);
 
             dc.DrawLine(
@@ -92,7 +97,9 @@ public static class CalendarIconRenderer
                 );
             }
 
-            var fontSize = size * (size <= 24 ? .69 : .65);
+            var fontSize = size * (size <= 24
+                ? .69
+                : .65);
             var text = new FormattedText(
                 week?.ToString("D2", CultureInfo.InvariantCulture) ?? "—",
                 CultureInfo.InvariantCulture,
@@ -110,7 +117,9 @@ public static class CalendarIconRenderer
             // Centre the glyph ink, not the font's ascent/descent box.
             var geometry = text.BuildGeometry(new Point(0, 0));
             var bounds = geometry.Bounds;
-            var maxWidth = size - 2 * stroke - (size <= 20 ? 1 : size * .1);
+            var maxWidth = size - 2 * stroke - (size <= 20
+                ? 1
+                : size * .1);
             var maxHeight = size - header - stroke - Math.Max(1, size * .06);
             var scale = Math.Min(1, Math.Min(maxWidth / bounds.Width, maxHeight / bounds.Height));
             var xOffset = (size - bounds.Width * scale) / 2 - bounds.X * scale;
@@ -120,6 +129,7 @@ public static class CalendarIconRenderer
             dc.DrawGeometry(fg, null, geometry);
             dc.Pop();
         }
+
         var bitmap = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
 
         bitmap.Render(visual);
@@ -135,6 +145,7 @@ public static class CalendarIconRenderer
     )
     {
         sizes ??= Sizes;
+
         var images = sizes.Select(size => Png(Render(week, size, appearance))).ToArray();
         using var output = new MemoryStream();
         using var writer = new BinaryWriter(output);
@@ -142,12 +153,17 @@ public static class CalendarIconRenderer
         writer.Write((ushort)0);
         writer.Write((ushort)1);
         writer.Write((ushort)sizes.Count);
+
         var offset = 6 + 16 * sizes.Count;
 
         for (var i = 0; i < sizes.Count; i++)
         {
-            writer.Write((byte)(sizes[i] == 256 ? 0 : sizes[i]));
-            writer.Write((byte)(sizes[i] == 256 ? 0 : sizes[i]));
+            writer.Write((byte)(sizes[i] == 256
+                ? 0
+                : sizes[i]));
+            writer.Write((byte)(sizes[i] == 256
+                ? 0
+                : sizes[i]));
             writer.Write((byte)0);
             writer.Write((byte)0);
             writer.Write((ushort)1);
@@ -170,6 +186,7 @@ public static class CalendarIconRenderer
         var encoder = new PngBitmapEncoder();
 
         encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
         using var output = new MemoryStream();
 
         encoder.Save(output);
@@ -187,27 +204,37 @@ public static class CalendarIconRenderer
 
             foreach (var dark in new[] { false, true })
             {
-                var y = dark ? 530 : 0;
+                var y = dark
+                    ? 530
+                    : 0;
 
                 dc.DrawRectangle(
-                    dark ? new SolidColorBrush(Color.FromRgb(16, 20, 28)) : Brushes.White,
+                    dark
+                        ? new SolidColorBrush(Color.FromRgb(16, 20, 28))
+                        : Brushes.White,
                     null,
                     new Rect(0, y, 1100, 530)
                 );
+
                 var appearance = IconAppearance.Resolve(new(), dark);
 
                 dc.DrawText(
                     new FormattedText(
-                        dark ? "Dark taskbar • 01–56" : "Light taskbar • 01–56",
+                        dark
+                            ? "Dark taskbar • 01–56"
+                            : "Light taskbar • 01–56",
                         CultureInfo.InvariantCulture,
                         FlowDirection.LeftToRight,
                         new Typeface("Segoe UI"),
                         22,
-                        dark ? Brushes.White : Brushes.Black,
+                        dark
+                            ? Brushes.White
+                            : Brushes.Black,
                         1
                     ),
                     new Point(20, y + 12)
                 );
+
                 for (var week = 1; week <= 56; week++)
                 {
                     var col = (week - 1) % 19;
@@ -222,6 +249,7 @@ public static class CalendarIconRenderer
                         new Rect(36 + col * 57, y + 56 + row * 52, 24, 24)
                     );
                 }
+
                 var x = 20;
 
                 foreach (var size in Sizes)
@@ -231,6 +259,7 @@ public static class CalendarIconRenderer
                 }
             }
         }
+
         var sheet = new RenderTargetBitmap(1100, 1060, 96, 96, PixelFormats.Pbgra32);
 
         sheet.Render(visual);

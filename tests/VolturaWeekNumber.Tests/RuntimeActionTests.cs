@@ -27,6 +27,7 @@ public sealed class RuntimeActionTests(WpfTestFixture fixture)
             args.Handled = true;
             completed.TrySetException(args.Exception);
         };
+
         try
         {
             fixture.Run(() =>
@@ -42,19 +43,23 @@ public sealed class RuntimeActionTests(WpfTestFixture fixture)
                         completed.TrySetResult(runtime.Model.Status);
                     }
                 };
+
                 typeof(AppRuntime)
                     .GetMethod("ActionRequested", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .Invoke(runtime, [action]);
             });
+
             var status = await completed.Task.WaitAsync(
                 TimeSpan.FromSeconds(10),
                 TestContext.Current.CancellationToken
             );
+
             Assert.StartsWith(Strings.Current["Invalid"], status, StringComparison.Ordinal);
         }
         finally
         {
             Task cleanup = Task.CompletedTask;
+
             fixture.Run(() =>
             {
                 if (runtime is not null)
@@ -64,6 +69,7 @@ public sealed class RuntimeActionTests(WpfTestFixture fixture)
                 }
             });
             await cleanup;
+
             if (Directory.Exists(root))
             {
                 Directory.Delete(root, true);
