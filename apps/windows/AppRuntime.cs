@@ -253,8 +253,8 @@ internal sealed class AppRuntime : IAsyncDisposable
         // announce a new week when a supported date becomes available again.
         _calendarIdentity = result is null ? null : identity;
         var text = result is null
-            ? $"{Strings.Current["Week"]} —\n{Strings.Current["Invalid"]}"
-            : $"{Strings.Current["Week"]} {result.Number:00}\n{date.ToString("dddd, d MMMM yyyy", Strings.Current.Culture)}";
+            ? $"{Strings.Current.WeekNumber(null)}\n{Strings.Current["Invalid"]}"
+            : $"{Strings.Current.WeekNumber(result.Number)}\n{date.ToString("D", Strings.Current.Culture)}";
 
         _tray.Update(
             result?.Number,
@@ -456,6 +456,7 @@ internal sealed class AppRuntime : IAsyncDisposable
                 {
                     Filter = "Voltura WeekNumber (*.json)|*.json",
                     CheckFileExists = true,
+                    Title = Strings.Current["Import"],
                 };
 
                 if (open.ShowDialog(Window) == true)
@@ -469,6 +470,7 @@ internal sealed class AppRuntime : IAsyncDisposable
                 {
                     Filter = "Voltura WeekNumber (*.json)|*.json",
                     FileName = "VolturaWeekNumber-settings.json",
+                    Title = Strings.Current["Export"],
                 };
 
                 if (export.ShowDialog(Window) == true)
@@ -481,8 +483,9 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "export-icon":
                 var saveIcon = new SaveFileDialog
                 {
-                    Filter = "Icon (*.ico)|*.ico",
+                    Filter = Strings.Current["IconFile"] + "|*.ico",
                     FileName = "WeekNumber.ico",
+                    Title = Strings.Current["ExportIcon"],
                 };
 
                 if (saveIcon.ShowDialog(Window) == true)

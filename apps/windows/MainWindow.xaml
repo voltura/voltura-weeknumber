@@ -37,7 +37,7 @@
             <ui:SpacingStackPanel Spacing="8">
               <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
               <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <DatePicker x:Name="DateInput" SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Long" Height="40" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
+                <DatePicker x:Name="DateInput" SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Short" Height="40" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
                 <Button Grid.Column="2" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
               </Grid>
               <TextBlock Text="{Binding ConventionText}" Style="{StaticResource Caption}"/>

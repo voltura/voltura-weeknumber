@@ -18,11 +18,19 @@ The tray icon displays the current week number (week 53 shown here).
 - **Look up a date.** Find its week number, day of the year, or Julian day number. Convert a year and day number—or a Julian day number—back to a date.
 - **Use your calendar rules.** Follow Windows regional settings, choose ISO 8601, or set your own first day of the week and first-week rule.
 - **Make it yours.** Choose light, dark, or system appearance, customize icon colors and transparency, and export the calendar icon as an ICO file.
-- **Choose your language.** English, Swedish, and German are available independently of your calendar rules.
+- **Choose your language.** Pick from 21 language options or follow your Windows language, independently of your calendar rules.
 - **Stay informed.** Optionally start with Windows and receive startup or new-week notifications, with or without sound.
 - **Keep your preferences.** Export and import settings for backup or use on another computer.
 
 Calendar lookups work offline. No account is required.
+
+## Supported languages
+
+English, Swedish, German, French, Danish, Finnish, Icelandic, Norwegian Bokmål, Polish, Italian, Spanish, Cantonese, Japanese, Brazilian Portuguese, Simplified Chinese, Traditional Chinese, Dutch, Korean, Russian, Turkish, and Indonesian.
+
+Choose your language in **Preferences → Application → Language**, then select **Save changes**. Language names appear in their native form. Dates and weekday names follow the selected language; your week-numbering rules remain unchanged.
+
+**Follow Windows** selects a supported translation automatically and falls back to English for unsupported languages. Chinese (Hong Kong) selects Cantonese, written in Traditional characters. Simplified Chinese and Traditional Chinese are separate options; Traditional Chinese uses Taiwan terminology. Portuguese regional variants use Brazilian Portuguese.
 
 ## Download and get started
 

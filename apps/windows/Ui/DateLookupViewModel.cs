@@ -45,7 +45,7 @@ public sealed class DateLookupViewModel : INotifyPropertyChanged
             )
             : "—";
     public string DateText =>
-        _date?.ToString("dddd, d MMMM yyyy", Strings.Current.Culture)
+        _date?.ToString("D", Strings.Current.Culture)
         ?? Strings.Current["ChooseDate"];
     public string Help => Strings.Current[_julian ? "JulianHelp" : "OrdinalHelp"];
     public string NumberLabel => Strings.Current[_julian ? "JulianTab" : "OrdinalTab"];

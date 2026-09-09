@@ -96,8 +96,8 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
                     CultureInfo.CurrentCulture
                 );
 
-                WeekText = $"{strings["Week"]} {result.Number:00}";
-                DateText = date.ToString("dddd, d MMMM yyyy", strings.Culture);
+                WeekText = strings.WeekNumber(result.Number);
+                DateText = date.ToString("D", strings.Culture);
                 WeekYearText =
                     result.IsoYear is { } year && year != date.Year
                         ? $"{strings["IsoYear"]}: {year}"

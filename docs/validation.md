@@ -8,7 +8,7 @@ Run commands from the repository root on Windows. See [Contributing](../CONTRIBU
 ./scripts/build.ps1
 ```
 
-This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
+This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence and language import/export, Windows-language detection (including Chinese scripts and regions), translation completeness, localized runtime and tray states, minimum-width button labels, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
 
 For installer or packaging changes:
 
@@ -32,7 +32,7 @@ $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
 ./apps/windows/bin/Release/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode "$reviewRoot/profile" --render-review "$reviewRoot/images"
 ```
 
-The mode exits after capturing the actual WPF UI, icon sheet, light/dark date lookups, English/Swedish/German pages, compact layouts, and color picker. It also writes `window-dpi.json`. Inspect images for clipping, text contrast, date entry, focus states, and consistent control spacing. The README screenshot is stored in `docs/images/voltura-weeknumber.png`; refresh it from an English `window-light.png` capture when the main page changes.
+The mode exits after capturing the actual WPF UI and icon sheet, plus week number, date lookup, Preferences, About, and color-picker views in all 21 languages and light/dark themes. Each main page is captured at normal and minimum window widths after layout animations finish. It also writes `window-dpi.json`. Inspect images for clipping, text contrast, date entry, focus states, and consistent control spacing. The README screenshot is stored in `docs/images/voltura-weeknumber.png`; refresh it from an English `window-light.png` capture when the main page changes.
 
 ## Display and idle diagnostics
 
@@ -51,7 +51,7 @@ The report includes startup time, CPU, memory, handles, icon render count, and D
 
 Choose checks relevant to the changed behavior and record the build, environment, and observed result:
 
-- **Calendar and appearance:** test date entry and invalid input, year boundaries, each calendar mode, all three languages, light/dark/high-contrast appearance, keyboard navigation, custom icon transparency, and export/import dialogs.
+- **Calendar and appearance:** test date entry and invalid input, year boundaries, each calendar mode, all 21 language options, light/dark/high-contrast appearance, keyboard navigation, custom icon transparency, and export/import dialogs.
 - **Tray and notifications:** restart Explorer; reopen the window; activate a second instance; test notification clicks, Exit, startup/new-week notifications, sound settings, and Windows quiet mode. Resume across midnight and change the clock or time zone.
 - **Displays:** move the window and taskbar between different DPI displays, change the primary monitor, disconnect/reconnect a display, and power-cycle relevant TV/receiver hardware. Check scale, icon sharpness, visible placement, and manual window sizing.
 - **Installation:** use a clean Windows Sandbox or VM for both installer wizards, missing-runtime download, UAC cancellation, offline failure, reboot-required outcomes, autostart, upgrade, and uninstall with and without settings removal. Check the portable ZIP separately.

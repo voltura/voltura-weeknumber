@@ -11,6 +11,7 @@ public partial class ColorPickerWindow : Window
     public ColorPickerWindow(string title, string value)
     {
         InitializeComponent();
+        Language = System.Windows.Markup.XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
         Title = title;
         SelectedColor = value;
         var color = (Color)ColorConverter.ConvertFromString(value);

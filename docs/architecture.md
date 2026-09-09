@@ -8,6 +8,8 @@ Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The 
 
 ## Calendar and tray
 
+`LanguageCatalog` owns supported language identifiers, native labels, formatting cultures, and compiled translation tables. Settings validation, language choices, Windows-language resolution, and review captures share this catalog. `Strings` keeps the existing WPF binding interface and formats complete week-number phrases. Display language does not change the culture used for calendar calculations.
+
 `WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the calendar selected in the culture's `DateTimeFormat`. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
 
 `NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.

@@ -82,8 +82,27 @@ public partial class MainWindow : Window
         );
     }
 
-    public void UpdateLanguage() =>
+    public void UpdateLanguage()
+    {
         Language = XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
+        RefreshDateText(this);
+    }
+
+    private static void RefreshDateText(DependencyObject parent)
+    {
+        if (parent is DatePicker picker)
+        {
+            // WPF updates calendar language, but leaves unchanged dates formatted in the old language.
+            picker.SetCurrentValue(DatePicker.TextProperty,
+                picker.SelectedDate?.ToString("d", Strings.Current.Culture) ?? string.Empty);
+            return;
+        }
+
+        foreach (var child in LogicalTreeHelper.GetChildren(parent).OfType<DependencyObject>())
+        {
+            RefreshDateText(child);
+        }
+    }
 
     // This checkbox saves immediately; do not accept edits while its save action is gated.
     internal void SetActionsBusy(bool busy) => AutomaticUpdateCheck.IsEnabled = !busy;

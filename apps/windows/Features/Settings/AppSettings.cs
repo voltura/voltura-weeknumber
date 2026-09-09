@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using VolturaWeekNumber.Features.Calendar;
+using VolturaWeekNumber.Features.Localization;
 
 namespace VolturaWeekNumber.Features.Settings;
 
@@ -27,7 +28,7 @@ public sealed record AppSettings
         }
 
         if (
-            Language is not ("system" or "en" or "sv" or "de")
+            !LanguageCatalog.IsSupported(Language)
             || Theme is not ("system" or "light" or "dark")
         )
         {

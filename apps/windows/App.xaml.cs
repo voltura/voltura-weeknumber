@@ -144,100 +144,58 @@ public partial class App : System.Windows.Application
                     )
                 );
 
-                foreach (var language in new[] { "en", "sv", "de" })
+                foreach (var language in Features.Localization.LanguageCatalog.All)
                 {
                     await _runtime.ApplyReviewSettingsAsync(
-                        new AppSettings { Language = language, Theme = "light" }
+                        new AppSettings { Language = language.Id, Theme = "light" }
                     );
-                    _runtime.Window.Width = 480;
-                    _runtime.Window.Height = 400;
 
-                    foreach (var page in new[] { MainPage.DayOfYear, MainPage.JulianDay })
+                    foreach (var reviewTheme in new[] { "light", "dark" })
                     {
-                        foreach (var reviewTheme in new[] { "light", "dark" })
+                        Ui.ThemeManager.Apply(reviewTheme);
+                        foreach (var page in Enum.GetValues<MainPage>())
                         {
-                            Ui.ThemeManager.Apply(reviewTheme);
-                            _runtime.Window.Width = 640;
-                            _runtime.Window.Height = 700;
-                            _runtime.Window.Open(page);
-                            await Dispatcher.InvokeAsync(
-                                () => { },
-                                DispatcherPriority.ApplicationIdle
-                            );
-                            _runtime.Window.UpdateLayout();
-                            Capture(
-                                _runtime.Window,
-                                Path.Combine(
-                                    output,
-                                    page + "-" + language + "-" + reviewTheme + ".png"
-                                )
-                            );
-                            _runtime.Window.Width = 360;
-                            _runtime.Window.Height = 520;
-                            await Dispatcher.InvokeAsync(
-                                () => { },
-                                DispatcherPriority.ApplicationIdle
-                            );
-                            _runtime.Window.UpdateLayout();
-                            Capture(
-                                _runtime.Window,
-                                Path.Combine(
-                                    output,
-                                    page + "-" + language + "-" + reviewTheme + "-compact.png"
-                                )
-                            );
+                            foreach (var compact in new[] { false, true })
+                            {
+                                _runtime.Window.Open(page);
+                                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                                // Activation restores the user's preferred size; resize after it completes.
+                                _runtime.Window.Width = compact ? _runtime.Window.MinWidth : 720;
+                                _runtime.Window.Height = compact ? 400 : 640;
+                                await Task.Delay(350); // Let Fluent layout animations finish before capture.
+                                _runtime.Window.PrepareReview();
+                                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                                _runtime.Window.UpdateLayout();
+                                Capture(
+                                    _runtime.Window,
+                                    Path.Combine(output, $"{page}-{language.Id}-{reviewTheme}{(compact ? "-compact" : "")}.png")
+                                );
+                                if (page == MainPage.About)
+                                {
+                                    _runtime.Window.UpdateState(
+                                        new Features.Updates.UpdateState(Features.Updates.UpdateStatus.Ready, "review-only"), true);
+                                    _runtime.Window.UpdateLayout();
+                                    Capture(_runtime.Window, Path.Combine(output,
+                                        $"about-update-ready-{language.Id}-{reviewTheme}{(compact ? "-compact" : "")}.png"));
+                                    _runtime.Window.UpdateState(
+                                        new Features.Updates.UpdateState(Features.Updates.UpdateStatus.ManualUpdates), false);
+                                }
+                            }
                         }
+
+                        var colorReview = new Ui.ColorPickerWindow(
+                            Ui.Strings.Current["Background"], "#80245CB4"
+                        )
+                        {
+                            Owner = _runtime.Window
+                        };
+                        colorReview.Show();
+                        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                        colorReview.UpdateLayout();
+                        Capture(colorReview, Path.Combine(output, $"color-picker-{language.Id}-{reviewTheme}.png"));
+                        colorReview.Close();
                     }
-
-                    Ui.ThemeManager.Apply("light");
-                    _runtime.Window.Width = 720;
-                    _runtime.Window.Height = 640;
-                    _runtime.Window.Open(MainPage.About);
-                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                    _runtime.Window.UpdateLayout();
-                    Capture(_runtime.Window, Path.Combine(output, "about-" + language + ".png"));
-                    _runtime.Window.Open(MainPage.Preferences);
-                    _runtime.Window.PrepareReview();
-                    await Task.Delay(350);
-                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                    _runtime.Window.UpdateLayout();
-                    Capture(
-                        _runtime.Window,
-                        Path.Combine(output, "preferences-" + language + ".png")
-                    );
-                    _runtime.Window.Width = 480;
-                    _runtime.Window.Height = 400;
-                    _runtime.Window.Open(MainPage.Preferences);
-                    _runtime.Window.PrepareReview();
-                    await Task.Delay(350);
-                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                    _runtime.Window.UpdateLayout();
-                    Capture(
-                        _runtime.Window,
-                        Path.Combine(output, "preferences-" + language + "-compact.png")
-                    );
-                    _runtime.Window.Open(MainPage.About);
-                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                    _runtime.Window.UpdateLayout();
-                    Capture(
-                        _runtime.Window,
-                        Path.Combine(output, "about-" + language + "-compact.png")
-                    );
                 }
-
-                var colorReview = new Ui.ColorPickerWindow(
-                    Ui.Strings.Current["Background"],
-                    "#80245CB4"
-                )
-                {
-                    Owner = _runtime.Window,
-                };
-
-                colorReview.Show();
-                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                colorReview.UpdateLayout();
-                Capture(colorReview, Path.Combine(output, "color-picker.png"));
-                colorReview.Close();
                 await StopAsync();
             }
         }
@@ -257,8 +215,8 @@ public partial class App : System.Windows.Application
     {
         var content = (FrameworkElement)window.Content;
         var bitmap = new RenderTargetBitmap(
-            (int)Math.Ceiling(content.ActualWidth + 40),
-            (int)Math.Ceiling(content.ActualHeight + 40),
+            (int)Math.Ceiling(content.ActualWidth + content.Margin.Left + content.Margin.Right),
+            (int)Math.Ceiling(content.ActualHeight + content.Margin.Top + content.Margin.Bottom),
             96,
             96,
             PixelFormats.Pbgra32
