@@ -51,14 +51,14 @@ Run `scripts/verify.ps1` to include signing and release-workflow regression chec
 
 ## UI captures
 
-Use a separate profile for review so normal settings are unaffected. Diagnostic modes require `--isolated-test-mode`; supply a path immediately after each of `--isolated-test-mode`, `--render-review`, and `--measure-idle` when used.
+Use a separate profile so normal settings are unaffected. The capture writes the current English main window in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits.
 
 ```powershell
 $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
 ./apps/windows/bin/Release/net10.0-windows/VolturaWeekNumber.exe --isolated-test-mode "$reviewRoot/profile" --render-review "$reviewRoot/images"
 ```
 
-The mode exits after capturing the actual WPF UI and icon sheet, plus week number, date lookup, Preferences, About, and color-picker views in all 21 languages and light/dark themes. Each main page is captured at normal and minimum window widths after layout animations finish. It also writes `window-dpi.json`. Inspect images for clipping, text contrast, date entry, focus states, and consistent control spacing. The README screenshot is stored in `docs/images/voltura-weeknumber.png`; refresh it from an English `window-light.png` capture when the main page changes.
+The README screenshot is stored in `docs/images/voltura-weeknumber.png`; refresh it from `window-light.png` when the main page changes.
 
 ## Display and idle diagnostics
 

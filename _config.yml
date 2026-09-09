@@ -1,0 +1,20 @@
+title: Voltura WeekNumber
+description: Keep the current week number visible beside the Windows clock.
+url: https://voltura.github.io
+baseurl: /voltura-weeknumber
+lang: en
+repository: voltura/voltura-weeknumber
+exclude:
+  - artifacts
+  - TestResults
+  - apps
+  - installer
+  - scripts
+  - tests
+  - tools
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
+  - NOTICE.md
+  - PRIVACY.md
+  - SECURITY.md
+  - THIRD-PARTY-NOTICES.md

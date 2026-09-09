@@ -5,7 +5,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Icon;
-using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Platform;
 
 namespace VolturaWeekNumber;
@@ -148,73 +147,9 @@ public partial class App : System.Windows.Application
                         ReportJson
                     )
                 );
-
-                foreach (var language in Features.Localization.LanguageCatalog.All)
-                {
-                    await _runtime.ApplyReviewSettingsAsync(
-                        new AppSettings { Language = language.Id, Theme = "light" }
-                    );
-
-                    foreach (var reviewTheme in new[] { "light", "dark" })
-                    {
-                        Ui.ThemeManager.Apply(reviewTheme);
-
-                        foreach (var page in Enum.GetValues<MainPage>())
-                        {
-                            foreach (var compact in new[] { false, true })
-                            {
-                                _runtime.Window.Open(page);
-                                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                                // Activation restores the user's preferred size; resize after it completes.
-                                _runtime.Window.Width = compact
-                                    ? _runtime.Window.MinWidth
-                                    : 720;
-                                _runtime.Window.Height = compact
-                                    ? 400
-                                    : 640;
-                                await Task.Delay(350); // Let Fluent layout animations finish before capture.
-                                _runtime.Window.PrepareReview();
-                                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                                _runtime.Window.UpdateLayout();
-                                Capture(
-                                    _runtime.Window,
-                                    Path.Combine(output, $"{page}-{language.Id}-{reviewTheme}{(compact
-                                        ? "-compact"
-                                        : "")}.png")
-                                );
-
-                                if (page == MainPage.About)
-                                {
-                                    _runtime.Window.UpdateState(
-                                        new Features.Updates.UpdateState(Features.Updates.UpdateStatus.Ready, "review-only"), true);
-                                    _runtime.Window.UpdateLayout();
-                                    Capture(_runtime.Window, Path.Combine(output,
-                                        $"about-update-ready-{language.Id}-{reviewTheme}{(compact
-                                            ? "-compact"
-                                            : "")}.png"));
-                                    _runtime.Window.UpdateState(
-                                        new Features.Updates.UpdateState(Features.Updates.UpdateStatus.ManualUpdates), false);
-                                }
-                            }
-                        }
-
-                        var colorReview = new Ui.ColorPickerWindow(
-                            Ui.Strings.Current["Background"], "#80245CB4"
-                        )
-                        {
-                            Owner = _runtime.Window
-                        };
-
-                        colorReview.Show();
-                        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
-                        colorReview.UpdateLayout();
-                        Capture(colorReview, Path.Combine(output, $"color-picker-{language.Id}-{reviewTheme}.png"));
-                        colorReview.Close();
-                    }
-                }
-
                 await StopAsync();
             }
+
         }
         catch (Exception error)
         {

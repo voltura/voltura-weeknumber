@@ -145,8 +145,6 @@ public partial class MainWindow : Window
         Close();
     }
 
-    internal void PrepareReview() => PreferencesScroll.ScrollToHome();
-
     private void OnClosing(object? sender, CancelEventArgs args)
     {
         if (_exit)
