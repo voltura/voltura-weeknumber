@@ -15,7 +15,7 @@
 !ifndef VARIANT
   !define VARIANT "standard"
 !endif
-Name "Voltura WeekNumber"
+Name "Voltura WeekNumber ${VERSION}"
 OutFile "${OUTPUT}"
 InstallDir "$LOCALAPPDATA\Programs\VolturaWeekNumber"
 RequestExecutionLevel user

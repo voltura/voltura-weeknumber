@@ -14,6 +14,11 @@ function git
     {
         if ($releaseTestState.Dirty) { ' M scripts/release.ps1' }
     }
+    elseif ($args -contains 'branch') { 'master' }
+    elseif ($args -contains 'add') { }
+    elseif ($args -contains 'diff') { if ($releaseTestState.Dirty) { $global:LASTEXITCODE = 1 } }
+    elseif ($args -contains 'commit') { $releaseTestState.Dirty = $false }
+    elseif ($args -contains 'push') { }
     elseif ($args -contains 'rev-parse') { $releaseTestState.Revision }
     elseif ($args -contains 'ls-remote') { $releaseTestState.Tags }
     else { throw 'Unexpected git command in release test.' }
@@ -24,6 +29,7 @@ function gh
     $global:LASTEXITCODE = 0
     if ($args[0] -eq 'api')
     {
+        if ($args[1] -like '*/releases') { return }
         if (-not $releaseTestState.CommitExists) { $global:LASTEXITCODE = 1 }
     }
     elseif ($args[0] -eq 'release' -and $args[1] -eq 'create')
@@ -51,7 +57,7 @@ function Read-Host([string]$Prompt, [switch]$AsSecureString)
     ConvertTo-SecureString $signingTestState.PromptPassword -AsPlainText -Force
 }
 
-function Invoke-SigningCase([string]$Name, [AllowNull()][string]$Value, [bool]$ExpectPrompt, [bool]$ExpectSuccess, [bool]$Publish = $false)
+function Invoke-SigningCase([string]$Name, [AllowNull()][string]$Value, [bool]$ExpectPrompt, [bool]$ExpectSuccess, [bool]$Publish = $false, [bool]$NoTests = $false)
 {
     $env:VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE = $Value
     $signingTestState.PromptCount = 0
@@ -62,7 +68,7 @@ function Invoke-SigningCase([string]$Name, [AllowNull()][string]$Value, [bool]$E
 
     try
     {
-        & (Join-Path $testRoot 'scripts/release.ps1') -KeyPath (Join-Path $testRoot 'test.private.pem') -Publish:$Publish | Out-Null
+        & (Join-Path $testRoot 'scripts/release.ps1') -KeyPath (Join-Path $testRoot 'test.private.pem') -PrepareOnly:(-not $Publish) -NoTests:$NoTests | Out-Null
     }
     catch
     {
@@ -110,6 +116,8 @@ try
     [IO.File]::WriteAllText((Join-Path $testRoot 'test.private.pem'),
         $rsa.ExportEncryptedPkcs8PrivateKeyPem($testPassword, $parameters))
     [IO.File]::WriteAllText((Join-Path $scripts 'package.ps1'), @'
+param([switch]$SkipTests)
+if ([bool]$SkipTests -ne $NoTests) { throw 'Release test selection was not forwarded to packaging.' }
 $root = Split-Path $PSScriptRoot -Parent
 [IO.File]::WriteAllText((Join-Path $root 'packaged'), 'packaged')
 $publishDirectory = Join-Path $root 'artifacts/publish'
@@ -118,9 +126,12 @@ foreach ($suffix in @('', '-full'))
 {
     [IO.File]::WriteAllText((Join-Path $publishDirectory "VolturaWeekNumber-Setup-1.0.0-win-x64$suffix.exe"), 'test payload')
 }
+[IO.File]::WriteAllText((Join-Path $publishDirectory 'VolturaWeekNumber-1.0.0-win-x64.zip'), 'test portable')
 '@)
 
     Invoke-SigningCase 'Environment passphrase with surrounding spaces' $testPassword $false $true
+    Invoke-SigningCase 'NoTests reaches packaging and still signs for publication' $testPassword $false $true $true $true
+    Invoke-SigningCase 'NoTests works with PrepareOnly' $testPassword $false $true $false $true
     Invoke-SigningCase 'Missing environment prompts before packaging' $null $true $true
     Invoke-SigningCase 'Empty environment prompts before packaging' '' $true $true
     Invoke-SigningCase 'Whitespace environment prompts before packaging' '   ' $true $true
@@ -142,10 +153,8 @@ foreach ($suffix in @('', '-full'))
     Invoke-SigningCase 'Conflicting tag stops before packaging' $testPassword $false $false $true
     $releaseTestState.Tags = @()
     $releaseTestState.Dirty = $true
-    Invoke-SigningCase 'Uncommitted changes stop before packaging' $testPassword $false $false $true
+    Invoke-SigningCase 'Uncommitted changes are committed for publication' $testPassword $false $true $true
     $releaseTestState.Dirty = $false
-    $releaseTestState.CommitExists = $false
-    Invoke-SigningCase 'Unpushed commit stops before packaging' $testPassword $false $false $true
 }
 finally
 {

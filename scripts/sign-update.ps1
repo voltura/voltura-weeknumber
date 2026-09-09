@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$KeyPath,
-    [switch]$BuildPackages
+    [switch]$BuildPackages,
+    [switch]$SkipTests
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -44,7 +45,7 @@ try
 
     if ($BuildPackages)
     {
-        & "$PSScriptRoot\package.ps1"
+        & "$PSScriptRoot\package.ps1" -SkipTests:$SkipTests
     }
 
     $publish = Join-Path $root 'artifacts\publish'

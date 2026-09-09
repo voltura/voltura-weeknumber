@@ -19,6 +19,7 @@ try
 
     Write-Output 'PowerShell syntax checks passed.'
     & "$PSScriptRoot\test-release-signing.ps1"
+    & "$PSScriptRoot\test-release-workflow.ps1"
 }
 finally
 {

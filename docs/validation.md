@@ -21,9 +21,33 @@ Packaging runs build and tests before creating both NSIS installers with warning
 
 The test suite checks that the installer's language identifiers and native labels match the application catalog and that all four custom setup messages exist for every language. NSIS supplies 20 wizard translations; `installer/languages/Cantonese.nsh` and `Cantonese.nlf` supply written Cantonese. Keep the `.nlf` file encoded as UTF-8 with a BOM so NSIS reads its characters correctly. `/WX` rejects missing wizard strings during packaging. When changing installer languages, inspect the actual language picker and welcome/license pages in both variants, including Cantonese, Simplified/Traditional Chinese, Japanese, and Korean. Cancel before installation when reviewing on a development machine.
 
-`scripts/release.ps1 -KeyPath <private-key-path> -Publish` reads the signing passphrase from `VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE` in the current process environment. If it is unset, empty, or whitespace, it prompts securely. The passphrase and matching signing key are validated before building or packaging, and signing reuses the unlocked key without a second prompt. After changing a persistent Windows environment variable, open a new terminal so the release process inherits it. Standalone `scripts/sign-update.ps1` uses the same environment variable and prompt fallback.
+## Release a version
 
-Commit and push the version, release notes, and code before running with `-Publish`. The script checks for uncommitted changes and conflicting remote tags before packaging. GitHub creates `v<version>` at the checked release commit when publishing if the tag does not already exist; a matching existing tag is reused. You do not need to create or push tags manually. Run `scripts/verify.ps1` to include signing and release-script regression checks using temporary keys and simulated packaging/publication.
+From `C:\Users\joaki\source\repos\voltura-weeknumber`, run:
+
+```powershell
+pwsh -NoProfile -File .\scripts\release.ps1
+# Or select the version explicitly:
+pwsh -NoProfile -File .\scripts\release.ps1 -Version 1.1.0
+```
+
+Publication is the default; the old `-Publish` switch has been removed. `-KeyPath` defaults to `WEEKNUMBER_KEYPATH` in the current process environment. You can override it with `-KeyPath 'C:\Users\joaki\newkey'`. Open a new terminal after setting a persistent Windows environment variable. Missing key configuration or a nonexistent key file stops the command before staging, committing, or pushing anything.
+
+The command checks GitHub releases and reuses a version in `version.json` that is newer than the existing stable version numbers (including reserved draft versions). Otherwise it prompts for a stable `x.y.z` version. An explicit `-Version` must also be newer. GitHub authentication/network errors stop the release instead of being treated as an absent release.
+
+Notes live in `docs/releases/<version>.md`. Existing notes with meaningful content are reused. Missing or empty notes are created with the release heading, then opened in a separate Notepad++ instance. Notepad++ is discovered through `PATH` or its standard Program Files/local installation locations. Save your notes and close that separate window to continue. Heading-only or unsaved notes stop the command without staging, committing, or pushing; the notes file remains for editing and retrying.
+
+After updating `version.json`, the script validates the signing key, builds/tests, packages once, and signs. It then stages **all current tracked and non-ignored untracked changes**, commits them as `Release <version>` if needed, pushes the current branch to `origin`, verifies the pushed commit, and publishes the five release assets. Review your working tree before running: existing code and installer edits are included. Push failures do not trigger an automatic pull, rebase, or force-push.
+
+GitHub creates `v<version>` at the checked release commit if the tag does not exist; a matching existing tag is reused and a conflicting tag stops publication. No manual tag creation is needed. If an attempt fails before publication, fix the reported error and rerun: the pending version/notes and any existing release commit are reused. If GitHub publication itself fails, inspect the release first because GitHub may have accepted part of the request. Published versions are never overwritten.
+
+Add `-PrepareOnly` to prepare version/notes and signed artifacts locally without staging, committing, pushing, or publishing. This still queries GitHub to validate the version. Edited files and generated artifacts remain available locally.
+
+Add `-NoTests` to skip test execution, including the UI tests: `pwsh -NoProfile -File .\scripts\release.ps1 -NoTests`. Packaging still builds the application and creates and signs all release artifacts. Tests run by default. This option also works with `-Version`, `-KeyPath`, and `-PrepareOnly`.
+
+The signing passphrase still comes from `VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE`. If unset, empty, or whitespace, it prompts securely. The passphrase and matching key are validated before building or packaging; signing reuses the unlocked key without a second prompt. Standalone `scripts/sign-update.ps1` retains its explicit `-KeyPath` parameter and the same passphrase behavior. Keep private keys outside the repository.
+
+Run `scripts/verify.ps1` to include signing and release-workflow regression checks with temporary keys and simulated editing, packaging, Git changes, and publication.
 
 ## UI captures
 
