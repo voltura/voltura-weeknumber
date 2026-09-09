@@ -1,4 +1,7 @@
-param([Parameter(Mandatory)][string]$KeyPath)
+param(
+    [Parameter(Mandatory)][string]$KeyPath,
+    [switch]$BuildPackages
+)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $version = (Get-Content (Join-Path $root 'version.json') -Raw | ConvertFrom-Json).version
@@ -9,11 +12,27 @@ if (-not (Test-Path -LiteralPath $publicPath))
     throw 'Configure the dedicated production public key before building release artifacts.'
 }
 
-$passphrase = Read-Host 'Update signing key passphrase' -AsSecureString
-$credential = [Net.NetworkCredential]::new('', $passphrase)
+$passphrase = $null
+$credential = $null
 $rsa = [Security.Cryptography.RSA]::Create()
 try
 {
+    if ([string]::IsNullOrWhiteSpace($env:VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE))
+    {
+        $passphrase = Read-Host 'Update signing key passphrase' -AsSecureString
+    }
+    else
+    {
+        $passphrase = ConvertTo-SecureString $env:VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE -AsPlainText -Force
+    }
+
+    $credential = [Net.NetworkCredential]::new('', $passphrase)
+
+    if ([string]::IsNullOrWhiteSpace($credential.Password))
+    {
+        throw 'A nonempty signing passphrase is required.'
+    }
+
     $rsa.ImportFromEncryptedPem(
         [IO.File]::ReadAllText([IO.Path]::GetFullPath($KeyPath)),
         $credential.Password)
@@ -21,6 +40,11 @@ try
     if ($rsa.ExportSubjectPublicKeyInfoPem().Trim() -ne [IO.File]::ReadAllText($publicPath).Trim())
     {
         throw 'Signing key does not match the embedded public key.'
+    }
+
+    if ($BuildPackages)
+    {
+        & "$PSScriptRoot\package.ps1"
     }
 
     $publish = Join-Path $root 'artifacts\publish'
@@ -48,6 +72,9 @@ try
 finally
 {
     $rsa.Dispose()
-    $passphrase.Dispose()
+    if ($null -ne $passphrase)
+    {
+        $passphrase.Dispose()
+    }
     $credential = $null
 }

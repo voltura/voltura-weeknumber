@@ -18,6 +18,7 @@ try
     }
 
     Write-Output 'PowerShell syntax checks passed.'
+    & "$PSScriptRoot\test-release-signing.ps1"
 }
 finally
 {

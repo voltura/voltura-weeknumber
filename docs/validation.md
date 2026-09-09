@@ -19,6 +19,10 @@ For installer or packaging changes:
 
 Packaging runs build and tests before creating both NSIS installers with warnings treated as errors and a self-contained portable ZIP in `artifacts/publish`. Installer tests exercise the maintenance helper in marked isolated directories and write `artifacts/installer-test-results.json`. They do not replace clean-machine testing of the actual installer and Windows integration.
 
+`scripts/release.ps1 -KeyPath <private-key-path> -Publish` reads the signing passphrase from `VOLTURA_AIR_UPDATE_SIGNING_PASSPHRASE` in the current process environment. If it is unset, empty, or whitespace, it prompts securely. The passphrase and matching signing key are validated before building or packaging, and signing reuses the unlocked key without a second prompt. After changing a persistent Windows environment variable, open a new terminal so the release process inherits it. Standalone `scripts/sign-update.ps1` uses the same environment variable and prompt fallback.
+
+Commit and push the version, release notes, and code before running with `-Publish`. The script checks for uncommitted changes and conflicting remote tags before packaging. GitHub creates `v<version>` at the checked release commit when publishing if the tag does not already exist; a matching existing tag is reused. You do not need to create or push tags manually. Run `scripts/verify.ps1` to include signing and release-script regression checks using temporary keys and simulated packaging/publication.
+
 ## UI captures
 
 Use a separate profile for review so normal settings are unaffected. Diagnostic modes require `--isolated-test-mode`; supply a path immediately after each of `--isolated-test-mode`, `--render-review`, and `--measure-idle` when used.
