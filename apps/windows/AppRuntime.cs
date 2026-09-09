@@ -323,6 +323,7 @@ internal sealed class AppRuntime : IAsyncDisposable
 
         try
         {
+            Window.SetActionsBusy(true);
             await ExecuteAsync(action);
         }
         catch (OperationCanceledException) when (_shuttingDown) { }
@@ -348,6 +349,7 @@ internal sealed class AppRuntime : IAsyncDisposable
         }
         finally
         {
+            Window.SetActionsBusy(false);
             _actions.Release();
         }
     }

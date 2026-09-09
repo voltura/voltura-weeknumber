@@ -85,6 +85,9 @@ public partial class MainWindow : Window
     public void UpdateLanguage() =>
         Language = XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
 
+    // This checkbox saves immediately; do not accept edits while its save action is gated.
+    internal void SetActionsBusy(bool busy) => AutomaticUpdateCheck.IsEnabled = !busy;
+
     internal void UpdateState(UpdateState state, bool eligible)
     {
         UpdateStatus.Text = Strings.Current[state.Status.ToString()];

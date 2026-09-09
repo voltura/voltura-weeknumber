@@ -4,7 +4,7 @@ param(
     [ValidateSet('standard', 'full')][string]$Variant = 'standard',
     [string]$SetupPath,
     [string]$TestRoot,
-    [ValidateSet('', 'AfterBackup', 'AfterPromotion', 'AfterHealth', 'AfterRegistration')][string]$FailurePoint = '',
+    [ValidateSet('', 'AfterBackup', 'AfterPromotion', 'AfterHealth', 'AfterRegistration', 'AfterCommit')][string]$FailurePoint = '',
     [switch]$RemoveSettings
 )
 $ErrorActionPreference = 'Stop'
@@ -186,6 +186,15 @@ function Restore-Transaction
     $tx = $script:transaction
     Assert-OwnedPath $tx.Stage
     Assert-OwnedPath $tx.Backup
+
+    if ($tx.Mode -eq 'Install' -and $tx.Phase -eq 'Committed')
+    {
+        # Backup deletion may already be partial. Keep the healthy installed target.
+        Remove-Owned $tx.Backup
+        Remove-Item -LiteralPath $journalPath -Force
+
+        return
+    }
 
     if ($tx.Mode -eq 'Uninstall' -and $tx.Phase -eq 'Removing')
     {
@@ -475,6 +484,11 @@ try
         $script:transaction.Phase = 'Registered'
         Write-Journal
         Fail-At 'AfterRegistration'
+
+        # Rollback is no longer safe once any backup files have been deleted.
+        $script:transaction.Phase = 'Committed'
+        Write-Journal
+        Fail-At 'AfterCommit'
 
         if ($hadPrevious)
         {

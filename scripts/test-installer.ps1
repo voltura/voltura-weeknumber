@@ -143,6 +143,18 @@ if ((Run-Maintenance 'Install') -ne 0)
 }
 
 $checks.Add('Upgrade and health check')
+$rollbackOnly = Join-Path $target 'rollback-only.txt'
+[IO.File]::WriteAllText($rollbackOnly, 'Only the previous installation contains this file.')
+
+if ((Run-Maintenance 'Install' 'AfterCommit') -eq 0 -or
+    (Test-Path -LiteralPath $rollbackOnly) -or
+    (Get-FileHash -LiteralPath (Join-Path $target 'VolturaWeekNumber.exe')).Hash -ne $original -or
+    (Test-Path -LiteralPath (Join-Path $test '.VolturaWeekNumber-maintenance\journal.json')))
+{
+    throw 'Committed upgrade rolled back instead of completing backup cleanup.'
+}
+
+$checks.Add('Keep the new installation after a committed upgrade failure')
 $cleanPayload = $payload
 $payload = Join-Path $test 'corrupt-payload'
 Copy-Item -LiteralPath $cleanPayload -Destination $payload -Recurse
@@ -159,6 +171,43 @@ if ((Get-FileHash -LiteralPath (Join-Path $target 'VolturaWeekNumber.exe')).Hash
 }
 
 $checks.Add('Reject corrupt payload before stopping or replacing installation')
+
+foreach ($keepMarker in @($true, $false))
+{
+    $backup = Join-Path $test ('.VolturaWeekNumber-backup-' + [Guid]::NewGuid().ToString('N'))
+    $stage = Join-Path $test ('.VolturaWeekNumber-stage-' + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $backup | Out-Null
+    [IO.File]::WriteAllText((Join-Path $backup 'remaining.txt'), 'Partially removed backup')
+
+    if ($keepMarker)
+    {
+        Copy-Item -LiteralPath (Join-Path $target 'installation.marker') -Destination $backup
+    }
+
+    $journal = [ordered]@{
+        Mode = 'Install'
+        Stage = $stage
+        Backup = $backup
+        HadPrevious = $true
+        PreviousVariant = 'standard'
+        Phase = 'Committed'
+    }
+    $journalPath = Join-Path $test '.VolturaWeekNumber-maintenance\journal.json'
+    [IO.File]::WriteAllText($journalPath, ($journal | ConvertTo-Json))
+
+    # The corrupt payload stops the next install after recovery, so a fresh install
+    # cannot conceal damage caused by restoring the incomplete backup.
+    if ((Run-Maintenance 'Install') -eq 0 -or
+        (Get-FileHash -LiteralPath (Join-Path $target 'VolturaWeekNumber.exe')).Hash -ne $original -or
+        (Test-Path -LiteralPath $backup) -or
+        (Test-Path -LiteralPath $journalPath))
+    {
+        throw "Interrupted backup cleanup damaged the installed application (marker: $keepMarker)."
+    }
+
+    $checks.Add("Recover partial backup cleanup without rollback (marker: $keepMarker)")
+}
+
 $payload = $cleanPayload
 $backup = Join-Path $test ('.VolturaWeekNumber-backup-' + [Guid]::NewGuid().ToString('N'))
 $stage = Join-Path $test ('.VolturaWeekNumber-stage-' + [Guid]::NewGuid().ToString('N'))
