@@ -20,7 +20,7 @@ public sealed class LocalizationTests
 
         var english = LanguageCatalog.All[0].Entries;
 
-        Assert.Equal(91, english.Count);
+        Assert.Equal(106, english.Count);
 
         foreach (var language in LanguageCatalog.All)
         {

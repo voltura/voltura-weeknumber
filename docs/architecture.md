@@ -4,13 +4,13 @@ Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The 
 
 ## Application and UI
 
-`App` owns single-instance activation and awaited shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, activation, and layout. `CalendarViewModel` presents the selected date; `DateLookupViewModel` handles day-of-year and Julian-day conversions. Date views follow today until a date is selected; Today resumes automatic date changes. `SettingsEditor` keeps preference edits in a draft until Save. The automatic-update toggle on About saves immediately while preserving other draft edits. Stable choice objects preserve selections when the display language changes.
+`App` owns single-instance activation and awaited shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, activation, and layout. `CalendarViewModel` presents the selected date, moves it by whole weeks, and resolves signed week offsets from the current local date; `WeekLookupViewModel` resolves week numbers to date ranges, and `DateLookupViewModel` handles day-of-year and Julian-day conversions. Date views follow today until a date is selected or navigated; Today and a zero-week offset resume automatic date changes. `SettingsEditor` keeps preference edits in a draft until Save. The automatic-update toggle on About saves immediately while preserving other draft edits. Stable choice objects preserve selections when the display language changes.
 
 ## Calendar and tray
 
 `LanguageCatalog` owns supported language identifiers, native labels, formatting cultures, and compiled translation tables. Settings validation, language choices, Windows-language resolution, and review captures share this catalog. `Strings` keeps the existing WPF binding interface and formats complete week-number phrases. Display language does not change the culture used for calendar calculations.
 
-`WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the calendar selected in the culture's `DateTimeFormat`. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
+`WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the calendar selected in the culture's `DateTimeFormat`. Reverse lookup reuses the same calculation in a bounded pass over the requested year and runs only when requested. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
 
 `NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.
 
@@ -19,6 +19,10 @@ Dates outside the regional calendar's supported range show an unavailable week (
 The executable declares PerMonitorV2 DPI awareness. Window placement respects monitor work areas. Display changes, activation, and tray reopening trigger recovery checks; a stale window DPI is handled through a native move and bounds restoration so Windows can deliver its DPI-change message.
 
 `WindowWorkAreaPlacement` retains the requested logical size while hidden and across display changes. Only an interactive user resize updates that preference; native bounds changes do not. Recovery fits the retained size to the current work area.
+
+Week-reference copying uses raw selected-date and lookup-range data with a pure formatter. Short and localized references follow the active week convention and display language. ISO references recalculate the selected date, or each lookup range’s first day, using ISO rules; repeated ISO references are deduplicated. Both split-copy controls use Localized for the primary action and expose the three formats in a menu. Clipboard writes pass through an injectable platform service and persist after the application exits. Input edits or settings changes clear stale lookup results. Copy success and failure use the existing status area; copy-format choices are not saved.
+
+Week navigation changes the selected Gregorian date by exactly seven days and is disabled at the representable date boundaries. The offset input accepts a signed whole number, anchors each calculation to the current local date, and rejects results outside years 1–9999 without changing the selection. Offset input and errors are transient UI state and are not persisted.
 
 ## Settings and diagnostics
 

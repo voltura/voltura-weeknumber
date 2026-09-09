@@ -17,6 +17,8 @@ public sealed record CalendarOptions(
 
 public sealed record WeekResult(int Number, int? IsoYear, DateOnly WeekStart);
 
+public sealed record WeekRange(DateOnly Start, DateOnly End);
+
 public static class WeekCalculator
 {
     public static WeekResult Calculate(DateOnly date, CalendarOptions options, CultureInfo region)
@@ -59,6 +61,66 @@ public static class WeekCalculator
                 : null,
             DateOnly.FromDayNumber(Math.Max(0, date.DayNumber - offset))
         );
+    }
+
+    public static IReadOnlyList<WeekRange> FindRanges(
+        int year,
+        int week,
+        CalendarOptions options,
+        CultureInfo region
+    )
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(region);
+
+        if (year is < 1 or > 9999)
+        {
+            throw new ArgumentOutOfRangeException(nameof(year));
+        }
+
+        if (week is < 1 or > 56)
+        {
+            throw new ArgumentOutOfRangeException(nameof(week));
+        }
+
+        var ranges = new List<WeekRange>();
+        var date = new DateOnly(year, 1, 1);
+        var last = new DateOnly(year, 12, 31);
+
+        while (true)
+        {
+            try
+            {
+                var result = Calculate(date, options, region);
+
+                if (
+                    result.Number == week
+                    && (result.IsoYear is null || result.IsoYear == year)
+                    && (ranges.Count == 0 || ranges[^1].Start != result.WeekStart)
+                )
+                {
+                    ranges.Add(
+                        new(
+                            result.WeekStart,
+                            DateOnly.FromDayNumber(
+                                Math.Min(DateOnly.MaxValue.DayNumber, result.WeekStart.DayNumber + 6)
+                            )
+                        )
+                    );
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // The active regional calendar may not support the entire Gregorian year.
+            }
+
+            if (date == last)
+            {
+                return ranges;
+            }
+
+            date = date.AddDays(1);
+        }
     }
 
     public static TimeSpan UntilNextMidnight(DateTimeOffset now, TimeZoneInfo zone)

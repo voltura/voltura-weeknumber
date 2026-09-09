@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Calendar;
@@ -153,6 +154,45 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
                     model.DayOfYear.Convert();
                     Assert.Equal(date, model.DayOfYear.SelectedDate);
                 }
+            }
+            finally
+            {
+                window.Exit();
+            }
+        });
+    }
+
+    [Fact]
+    public void WeekLookupIsQuietUntilOpenedAndDoesNotChangeTheSelectedDate()
+    {
+        fixture.Run(() =>
+        {
+            var model = new CalendarViewModel();
+
+            model.Apply(new AppSettings { Calendar = new(CalendarMode.Iso) });
+            model.SelectedDate = new DateTime(2024, 6, 12);
+
+            var window = new MainWindow(model);
+
+            try
+            {
+                window.Open();
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+                var expander = Assert.IsType<Expander>(window.FindName("WeekLookupExpander"));
+
+                Assert.False(expander.IsExpanded);
+                expander.IsExpanded = true;
+                model.WeekLookup.YearInput = "2026";
+                model.WeekLookup.WeekInput = "1";
+                Assert.IsType<Button>(window.FindName("FindWeekButton"))
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+                Assert.Equal(new DateTime(2024, 6, 12), model.SelectedDate);
+                Assert.Contains("29", model.WeekLookup.ResultText, StringComparison.Ordinal);
+                Assert.Contains("2025", model.WeekLookup.ResultText, StringComparison.Ordinal);
+                Assert.Contains("2026", model.WeekLookup.ResultText, StringComparison.Ordinal);
+                Assert.Empty(model.WeekLookup.ErrorText);
             }
             finally
             {

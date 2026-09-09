@@ -1,0 +1,20 @@
+<UserControl x:Class="VolturaWeekNumber.Ui.WeekCopyControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui">
+  <StackPanel Orientation="Horizontal">
+    <Button x:Name="CopyButton" Width="Auto" MinWidth="140" Click="CopyClick" AutomationProperties.Name="{Binding [CopyWeekReference], Source={x:Static ui:Strings.Current}}" ToolTip="{Binding [CopyLocalized], Source={x:Static ui:Strings.Current}}">
+      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="&#xE8C8;" Style="{StaticResource ButtonGlyph}"/>
+        <TextBlock Text="{Binding [CopyWeekReference], Source={x:Static ui:Strings.Current}}"/>
+      </ui:SpacingStackPanel>
+    </Button>
+    <Button x:Name="FormatsButton" Width="40" Margin="4,0,0,0" Padding="8" Click="FormatsClick" AutomationProperties.Name="{Binding [CopyFormats], Source={x:Static ui:Strings.Current}}" ToolTip="{Binding [CopyFormats], Source={x:Static ui:Strings.Current}}">
+      <TextBlock Text="&#xE70D;" Style="{StaticResource ButtonGlyph}"/>
+      <Button.ContextMenu>
+        <ContextMenu Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}">
+          <MenuItem Header="{Binding [CopyIso], Source={x:Static ui:Strings.Current}}" Tag="Iso" Click="FormatClick"/>
+          <MenuItem Header="{Binding [CopyShort], Source={x:Static ui:Strings.Current}}" Tag="Short" Click="FormatClick"/>
+          <MenuItem Header="{Binding [CopyLocalized], Source={x:Static ui:Strings.Current}}" Tag="Localized" Click="FormatClick"/>
+        </ContextMenu>
+      </Button.ContextMenu>
+    </Button>
+  </StackPanel>
+</UserControl>

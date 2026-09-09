@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -25,16 +26,35 @@ public partial class MainWindow : Window
     public event Action<string>? ActionRequested;
     public event Action? HiddenToTray;
     private bool _exit;
+    private readonly IClipboardWriter _clipboard;
 
-    public MainWindow(CalendarViewModel model)
+    public MainWindow(CalendarViewModel model) : this(model, new ClipboardWriter()) { }
+
+    internal MainWindow(CalendarViewModel model, IClipboardWriter clipboard)
     {
+        _clipboard = clipboard;
         InitializeComponent();
         DataContext = model;
+        SelectedWeekCopy.CopyRequested += format => CopyWeek(model.CopyText(format));
+        LookupWeekCopy.CopyRequested += format => CopyWeek(model.WeekLookup.CopyText(format));
         WindowWorkAreaPlacement.ConstrainAndCenterOnFirstLoad(this);
         WindowWorkAreaPlacement.KeepVisibleAfterDisplayChanges(this);
         Closing += OnClosing;
         Tabs.SelectionChanged += OnPageChanged;
         AddHandler(Expander.ExpandedEvent, new RoutedEventHandler(OnExpanded));
+    }
+
+    private void CopyWeek(string text)
+    {
+        if (text.Length == 0)
+        {
+            return;
+        }
+
+        ((CalendarViewModel)DataContext).Status = Strings.Current[
+            _clipboard.TryWrite(text)
+                ? "Copied"
+                : "CopyFailed"];
     }
 
     public void Open(MainPage tab = MainPage.WeekNumber)
@@ -159,6 +179,108 @@ public partial class MainWindow : Window
 
     private void TodayClick(object sender, RoutedEventArgs args) =>
         ((CalendarViewModel)DataContext).Today();
+
+    private void PreviousWeekClick(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).PreviousWeek();
+
+    private void NextWeekClick(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).NextWeek();
+
+    private void ShowOffsetDateClick(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).ApplyWeekOffset();
+
+    private static bool ValidWeekOffsetInput(TextBox input, string text)
+    {
+        var candidate = input
+            .Text.Remove(input.SelectionStart, input.SelectionLength)
+            .Insert(input.SelectionStart, text);
+
+        if (candidate.Length == 0 || candidate == "-")
+        {
+            return true;
+        }
+
+        return candidate.Length <= 7
+            && (candidate[0] == '-'
+                ? candidate.AsSpan(1).IndexOfAnyExceptInRange('0', '9') < 0
+                : candidate.AsSpan().IndexOfAnyExceptInRange('0', '9') < 0);
+    }
+
+    private void WeekOffsetTextInput(object sender, TextCompositionEventArgs args) =>
+        args.Handled = !ValidWeekOffsetInput((TextBox)sender, args.Text);
+
+    private void WeekOffsetKeyDown(object sender, KeyEventArgs args)
+    {
+        if (args.Key == Key.Enter)
+        {
+            ((CalendarViewModel)DataContext).ApplyWeekOffset();
+            args.Handled = true;
+        }
+        else if (args.Key == Key.Space)
+        {
+            args.Handled = true;
+        }
+    }
+
+    private void WeekOffsetPasting(object sender, DataObjectPastingEventArgs args)
+    {
+        if (
+            args.DataObject.GetData(DataFormats.UnicodeText) is not string text
+            || !ValidWeekOffsetInput((TextBox)sender, text)
+        )
+        {
+            args.CancelCommand();
+        }
+    }
+
+    private void FindWeekClick(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).WeekLookup.Find();
+
+    private void WeekLookupExpanded(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).WeekLookup.Refresh(DateTime.Today);
+
+    private bool ValidWeekLookupInput(TextBox input, string text)
+    {
+        var candidate = input
+            .Text.Remove(input.SelectionStart, input.SelectionLength)
+            .Insert(input.SelectionStart, text);
+
+        if (candidate.Length == 0)
+        {
+            return true;
+        }
+
+        var maximum = input == WeekYearInput
+            ? 9999
+            : 56;
+
+        return candidate.All(character => character is >= '0' and <= '9')
+            && int.TryParse(candidate, NumberStyles.None, CultureInfo.InvariantCulture, out var value)
+            && value is >= 1
+            && value <= maximum;
+    }
+
+    private void WeekLookupTextInput(object sender, TextCompositionEventArgs args) =>
+        args.Handled = !ValidWeekLookupInput((TextBox)sender, args.Text);
+
+    private void WeekLookupKeyDown(object sender, KeyEventArgs args)
+    {
+        if (args.Key == Key.Space)
+        {
+            args.Handled = true;
+        }
+    }
+
+    private void WeekLookupPasting(object sender, DataObjectPastingEventArgs args)
+    {
+        if (
+            args.DataObject.GetData(DataFormats.UnicodeText) is not string text
+            || !ValidWeekLookupInput((TextBox)sender, text)
+        )
+        {
+            args.CancelCommand();
+        }
+    }
 
     private void ActionClick(object sender, RoutedEventArgs args)
     {

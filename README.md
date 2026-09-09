@@ -18,7 +18,7 @@
       </div>
     </div>
     <figure class="app-window">
-      <img src="docs/images/voltura-weeknumber.png" width="704" height="601" alt="Voltura WeekNumber showing week 37 and its date picker">
+      <img src="docs/images/voltura-weeknumber.png" width="708" height="605" alt="Voltura WeekNumber showing week 37 with week navigation, a date picker, and a week offset calculator">
       <figcaption>The calendar is there when you need more than a glance.</figcaption>
     </figure>
   </div>
@@ -39,7 +39,7 @@
     <article class="feature-card">
       <span class="feature-number">02</span>
       <h3>Any date, one click away</h3>
-      <p>Find a date’s week number, day of the year, or Julian day number.</p>
+      <p>Move week by week, jump a number of weeks from today, or find a week’s date range, day of the year, or Julian day number. Copy week references in ISO, short, or localized formats.</p>
     </article>
     <article class="feature-card">
       <span class="feature-number">03</span>

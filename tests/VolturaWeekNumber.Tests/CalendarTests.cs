@@ -140,6 +140,45 @@ public sealed class CalendarTests
     }
 
     [Fact]
+    public void ReverseLookupUsesTheActiveConventionAndWeekYear()
+    {
+        var region = CultureInfo.GetCultureInfo("en-US");
+        var iso = WeekCalculator.FindRanges(2026, 1, new(CalendarMode.Iso), region);
+
+        Assert.Equal(
+            [new WeekRange(new(2025, 12, 29), new(2026, 1, 4))],
+            iso
+        );
+        Assert.Empty(WeekCalculator.FindRanges(2021, 53, new(CalendarMode.Iso), region));
+
+        var custom = WeekCalculator.FindRanges(
+            2000,
+            54,
+            new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
+            region
+        );
+
+        Assert.Equal(
+            [new WeekRange(new(2000, 12, 31), new(2001, 1, 6))],
+            custom
+        );
+
+        var hebrew = new CultureInfo("he-IL");
+
+        hebrew.DateTimeFormat.Calendar = new HebrewCalendar();
+
+        Assert.Contains(
+            new WeekRange(new(2022, 9, 25), new(2022, 10, 1)),
+            WeekCalculator.FindRanges(
+                2022,
+                56,
+                new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
+                hebrew
+            )
+        );
+    }
+
+    [Fact]
     public void WeekNotificationsDeduplicateAndSettingsRefreshResetsBaseline()
     {
         var tracker = new WeekTracker();
