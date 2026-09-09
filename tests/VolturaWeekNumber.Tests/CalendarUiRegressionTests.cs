@@ -1,9 +1,11 @@
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Calendar;
 using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Ui;
 using Xunit;
+using CalendarMode = VolturaWeekNumber.Features.Calendar.CalendarMode;
 using DatePicker = System.Windows.Controls.DatePicker;
 
 namespace VolturaWeekNumber.Tests;
@@ -108,10 +110,32 @@ public sealed class CalendarUiRegressionTests(WpfTestFixture fixture)
                 window.Open(MainPage.DayOfYear);
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
                 Assert.Equal("366", model.DayOfYear.NumberInput);
-                model.DayOfYear.SelectedDate = new DateTime(2025, 1, 1);
-                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-                Assert.Equal("001", model.DayOfYear.Result);
-                Assert.Equal("001", model.DayOfYear.NumberInput);
+                var tabs = Assert.IsType<TabControl>(window.FindName("Tabs"));
+                var page = Assert.IsType<DateLookupPage>(
+                    Assert.IsType<TabItem>(tabs.SelectedItem).Content
+                );
+                var year = Assert.IsType<TextBox>(page.FindName("YearInput"));
+                var number = Assert.IsType<TextBox>(page.FindName("NumberInput"));
+
+                foreach (var date in new[]
+                {
+                    new DateTime(2025, 1, 1),
+                    new DateTime(2024, 12, 31),
+                    new DateTime(2025, 12, 31),
+                    new DateTime(2028, 12, 31),
+                    new DateTime(2029, 1, 1),
+                })
+                {
+                    model.DayOfYear.SelectedDate = date;
+                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                    var expected = date.DayOfYear.ToString("D3", CultureInfo.InvariantCulture);
+                    Assert.Equal(expected, model.DayOfYear.Result);
+                    Assert.Equal(expected, model.DayOfYear.NumberInput);
+                    Assert.Equal(expected, number.Text);
+                    Assert.Equal(date.Year.ToString(CultureInfo.InvariantCulture), year.Text);
+                    model.DayOfYear.Convert();
+                    Assert.Equal(date, model.DayOfYear.SelectedDate);
+                }
             }
             finally
             {

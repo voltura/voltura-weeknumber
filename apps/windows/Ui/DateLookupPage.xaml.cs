@@ -44,7 +44,7 @@ public partial class DateLookupPage : UserControl
     }
 
     private int MaximumDay() =>
-        int.TryParse(YearInput.Text, out var year)
+        int.TryParse((DataContext as DateLookupViewModel)?.YearInput, out var year)
         && year is >= 1 and <= 9999
         && DateTime.IsLeapYear(year)
             ? 366
@@ -83,7 +83,7 @@ public partial class DateLookupPage : UserControl
 
     private void OrdinalTextChanged(object sender, TextChangedEventArgs args)
     {
-        if (_updating || DataContext is not DateLookupViewModel { ShowYear: true })
+        if (_updating || DataContext is not DateLookupViewModel { ShowYear: true } model)
         {
 
             return;
@@ -117,7 +117,8 @@ public partial class DateLookupPage : UserControl
 
                 if (
                     NumberInput is not null
-                    && int.TryParse(NumberInput.Text, out var day)
+                    // The other control may still show the previous date during a binding refresh.
+                    && int.TryParse(model.NumberInput, out var day)
                     && day > MaximumDay()
                 )
                 {
