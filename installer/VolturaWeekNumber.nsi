@@ -22,7 +22,7 @@ RequestExecutionLevel user
 XPStyle on
 ManifestDPIAware true
 ManifestSupportedOS all
-SetCompressor /SOLID lzma
+SetCompressor lzma
 VIProductVersion "${VERSION}.0"
 VIAddVersionKey /LANG=1033 "ProductName" "Voltura WeekNumber"
 VIAddVersionKey /LANG=1033 "FileDescription" "Voltura WeekNumber Setup"
