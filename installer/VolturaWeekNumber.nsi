@@ -30,6 +30,8 @@ VIAddVersionKey /LANG=1033 "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "Copyright (c) 2026 Voltura AB"
 !define MUI_ICON "..\apps\windows\Assets\App.ico"
 !define MUI_ABORTWARNING
+; Unicode setup must offer every language, regardless of the Windows code page.
+!define MUI_LANGDLL_ALLLANGUAGES
 !define MUI_FINISHPAGE_RUN "$INSTDIR\VolturaWeekNumber.exe"
 !define MUI_FINISHPAGE_REBOOTLATER_DEFAULT
 !insertmacro MUI_PAGE_WELCOME
@@ -38,23 +40,13 @@ VIAddVersionKey /LANG=1033 "LegalCopyright" "Copyright (c) 2026 Voltura AB"
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_LANGUAGE "English"
-!insertmacro MUI_LANGUAGE "Swedish"
-!insertmacro MUI_LANGUAGE "German"
-LangString Failed ${LANG_ENGLISH} "Setup could not complete. The previous installation was restored where possible. See the installation details and retry."
-LangString Failed ${LANG_SWEDISH} "Installationen kunde inte slutföras. Den tidigare installationen återställdes om möjligt. Se installationsinformationen och försök igen."
-LangString Failed ${LANG_GERMAN} "Setup konnte nicht abgeschlossen werden. Die vorherige Installation wurde nach Möglichkeit wiederhergestellt. Details prüfen und erneut versuchen."
-LangString RuntimeFailed ${LANG_ENGLISH} "The .NET 10 Desktop Runtime could not be installed. Retry, or use the offline installer."
-LangString RuntimeFailed ${LANG_SWEDISH} ".NET 10 Desktop Runtime kunde inte installeras. Försök igen eller använd offline-installationsprogrammet."
-LangString RuntimeFailed ${LANG_GERMAN} ".NET 10 Desktop Runtime konnte nicht installiert werden. Erneut versuchen oder Offline-Installer verwenden."
-LangString RemoveData ${LANG_ENGLISH} "Also remove your settings, logs, and downloaded updates?"
-LangString RemoveData ${LANG_SWEDISH} "Vill du också ta bort inställningar, loggar och hämtade uppdateringar?"
-LangString RemoveData ${LANG_GERMAN} "Auch Einstellungen, Protokolle und heruntergeladene Updates entfernen?"
+!include "languages.nsh"
 Var AutoUpdate
 Var PowerShell
 Function .onInit
+  !insertmacro MUI_LANGDLL_DISPLAY
   ${IfNot} ${RunningX64}
-    Abort "Windows x64 is required."
+    Abort "$(RequiresX64)"
   ${EndIf}
   StrCpy $PowerShell "$WINDIR\Sysnative\WindowsPowerShell\v1.0\powershell.exe"
   ; Use Windows modules even when setup inherits a PowerShell 7 environment.
@@ -65,7 +57,6 @@ Function .onInit
   ${IfNot} ${Errors}
     StrCpy $AutoUpdate "1"
   ${EndIf}
-  !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 Section "Install"
   CreateDirectory "$LOCALAPPDATA\Voltura\WeekNumber"

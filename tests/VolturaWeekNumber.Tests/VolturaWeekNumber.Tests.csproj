@@ -2,6 +2,7 @@
   <PropertyGroup><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><IsPackable>false</IsPackable><ImplicitUsings>enable</ImplicitUsings><AllowUnsafeBlocks>true</AllowUnsafeBlocks></PropertyGroup>
   <ItemGroup>
     <None Include="../../apps/windows/App.xaml" Link="UiTestApp.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../installer/languages.nsh" Link="InstallerLanguages.nsh" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageReference Include="xunit.v3" Version="4.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />

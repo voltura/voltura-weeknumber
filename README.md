@@ -28,6 +28,8 @@ Calendar lookups work offline. No account is required.
 
 English, Swedish, German, French, Danish, Finnish, Icelandic, Norwegian Bokmål, Polish, Italian, Spanish, Cantonese, Japanese, Brazilian Portuguese, Simplified Chinese, Traditional Chinese, Dutch, Korean, Russian, Turkish, and Indonesian.
 
+Both the standard and offline installers offer these same 21 languages for the installation wizard. The original license text remains in English. The installer language controls setup; choose the application's language separately in Preferences.
+
 Choose your language in **Preferences → Application → Language**, then select **Save changes**. Language names appear in their native form. Dates and weekday names follow the selected language; your week-numbering rules remain unchanged.
 
 **Follow Windows** selects a supported translation automatically and falls back to English for unsupported languages. Chinese (Hong Kong) selects Cantonese, written in Traditional characters. Simplified Chinese and Traditional Chinese are separate options; Traditional Chinese uses Taiwan terminology. Portuguese regional variants use Brazilian Portuguese.
