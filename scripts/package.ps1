@@ -145,7 +145,11 @@ try
         -Path "$portable\*" `
         -DestinationPath (Join-Path $publish "VolturaWeekNumber-$version-win-x64.zip") `
         -Force
-    Get-ChildItem -LiteralPath $publish -File | Get-FileHash -Algorithm SHA256 | Format-Table -AutoSize
+    Get-FileHash -LiteralPath @(
+        (Join-Path $publish "VolturaWeekNumber-Setup-$version-win-x64.exe"),
+        (Join-Path $publish "VolturaWeekNumber-Setup-$version-win-x64-full.exe"),
+        (Join-Path $publish "VolturaWeekNumber-$version-win-x64.zip")
+    ) -Algorithm SHA256 | Format-Table -AutoSize
 }
 finally
 {
