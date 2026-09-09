@@ -2,7 +2,7 @@
 
 ### A little clarity, every week.
 
-Keep the current week number in your Windows notification area, and look up any date in a click. Free and open source, made by **Voltura AB**.
+Keep the current week number in your Windows notification area, and look up week numbers and other date information. Free and open source, made by **Voltura AB**.
 
 [**Download for Windows**](https://github.com/voltura/voltura-weeknumber/releases/latest) · [Release notes](https://github.com/voltura/voltura-weeknumber/releases) · [Report a bug](https://github.com/voltura/voltura-weeknumber/issues/new?template=bug_report.yml)
 
@@ -43,25 +43,25 @@ Closing the window keeps the week number available in the notification area. To 
 
 ## Updates and privacy
 
-Installed copies can check for updates and download them automatically. You choose when to install a ready update. Automatic updates can be turned off in Preferences; portable copies are updated by downloading a new release.
+Installed copies can check for updates and download them automatically. You choose when to install a ready update. Automatic updates can be turned off on the **About** page; portable copies are updated by downloading a new release.
 
-Your settings stay on your computer. The app does not upload date lookups, settings, or diagnostic logs. Update checks contact GitHub, and the standard installer may download the runtime from Microsoft. See the [privacy policy](https://github.com/voltura/voltura-weeknumber/blob/main/PRIVACY.md) for details.
+Your settings stay on your computer. The app does not upload date lookups, settings, or diagnostic logs. Update checks contact GitHub, and the standard installer may download the runtime from Microsoft. See the [privacy policy](https://github.com/voltura/voltura-weeknumber/blob/master/PRIVACY.md) for details.
 
 ## Help and contribute
 
 Found a problem? [Report a bug](https://github.com/voltura/voltura-weeknumber/issues/new?template=bug_report.yml) with your app version, Windows version, and steps to reproduce it. For week-number questions, include the date and calendar rules selected in Preferences.
 
-- [Contributing and building from source](https://github.com/voltura/voltura-weeknumber/blob/main/CONTRIBUTING.md)
-- [Architecture](https://github.com/voltura/voltura-weeknumber/blob/main/docs/architecture.md) and [validation guide](https://github.com/voltura/voltura-weeknumber/blob/main/docs/validation.md)
-- [Security policy](https://github.com/voltura/voltura-weeknumber/blob/main/SECURITY.md) · [Code of conduct](https://github.com/voltura/voltura-weeknumber/blob/main/CODE_OF_CONDUCT.md)
-- [MIT License](https://github.com/voltura/voltura-weeknumber/blob/main/LICENSE) · [Third-party notices](https://github.com/voltura/voltura-weeknumber/blob/main/THIRD-PARTY-NOTICES.md)
+- [Contributing and building from source](https://github.com/voltura/voltura-weeknumber/blob/master/CONTRIBUTING.md)
+- [Architecture](https://github.com/voltura/voltura-weeknumber/blob/master/docs/architecture.md) and [validation guide](https://github.com/voltura/voltura-weeknumber/blob/master/docs/validation.md)
+- [Security policy](https://github.com/voltura/voltura-weeknumber/blob/master/SECURITY.md) · [Code of conduct](https://github.com/voltura/voltura-weeknumber/blob/master/CODE_OF_CONDUCT.md)
+- [MIT License](https://github.com/voltura/voltura-weeknumber/blob/master/LICENSE) · [Third-party notices](https://github.com/voltura/voltura-weeknumber/blob/master/THIRD-PARTY-NOTICES.md)
 
 If you enjoy Voltura WeekNumber, you can support development through [Ko-fi](https://ko-fi.com/G2G74W5F8) or [PayPal](https://www.paypal.com/donate?hosted_button_id=7PN65YXN64DBG).
 
 ## Statistics
 
 [![Downloads](https://img.shields.io/github/downloads/voltura/voltura-weeknumber/total)](https://github.com/voltura/voltura-weeknumber/releases)
-[![Stars](https://img.shields.io/github/stars/voltura/voltura-weeknumber)](https://github.com/voltura/voltura-weeknumber/stargazers)
+[![Stars](https://img.shields.io/github/stars/voltura/voltura-weeknumber)](https://github.com/voltura/voltura-weeknumber)
 [![Forks](https://img.shields.io/github/forks/voltura/voltura-weeknumber)](https://github.com/voltura/voltura-weeknumber/forks)
 [![Code size](https://img.shields.io/github/languages/code-size/voltura/voltura-weeknumber)](https://github.com/voltura/voltura-weeknumber)
 [![Last commit](https://img.shields.io/github/last-commit/voltura/voltura-weeknumber?color=red)](https://github.com/voltura/voltura-weeknumber/commits)

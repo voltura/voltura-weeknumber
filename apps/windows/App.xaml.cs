@@ -38,6 +38,12 @@ public partial class App : System.Windows.Application
             }
 
             var paths = AppPaths.Resolve(e.Args);
+            var reportPath = paths.Isolated
+                ? AppPaths.ReadPathArgument(e.Args, "--measure-idle")
+                : null;
+            var output = paths.Isolated
+                ? AppPaths.ReadPathArgument(e.Args, "--render-review")
+                : null;
 
             _instance = new SingleInstance(paths.Data);
 
@@ -56,9 +62,8 @@ public partial class App : System.Windows.Application
             );
             _instance.Listen(() => Dispatcher.BeginInvoke(() => _runtime?.Open()));
             await _runtime.StartAsync(e.Args.Contains("--autostart", StringComparer.Ordinal));
-            var measureIndex = Array.IndexOf(e.Args, "--measure-idle");
 
-            if (measureIndex >= 0 && paths.Isolated)
+            if (reportPath is not null)
             {
                 var startupMilliseconds = startupWatch.Elapsed.TotalMilliseconds;
                 using var process = Process.GetCurrentProcess();
@@ -103,8 +108,6 @@ public partial class App : System.Windows.Application
                     dpi = _runtime.CurrentDpi,
                     window = WindowDpiDiagnostics.Capture(_runtime.Window),
                 };
-                var reportPath = Path.GetFullPath(e.Args[measureIndex + 1]);
-
                 Directory.CreateDirectory(Path.GetDirectoryName(reportPath)!);
                 await File.WriteAllTextAsync(
                     reportPath,
@@ -115,12 +118,8 @@ public partial class App : System.Windows.Application
                 return;
             }
 
-            var renderIndex = Array.IndexOf(e.Args, "--render-review");
-
-            if (renderIndex >= 0 && paths.Isolated)
+            if (output is not null)
             {
-                var output = Path.GetFullPath(e.Args[renderIndex + 1]);
-
                 Directory.CreateDirectory(output);
                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                 CalendarIconRenderer.CreateReviewSheet(Path.Combine(output, "icon-review.png"));

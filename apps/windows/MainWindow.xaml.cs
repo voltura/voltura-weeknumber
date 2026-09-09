@@ -116,7 +116,7 @@ public partial class MainWindow : Window
     }
 
     private void TodayClick(object sender, RoutedEventArgs args) =>
-        ((CalendarViewModel)DataContext).SelectedDate = DateTime.Today;
+        ((CalendarViewModel)DataContext).Today();
 
     private void ActionClick(object sender, RoutedEventArgs args)
     {

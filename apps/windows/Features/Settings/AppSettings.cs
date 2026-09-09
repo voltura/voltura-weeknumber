@@ -46,18 +46,23 @@ public sealed record AppSettings
 
         foreach (var color in new[] { Foreground, Background })
         {
-            if (
-                color is null
-                || !Regex.IsMatch(
-                    color,
-                    "^#[0-9A-Fa-f]{8}$",
-                    RegexOptions.CultureInvariant,
-                    TimeSpan.FromMilliseconds(100)
-                )
+            ValidateColor(color);
+        }
+    }
+
+    public static void ValidateColor(string color)
+    {
+        if (
+            color is not { Length: 9 }
+            || !Regex.IsMatch(
+                color,
+                "^#[0-9A-Fa-f]{8}$",
+                RegexOptions.CultureInvariant,
+                TimeSpan.FromMilliseconds(100)
             )
-            {
-                throw new InvalidDataException("Colors must use #AARRGGBB.");
-            }
+        )
+        {
+            throw new InvalidDataException("Colors must use #AARRGGBB.");
         }
     }
 }

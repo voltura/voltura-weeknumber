@@ -235,7 +235,7 @@ internal sealed class AppRuntime : IAsyncDisposable
                 ? region.DateTimeFormat.CalendarWeekRule
                 : settings.Calendar.Rule;
         var identity =
-            $"{settings.Calendar.Mode}/{region.Calendar.GetType().FullName}/{firstDay}/{rule}";
+            $"{settings.Calendar.Mode}/{region.DateTimeFormat.Calendar.GetType().FullName}/{firstDay}/{rule}";
         var rulesUnchanged = _calendarIdentity == identity;
 
         WeekResult? result = null;
@@ -276,7 +276,7 @@ internal sealed class AppRuntime : IAsyncDisposable
             _tray.Notify(Strings.Current["NewWeek"], text, settings.SilentNotifications);
         }
 
-        Model.Refresh();
+        Model.Refresh(date.ToDateTime(TimeOnly.MinValue));
         _midnight.Interval = WeekCalculator.UntilNextMidnight(now, TimeZoneInfo.Local);
         _midnight.Start();
     }
@@ -425,9 +425,12 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "foreground":
             case "background":
                 var foreground = action == "foreground";
+                var color = foreground ? Model.Editor.Foreground : Model.Editor.Background;
+
+                AppSettings.ValidateColor(color);
                 var colorPicker = new ColorPickerWindow(
                     Strings.Current[foreground ? "Foreground" : "Background"],
-                    foreground ? Model.Editor.Foreground : Model.Editor.Background
+                    color
                 )
                 {
                     Owner = Window,

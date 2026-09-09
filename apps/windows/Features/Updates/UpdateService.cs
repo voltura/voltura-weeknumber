@@ -128,13 +128,12 @@ internal sealed class UpdateService : IAsyncDisposable
 
     public async Task CheckAsync()
     {
-        if (!Eligible || State.Busy)
+        if (!Eligible || State.Busy || !await _gate.WaitAsync(0, _stop.Token))
         {
 
             return;
         }
 
-        await _gate.WaitAsync(_stop.Token);
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
 
         timeout.CancelAfter(TimeSpan.FromMinutes(10));
@@ -376,13 +375,12 @@ internal sealed class UpdateService : IAsyncDisposable
 
     public async Task<bool> InstallAsync()
     {
-        if (!Eligible || State.Busy)
+        if (!Eligible || State.Busy || !await _gate.WaitAsync(0, _stop.Token))
         {
 
             return false;
         }
 
-        await _gate.WaitAsync(_stop.Token);
         var failure = UpdateStatus.UpdateVerificationFailed;
 
         try

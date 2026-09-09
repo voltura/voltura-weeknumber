@@ -10,6 +10,7 @@ namespace VolturaWeekNumber.Ui;
 public sealed class CalendarViewModel : INotifyPropertyChanged
 {
     private DateTime? _date = DateTime.Today;
+    private bool _followingToday = true;
     private AppSettings _settings = new();
     private string _status = string.Empty;
     private (int Week, IconAppearance Appearance)? _previewKey;
@@ -22,7 +23,13 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
         get => _date;
         set
         {
-            _date = value;
+            if (_date == value?.Date)
+            {
+                return;
+            }
+
+            _date = value?.Date;
+            _followingToday = false;
             Refresh();
         }
     }
@@ -51,11 +58,33 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
         Editor.RefreshLabels();
     }
 
-    public void Refresh()
+    public void Refresh() => Refresh(DateTime.Today);
+
+    public void Today()
     {
-        DayOfYear.Refresh(DateTime.Today);
-        JulianDay.Refresh(DateTime.Today);
+        _followingToday = true;
+        Refresh();
+    }
+
+    internal void Refresh(DateTime today)
+    {
+        if (_followingToday)
+        {
+            _date = today.Date;
+        }
+
+        DayOfYear.Refresh(today);
+        JulianDay.Refresh(today);
         var strings = Strings.Current;
+        WeekYearText = string.Empty;
+        ConventionText = strings[
+            _settings.Calendar.Mode switch
+            {
+                CalendarMode.Iso => "Iso",
+                CalendarMode.Custom => "Custom",
+                _ => "Regional",
+            }
+        ];
 
         if (_date is { } date)
         {
@@ -69,16 +98,6 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
 
                 WeekText = $"{strings["Week"]} {result.Number:00}";
                 DateText = date.ToString("dddd, d MMMM yyyy", strings.Culture);
-                ConventionText = strings[
-                    _settings.Calendar.Mode switch
-                    {
-                        CalendarMode.Iso => "Iso",
-
-                        CalendarMode.Custom => "Custom",
-
-                        _ => "Regional",
-                    }
-                ];
                 WeekYearText =
                     result.IsoYear is { } year && year != date.Year
                         ? $"{strings["IsoYear"]}: {year}"

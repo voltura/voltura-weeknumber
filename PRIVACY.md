@@ -15,7 +15,7 @@ Starting with Windows creates an application-specific entry in the current user'
 
 ## Network requests
 
-Automatic updates are enabled by default for installed copies and can be disabled in Preferences. Update checks use the GitHub API; update metadata, signatures, and installers are downloaded from GitHub release infrastructure over HTTPS. Requests include an application user-agent, and the server receives normal network information such as your IP address and the requested resource. Settings and calendar lookups are not attached to these requests. You choose when to install the downloaded update.
+Automatic updates are enabled by default for installed copies and can be disabled on the About page. Update checks use the GitHub API; update metadata, signatures, and installers are downloaded from GitHub release infrastructure over HTTPS. Requests include an application user-agent, and the server receives normal network information such as your IP address and the requested resource. Settings and calendar lookups are not attached to these requests. You choose when to install the downloaded update.
 
 The standard installer may contact Microsoft to download the .NET Desktop Runtime. The offline installer and portable ZIP include the runtime. Portable copies do not use the in-app updater.
 

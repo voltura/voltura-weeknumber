@@ -492,6 +492,54 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         Assert.Equal(2, launches);
     }
 
+    [Fact]
+    public async Task ConcurrentOperationsDoNotQueueBeforeTheBusyStateIsPublished()
+    {
+        using var key = RSA.Create(2048);
+        var handler = new ReleaseHandler(key);
+        var launches = 0;
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false,
+            install: (_, _) =>
+            {
+                launches++;
+                return Task.CompletedTask;
+            }
+        );
+        var gate = (SemaphoreSlim)typeof(UpdateService)
+            .GetField(
+                "_gate",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            )!
+            .GetValue(service)!;
+        // Hold the same gate as an operation which has acquired it but has not
+        // yet resumed after ForceYielding to publish its busy state.
+        await gate.WaitAsync(TestContext.Current.CancellationToken);
+        Task check;
+        Task<bool> install;
+        bool returnedImmediately;
+        try
+        {
+            check = service.CheckAsync();
+            install = service.InstallAsync();
+            returnedImmediately = check.IsCompleted && install.IsCompleted;
+        }
+        finally
+        {
+            gate.Release();
+        }
+        await check;
+        var installed = await install;
+        Assert.True(returnedImmediately);
+        Assert.False(installed);
+        Assert.Empty(handler.Requests);
+        Assert.Equal(0, launches);
+    }
+
     [Theory]
     [InlineData("en")]
     [InlineData("sv")]

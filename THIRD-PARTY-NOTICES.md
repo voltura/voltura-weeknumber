@@ -1,6 +1,6 @@
 # Third-party software notices
 
-Voltura WeekNumber is distributed under the [MIT License](https://github.com/voltura/voltura-weeknumber/blob/main/LICENSE). Third-party components retain their own licenses and notices.
+Voltura WeekNumber is distributed under the [MIT License](https://github.com/voltura/voltura-weeknumber/blob/master/LICENSE). Third-party components retain their own licenses and notices.
 
 ## Microsoft .NET runtime
 

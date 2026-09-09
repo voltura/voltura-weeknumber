@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security reports should target the latest public Voltura WeekNumber release or the current `main` branch. Older versions may receive fixes when the issue is severe and a safe patch is practical.
+Security reports should target the latest public Voltura WeekNumber release or the current default branch (`master`). Older versions may receive fixes when the issue is severe and a safe patch is practical.
 
 ## Reporting a vulnerability
 

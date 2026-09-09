@@ -7,6 +7,26 @@ namespace VolturaWeekNumber.Tests;
 public sealed class DateLookupTests
 {
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FollowingTodayUpdatesUntouchedLookupInputsButPreservesDrafts(bool julian)
+    {
+        var model = new DateLookupViewModel(julian);
+        model.Refresh(new DateTime(2026, 12, 31));
+        Assert.Equal(model.Result, model.NumberInput);
+        Assert.Equal("2026", model.YearInput);
+        model.Refresh(new DateTime(2027, 1, 1));
+        Assert.Equal(model.Result, model.NumberInput);
+        Assert.Equal("2027", model.YearInput);
+
+        model.YearInput = "2000";
+        model.NumberInput = "123";
+        model.Refresh(new DateTime(2027, 1, 2));
+        Assert.Equal("2000", model.YearInput);
+        Assert.Equal("123", model.NumberInput);
+    }
+
+    [Theory]
     [InlineData(2026, 1, 1, 1)]
     [InlineData(2026, 2, 19, 50)]
     [InlineData(2024, 2, 29, 60)]

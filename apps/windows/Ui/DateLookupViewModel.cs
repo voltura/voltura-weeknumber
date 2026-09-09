@@ -65,7 +65,14 @@ public sealed class DateLookupViewModel : INotifyPropertyChanged
     {
         if (_followingToday)
         {
+            var inputsUnchanged = NumberInput == Result
+                && YearInput == _date?.Year.ToString(CultureInfo.InvariantCulture);
             _date = today.Date;
+
+            if (inputsUnchanged)
+            {
+                InitializeInputs();
+            }
         }
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));

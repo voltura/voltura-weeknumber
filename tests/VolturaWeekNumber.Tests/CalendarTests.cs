@@ -35,19 +35,37 @@ public sealed class CalendarTests
     [Fact]
     public void HebrewLeapYearCanProduceWeek56()
     {
+        var region = new CultureInfo("he-IL");
+        region.DateTimeFormat.Calendar = new HebrewCalendar();
         var result = WeekCalculator.Calculate(
             new(2022, 9, 25),
             new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
-            new HebrewCulture()
+            region
         );
 
         Assert.Equal(56, result.Number);
         Assert.Null(result.IsoYear);
     }
 
-    private sealed class HebrewCulture() : CultureInfo("he-IL")
+    [Fact]
+    public void RegionalAndCustomRulesUseTheSelectedOptionalCalendar()
     {
-        public override System.Globalization.Calendar Calendar { get; } = new HebrewCalendar();
+        var region = new CultureInfo("he-IL");
+        region.DateTimeFormat.Calendar = new HebrewCalendar();
+        region.DateTimeFormat.FirstDayOfWeek = DayOfWeek.Sunday;
+        region.DateTimeFormat.CalendarWeekRule = CalendarWeekRule.FirstDay;
+        var date = new DateOnly(2022, 9, 25);
+
+        Assert.Equal(56, WeekCalculator.Calculate(date, new(), region).Number);
+        Assert.Equal(
+            56,
+            WeekCalculator.Calculate(
+                date,
+                new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
+                region
+            ).Number
+        );
+        Assert.Equal(38, WeekCalculator.Calculate(date, new(CalendarMode.Iso), region).Number);
     }
 
     [Theory]

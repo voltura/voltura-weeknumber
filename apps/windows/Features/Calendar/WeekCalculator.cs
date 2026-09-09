@@ -23,6 +23,7 @@ public static class WeekCalculator
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(region);
+        var calendar = region.DateTimeFormat.Calendar;
         var first =
             options.Mode == CalendarMode.Regional
                 ? region.DateTimeFormat.FirstDayOfWeek
@@ -34,7 +35,7 @@ public static class WeekCalculator
         var iso =
             options.Mode == CalendarMode.Iso
             || (
-                region.Calendar is GregorianCalendar
+                calendar is GregorianCalendar
                 && first == DayOfWeek.Monday
                 && rule == CalendarWeekRule.FirstFourDayWeek
             );
@@ -47,7 +48,7 @@ public static class WeekCalculator
         var value = date.ToDateTime(TimeOnly.MinValue);
         var number = iso
             ? ISOWeek.GetWeekOfYear(value)
-            : region.Calendar.GetWeekOfYear(value, rule, first);
+            : calendar.GetWeekOfYear(value, rule, first);
         var offset = ((int)date.DayOfWeek - (int)first + 7) % 7;
 
         return new(

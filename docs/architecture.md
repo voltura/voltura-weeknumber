@@ -1,14 +1,14 @@
 # Architecture
 
-Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The solution contains the application in `apps/windows` and the xUnit test project in `tests/VolturaWeekNumber.Tests`. Shared build metadata reads `version.json`. No sibling repository is required to build or run it.
+Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The solution contains the application in `apps/windows` and the xUnit test project in `tests/VolturaWeekNumber.Tests`. Shared build metadata reads `version.json`.
 
 ## Application and UI
 
-`App` owns single-instance activation and awaited shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, activation, and layout. `CalendarViewModel` presents the selected date; `DateLookupViewModel` handles day-of-year and Julian-day conversions. `SettingsEditor` keeps a draft until Save. Stable choice objects preserve selections when the display language changes.
+`App` owns single-instance activation and awaited shutdown. `AppRuntime` composes services and routes application actions. `MainWindow` owns navigation, activation, and layout. `CalendarViewModel` presents the selected date; `DateLookupViewModel` handles day-of-year and Julian-day conversions. Date views follow today until a date is selected; Today resumes automatic date changes. `SettingsEditor` keeps preference edits in a draft until Save. The automatic-update toggle on About saves immediately while preserving other draft edits. Stable choice objects preserve selections when the display language changes.
 
 ## Calendar and tray
 
-`WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the regional calendar. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
+`WeekCalculator` accepts a date, explicit calendar options, and regional culture. ISO mode and Gregorian Monday/FirstFourDayWeek use .NET `ISOWeek`; other combinations use the calendar selected in the culture's `DateTimeFormat`. `WeekTracker` compares week-start dates, including the year, to deduplicate notifications. A dispatcher timer targets local midnight; time, resume, display, and preference events are coalesced into a pending refresh.
 
 `NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.
 
@@ -26,7 +26,7 @@ Optional application logging uses a bounded channel, one writer, and two rotatin
 
 ## Updates and installation
 
-`UpdateService` owns HTTP, one operation gate, a disposable pending package, and an immutable UI state. Automatic checks run two minutes after startup and then daily while enabled; the schedule is in memory. Manual checks use the same operation. Update eligibility requires the running path to match the per-user uninstall registration. Portable, development, and isolated profiles use manual updates.
+`UpdateService` owns HTTP, the pending update files, and an immutable UI state. One operation gate prevents overlapping checks and installer launches. Automatic checks run two minutes after startup and then daily while the app is running, automatic updates are enabled, and no update is ready to install. Manual checks use the same operation. Update eligibility requires the running path to match the per-user uninstall registration. Portable, development, and isolated profiles open the release downloads page instead of using the in-app updater.
 
 Signature verification establishes authenticity; the service separately decides whether a version is newer. Startup restores a verified newer package or discards obsolete, incomplete, or damaged cache files. Cache cleanup is best effort and never claims that the app is up to date: only a successful online check does that. Replacing a package removes its old manifest first and publishes the new manifest last. Installation reverifies the package and holds the operation gate until setup exits. The UI receives its status and install action together; failures identify checking, downloading, verification, or launching setup. The optional application log records the failed operation and exception type.
 

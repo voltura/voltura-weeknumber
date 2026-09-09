@@ -21,7 +21,7 @@ Packaging runs build and tests before creating both NSIS installers with warning
 
 ## UI captures
 
-Use a separate profile for review so normal settings are unaffected:
+Use a separate profile for review so normal settings are unaffected. Diagnostic modes require `--isolated-test-mode`; supply a path immediately after each of `--isolated-test-mode`, `--render-review`, and `--measure-idle` when used.
 
 ```powershell
 $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
