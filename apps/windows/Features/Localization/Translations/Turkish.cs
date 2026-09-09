@@ -54,7 +54,7 @@ internal static class Turkish
             ["Background"] = "Takvim arka planı",
             ["ColorHelp"] = "#AARRGGBB · AA opaklığı ayarlar: 00 saydam, FF opak.",
             ["ResetIcon"] = "Simge görünümünü sıfırla",
-            ["ExportIcon"] = "Simgeyi kaydet…",
+            ["ExportIcon"] = "Simgeyi dışa aktar…",
             ["Data"] = "Ayarlar ve tanılama",
             ["Logging"] = "Uygulama günlüğünü etkinleştir",
             ["OpenLog"] = "Günlüğü aç",

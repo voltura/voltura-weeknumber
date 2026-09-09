@@ -54,7 +54,7 @@ internal static class German
             ["Background"] = "Kalenderfläche",
             ["ColorHelp"] = "#AARRGGBB · AA bestimmt Deckkraft: 00 transparent, FF undurchsichtig.",
             ["ResetIcon"] = "Symboldarstellung zurücksetzen",
-            ["ExportIcon"] = "Symbol speichern…",
+            ["ExportIcon"] = "Symbol exportieren…",
             ["Data"] = "Einstellungen und Diagnose",
             ["Logging"] = "Anwendungsprotokoll aktivieren",
             ["OpenLog"] = "Protokoll öffnen",

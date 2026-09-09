@@ -54,7 +54,7 @@ internal static class Indonesian
             ["Background"] = "Latar kalender",
             ["ColorHelp"] = "#AARRGGBB · AA mengatur opasitas: 00 transparan, FF tidak transparan.",
             ["ResetIcon"] = "Atur ulang tampilan ikon",
-            ["ExportIcon"] = "Simpan ikon…",
+            ["ExportIcon"] = "Ekspor ikon…",
             ["Data"] = "Pengaturan dan diagnostik",
             ["Logging"] = "Aktifkan log aplikasi",
             ["OpenLog"] = "Buka log",

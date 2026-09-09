@@ -54,7 +54,7 @@ internal static class Korean
             ["Background"] = "달력 배경",
             ["ColorHelp"] = "#AARRGGBB · AA로 불투명도 설정: 00은 투명, FF는 불투명.",
             ["ResetIcon"] = "아이콘 모양 초기화",
-            ["ExportIcon"] = "아이콘 저장…",
+            ["ExportIcon"] = "아이콘 내보내기…",
             ["Data"] = "설정 및 진단",
             ["Logging"] = "앱 로그 사용",
             ["OpenLog"] = "로그 열기",

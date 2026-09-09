@@ -54,7 +54,7 @@ internal static class English
             ["Background"] = "Calendar face",
             ["ColorHelp"] = "#AARRGGBB · AA sets opacity: 00 transparent, FF opaque.",
             ["ResetIcon"] = "Reset icon appearance",
-            ["ExportIcon"] = "Save icon…",
+            ["ExportIcon"] = "Export icon…",
             ["Data"] = "Settings and diagnostics",
             ["Logging"] = "Enable application log",
             ["OpenLog"] = "Open log",

@@ -38,7 +38,12 @@
               <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
               <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <DatePicker x:Name="DateInput" SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Short" Height="40" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
-                <Button Grid.Column="2" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+                <Button Grid.Column="2" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
+                  <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="&#xE8D1;" Style="{StaticResource ButtonGlyph}"/>
+                    <TextBlock Text="{Binding [Today], Source={x:Static ui:Strings.Current}}"/>
+                  </ui:SpacingStackPanel>
+                </Button>
               </Grid>
               <TextBlock Text="{Binding ConventionText}" Style="{StaticResource Caption}"/>
             </ui:SpacingStackPanel>
@@ -54,8 +59,18 @@
       <TabItem Header="{Binding [Preferences], Source={x:Static ui:Strings.Current}}">
         <DockPanel Margin="0,14,0,0">
           <ui:SpacingStackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,8,0,0">
-            <Button x:Name="SaveChangesButton" Content="{Binding [Save], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="save" IsEnabled="{Binding Editor.HasChanges}"/>
-            <Button x:Name="DiscardChangesButton" Content="{Binding [Cancel], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="discard" IsEnabled="{Binding Editor.HasChanges}"/>
+            <Button x:Name="SaveChangesButton" Click="ActionClick" Tag="save" IsEnabled="{Binding Editor.HasChanges}" AutomationProperties.Name="{Binding [Save], Source={x:Static ui:Strings.Current}}">
+              <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="&#xE74E;" Style="{StaticResource ButtonGlyph}"/>
+                <TextBlock Text="{Binding [Save], Source={x:Static ui:Strings.Current}}"/>
+              </ui:SpacingStackPanel>
+            </Button>
+            <Button x:Name="DiscardChangesButton" Click="ActionClick" Tag="discard" IsEnabled="{Binding Editor.HasChanges}" AutomationProperties.Name="{Binding [Cancel], Source={x:Static ui:Strings.Current}}">
+              <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="&#xE7A7;" Style="{StaticResource ButtonGlyph}"/>
+                <TextBlock Text="{Binding [Cancel], Source={x:Static ui:Strings.Current}}"/>
+              </ui:SpacingStackPanel>
+            </Button>
           </ui:SpacingStackPanel>
           <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Margin="0,4,0,0" AutomationProperties.LiveSetting="Polite">
             <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
@@ -64,16 +79,16 @@
           </TextBlock>
           <ScrollViewer x:Name="PreferencesScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <ui:SpacingStackPanel Spacing="8">
-              <Expander Header="{Binding [General], Source={x:Static ui:Strings.Current}}" IsExpanded="True">
+              <Expander Header="{Binding [General], Source={x:Static ui:Strings.Current}}" IsExpanded="True" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
-                  <TextBlock Text="{Binding [Language], Source={x:Static ui:Strings.Current}}"/>
-                  <ComboBox ItemsSource="{Binding Languages}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Language}" AutomationProperties.Name="{Binding [Language], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock Text="{Binding [LanguageHeading], Source={x:Static ui:Strings.Current}}"/>
+                  <ComboBox ItemsSource="{Binding Languages}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Language}" AutomationProperties.Name="{Binding [LanguageHeading], Source={x:Static ui:Strings.Current}}"/>
                   <TextBlock Text="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
                   <ComboBox ItemsSource="{Binding Themes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Theme}" AutomationProperties.Name="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
                   <CheckBox IsChecked="{Binding StartWithWindows}" Content="{Binding [Autostart], Source={x:Static ui:Strings.Current}}"/>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}">
+              <Expander Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
                   <ComboBox ItemsSource="{Binding Modes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Mode}" AutomationProperties.Name="{Binding [Convention], Source={x:Static ui:Strings.Current}}"/>
                   <TextBlock Text="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}"/>
@@ -82,33 +97,93 @@
                   <ComboBox ItemsSource="{Binding Rules}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Rule}" IsEnabled="{Binding CustomCalendar}" AutomationProperties.Name="{Binding [Rule], Source={x:Static ui:Strings.Current}}"/>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Icon], Source={x:Static ui:Strings.Current}}">
+              <Expander Header="{Binding [Icon], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
                   <CheckBox IsChecked="{Binding AutomaticIcon}" Content="{Binding [AutoIcon], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBlock Text="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBox Text="{Binding Foreground, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CustomIcon}" MaxLength="9" AutomationProperties.Name="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
-                  <Button Content="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="foreground" IsEnabled="{Binding CustomIcon}" HorizontalAlignment="Left"/>
-                  <TextBlock Text="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBox Text="{Binding Background, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CustomIcon}" MaxLength="9" AutomationProperties.Name="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
-                  <Button Content="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="background" IsEnabled="{Binding CustomIcon}" HorizontalAlignment="Left"/>
-                  <TextBlock Text="{Binding [ColorHelp], Source={x:Static ui:Strings.Current}}" Style="{StaticResource Caption}"/>
-                  <Button Content="{Binding [ResetIcon], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="reset-icon" HorizontalAlignment="Left"/>
-                  <Button Content="{Binding [ExportIcon], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="export-icon" HorizontalAlignment="Left"/>
+                  <ui:SpacingStackPanel Spacing="8" IsEnabled="{Binding CustomIcon}">
+                    <ui:SpacingStackPanel.Style>
+                      <Style TargetType="ui:SpacingStackPanel"><Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger></Style.Triggers></Style>
+                    </ui:SpacingStackPanel.Style>
+                    <TextBlock Text="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="160"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                      <Border x:Name="ForegroundSwatch" Width="40" Height="40" Background="{Binding Foreground}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" AutomationProperties.Name="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                      <TextBox Grid.Column="2" Width="160" Height="40" VerticalContentAlignment="Center" Text="{Binding Foreground, UpdateSourceTrigger=PropertyChanged}" MaxLength="9" AutomationProperties.Name="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                      <Button Grid.Column="4" Click="ActionClick" Tag="foreground" AutomationProperties.Name="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}">
+                        <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="&#xE790;" Style="{StaticResource ButtonGlyph}"/>
+                          <TextBlock Text="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}"/>
+                        </ui:SpacingStackPanel>
+                      </Button>
+                    </Grid>
+                    <TextBlock Text="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="160"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                      <Border x:Name="BackgroundSwatch" Width="40" Height="40" Background="{Binding Background}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" AutomationProperties.Name="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                      <TextBox Grid.Column="2" Width="160" Height="40" VerticalContentAlignment="Center" Text="{Binding Background, UpdateSourceTrigger=PropertyChanged}" MaxLength="9" AutomationProperties.Name="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                      <Button Grid.Column="4" Click="ActionClick" Tag="background" AutomationProperties.Name="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}">
+                        <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="&#xE790;" Style="{StaticResource ButtonGlyph}"/>
+                          <TextBlock Text="{Binding [ChooseColor], Source={x:Static ui:Strings.Current}}"/>
+                        </ui:SpacingStackPanel>
+                      </Button>
+                    </Grid>
+                    <TextBlock Text="{Binding [ColorHelp], Source={x:Static ui:Strings.Current}}" Style="{StaticResource Caption}"/>
+                  </ui:SpacingStackPanel>
+                  <WrapPanel x:Name="IconActionsPanel" Margin="0,0,-8,-8">
+                    <WrapPanel.Resources>
+                      <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Margin" Value="0,0,8,8"/></Style>
+                    </WrapPanel.Resources>
+                    <Button Click="ActionClick" Tag="reset-icon" IsEnabled="{Binding CustomIcon}" AutomationProperties.Name="{Binding [ResetIcon], Source={x:Static ui:Strings.Current}}">
+                      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE7A7;" Style="{StaticResource ButtonGlyph}"/>
+                        <TextBlock Text="{Binding [ResetIcon], Source={x:Static ui:Strings.Current}}"/>
+                      </ui:SpacingStackPanel>
+                    </Button>
+                    <Button Click="ActionClick" Tag="export-icon" AutomationProperties.Name="{Binding [ExportIcon], Source={x:Static ui:Strings.Current}}">
+                      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE74E;" Style="{StaticResource ButtonGlyph}"/>
+                        <TextBlock Text="{Binding [ExportIcon], Source={x:Static ui:Strings.Current}}"/>
+                      </ui:SpacingStackPanel>
+                    </Button>
+                  </WrapPanel>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Notifications], Source={x:Static ui:Strings.Current}}">
+              <Expander Header="{Binding [Notifications], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="4" DataContext="{Binding Editor}">
                   <CheckBox IsChecked="{Binding StartupNotification}" Content="{Binding [StartupNote], Source={x:Static ui:Strings.Current}}"/>
                   <CheckBox IsChecked="{Binding WeekNotification}" Content="{Binding [WeekNote], Source={x:Static ui:Strings.Current}}"/>
                   <CheckBox IsChecked="{Binding SilentNotifications}" Content="{Binding [Silent], Source={x:Static ui:Strings.Current}}"/>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Data], Source={x:Static ui:Strings.Current}}">
-                <ui:SpacingStackPanel Spacing="8">
-                  <CheckBox IsChecked="{Binding Editor.Logging}" Content="{Binding [Logging], Source={x:Static ui:Strings.Current}}"/>
-                  <Button Content="{Binding [OpenLog], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="log" HorizontalAlignment="Left"/>
-                  <Button Content="{Binding [Import], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="import" HorizontalAlignment="Left"/>
-                  <Button Content="{Binding [Export], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="export" HorizontalAlignment="Left"/>
+              <Expander Header="{Binding [Data], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
+                <ui:SpacingStackPanel Spacing="16">
+                  <WrapPanel x:Name="DiagnosticsActionsPanel" Margin="0,0,-8,-8">
+                    <CheckBox IsChecked="{Binding Editor.Logging}" Content="{Binding [Logging], Source={x:Static ui:Strings.Current}}" Margin="0,0,8,8"/>
+                    <Button Click="ActionClick" Tag="log" Margin="0,0,8,8" AutomationProperties.Name="{Binding [OpenLog], Source={x:Static ui:Strings.Current}}">
+                      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE8E5;" Style="{StaticResource ButtonGlyph}"/>
+                        <TextBlock Text="{Binding [OpenLog], Source={x:Static ui:Strings.Current}}"/>
+                      </ui:SpacingStackPanel>
+                    </Button>
+                  </WrapPanel>
+                  <WrapPanel x:Name="SettingsTransferActionsPanel" Margin="0,0,-8,-8">
+                    <WrapPanel.Resources>
+                      <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Margin" Value="0,0,8,8"/></Style>
+                    </WrapPanel.Resources>
+                    <Button Click="ActionClick" Tag="import" AutomationProperties.Name="{Binding [Import], Source={x:Static ui:Strings.Current}}">
+                      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xE8B5;" Style="{StaticResource ButtonGlyph}"/>
+                        <TextBlock Text="{Binding [Import], Source={x:Static ui:Strings.Current}}"/>
+                      </ui:SpacingStackPanel>
+                    </Button>
+                    <Button Click="ActionClick" Tag="export" AutomationProperties.Name="{Binding [Export], Source={x:Static ui:Strings.Current}}">
+                      <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#xEDE1;" Style="{StaticResource ButtonGlyph}"/>
+                        <TextBlock Text="{Binding [Export], Source={x:Static ui:Strings.Current}}"/>
+                      </ui:SpacingStackPanel>
+                    </Button>
+                  </WrapPanel>
                 </ui:SpacingStackPanel>
               </Expander>
             </ui:SpacingStackPanel>
@@ -123,18 +198,48 @@
             <TextBlock Text="{Binding [Updates], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
             <CheckBox x:Name="AutomaticUpdateCheck" IsChecked="{Binding Editor.AutomaticUpdates}" Content="{Binding [AutoUpdates], Source={x:Static ui:Strings.Current}}" Checked="AutomaticUpdatesChanged" Unchecked="AutomaticUpdatesChanged"/>
             <TextBlock x:Name="UpdateStatus" Style="{StaticResource Caption}" AutomationProperties.LiveSetting="Polite"/>
-            <Button x:Name="CheckUpdateButton" Content="{Binding [CheckUpdates], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="check-update" HorizontalAlignment="Left"/>
-            <Button x:Name="InstallButton" Content="{Binding [Install], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="install-update" HorizontalAlignment="Left" Visibility="Collapsed"/>
+            <Button x:Name="CheckUpdateButton" Click="ActionClick" Tag="check-update" HorizontalAlignment="Left" AutomationProperties.Name="{Binding [CheckUpdates], Source={x:Static ui:Strings.Current}}">
+              <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock x:Name="CheckUpdateGlyph" Text="&#xE72C;" Style="{StaticResource ButtonGlyph}"/>
+                <TextBlock x:Name="CheckUpdateLabel" Text="{Binding [CheckUpdates], Source={x:Static ui:Strings.Current}}"/>
+              </ui:SpacingStackPanel>
+            </Button>
+            <Button x:Name="InstallButton" Click="ActionClick" Tag="install-update" HorizontalAlignment="Left" Visibility="Collapsed" AutomationProperties.Name="{Binding [Install], Source={x:Static ui:Strings.Current}}">
+              <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="&#xE777;" Style="{StaticResource ButtonGlyph}"/>
+                <TextBlock Text="{Binding [Install], Source={x:Static ui:Strings.Current}}"/>
+              </ui:SpacingStackPanel>
+            </Button>
             <WrapPanel Margin="0,0,-8,-8">
               <WrapPanel.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                   <Setter Property="Margin" Value="0,0,8,8"/>
                 </Style>
               </WrapPanel.Resources>
-              <Button Content="{Binding [Project], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="project"/>
-              <Button Content="{Binding [License], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="license"/>
-              <Button Content="{Binding [Donate], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="donate"/>
-              <Button Content="{Binding [Coffee], Source={x:Static ui:Strings.Current}}" Click="ActionClick" Tag="coffee"/>
+              <Button Click="ActionClick" Tag="project" AutomationProperties.Name="{Binding [Project], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#xE774;" Style="{StaticResource ButtonGlyph}"/>
+                  <TextBlock Text="{Binding [Project], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Button>
+              <Button Click="ActionClick" Tag="license" AutomationProperties.Name="{Binding [License], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#xE8A5;" Style="{StaticResource ButtonGlyph}"/>
+                  <TextBlock Text="{Binding [License], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Button>
+              <Button Click="ActionClick" Tag="donate" AutomationProperties.Name="{Binding [Donate], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#xEB51;" Style="{StaticResource ButtonGlyph}"/>
+                  <TextBlock Text="{Binding [Donate], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Button>
+              <Button Click="ActionClick" Tag="coffee" AutomationProperties.Name="{Binding [Coffee], Source={x:Static ui:Strings.Current}}">
+                <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#xE719;" Style="{StaticResource ButtonGlyph}"/>
+                  <TextBlock Text="{Binding [Coffee], Source={x:Static ui:Strings.Current}}"/>
+                </ui:SpacingStackPanel>
+              </Button>
             </WrapPanel>
           </ui:SpacingStackPanel>
         </ScrollViewer>

@@ -54,7 +54,7 @@ internal static class Danish
             ["Background"] = "Kalenderbaggrund",
             ["ColorHelp"] = "#AARRGGBB · AA angiver uigennemsigtighed: 00 gennemsigtig, FF uigennemsigtig.",
             ["ResetIcon"] = "Nulstil ikonets udseende",
-            ["ExportIcon"] = "Gem ikon…",
+            ["ExportIcon"] = "Eksportér ikon…",
             ["Data"] = "Indstillinger og diagnostik",
             ["Logging"] = "Aktivér programlog",
             ["OpenLog"] = "Åbn log",

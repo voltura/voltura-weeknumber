@@ -54,7 +54,7 @@ internal static class Italian
             ["Background"] = "Sfondo del calendario",
             ["ColorHelp"] = "#AARRGGBB · AA imposta l’opacità: 00 trasparente, FF opaco.",
             ["ResetIcon"] = "Ripristina aspetto dell’icona",
-            ["ExportIcon"] = "Salva icona…",
+            ["ExportIcon"] = "Esporta icona…",
             ["Data"] = "Impostazioni e diagnostica",
             ["Logging"] = "Abilita registro dell’applicazione",
             ["OpenLog"] = "Apri registro",

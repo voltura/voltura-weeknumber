@@ -54,7 +54,7 @@ internal static class Icelandic
             ["Background"] = "Bakgrunnur dagatals",
             ["ColorHelp"] = "#AARRGGBB · AA stillir ógagnsæi: 00 gegnsætt, FF ógagnsætt.",
             ["ResetIcon"] = "Endurstilla útlit tákns",
-            ["ExportIcon"] = "Vista tákn…",
+            ["ExportIcon"] = "Flytja út tákn…",
             ["Data"] = "Stillingar og greining",
             ["Logging"] = "Virkja annál forritsins",
             ["OpenLog"] = "Opna annál",

@@ -13,7 +13,12 @@
         <TextBlock Text="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}" FontWeight="SemiBold"/>
         <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
           <DatePicker SelectedDate="{Binding SelectedDate}" SelectedDateFormat="Short" Height="40" AutomationProperties.Name="{Binding [ChooseDate], Source={x:Static ui:Strings.Current}}"/>
-          <Button Grid.Column="2" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+          <Button Grid.Column="2" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
+            <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#xE8D1;" Style="{StaticResource ButtonGlyph}"/>
+              <TextBlock Text="{Binding [Today], Source={x:Static ui:Strings.Current}}"/>
+            </ui:SpacingStackPanel>
+          </Button>
         </Grid>
       </ui:SpacingStackPanel>
       <ui:SpacingStackPanel Spacing="8">
@@ -28,7 +33,12 @@
             <TextBox x:Name="NumberInput" Text="{Binding NumberInput, UpdateSourceTrigger=PropertyChanged}" Width="140" MaxLength="10" MinHeight="36" AutomationProperties.Name="{Binding NumberLabel}" PreviewTextInput="NumberTextInput" PreviewKeyDown="NumberKeyDown" DataObject.Pasting="NumberPasting" TextChanged="OrdinalTextChanged" LostKeyboardFocus="OrdinalLostFocus" AllowDrop="False" InputMethod.IsInputMethodEnabled="False"/>
           </ui:SpacingStackPanel>
         </WrapPanel>
-        <Button Content="{Binding [Convert], Source={x:Static ui:Strings.Current}}" Click="ConvertClick" HorizontalAlignment="Left"/>
+        <Button Click="ConvertClick" HorizontalAlignment="Left" AutomationProperties.Name="{Binding [Convert], Source={x:Static ui:Strings.Current}}">
+          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="&#xE8AB;" Style="{StaticResource ButtonGlyph}"/>
+            <TextBlock Text="{Binding [Convert], Source={x:Static ui:Strings.Current}}"/>
+          </ui:SpacingStackPanel>
+        </Button>
         <TextBlock Text="{Binding Error}" AutomationProperties.LiveSetting="Polite"/>
       </ui:SpacingStackPanel>
     </ui:SpacingStackPanel>

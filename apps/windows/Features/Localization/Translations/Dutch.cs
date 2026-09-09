@@ -54,7 +54,7 @@ internal static class Dutch
             ["Background"] = "Kalenderachtergrond",
             ["ColorHelp"] = "#AARRGGBB · AA bepaalt de dekking: 00 transparant, FF ondoorzichtig.",
             ["ResetIcon"] = "Pictogramweergave herstellen",
-            ["ExportIcon"] = "Pictogram opslaan…",
+            ["ExportIcon"] = "Pictogram exporteren…",
             ["Data"] = "Instellingen en diagnostiek",
             ["Logging"] = "Toepassingslogboek inschakelen",
             ["OpenLog"] = "Logboek openen",

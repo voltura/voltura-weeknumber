@@ -54,7 +54,7 @@ internal static class Japanese
             ["Background"] = "カレンダーの背景",
             ["ColorHelp"] = "#AARRGGBB · AAで不透明度を設定：00は透明、FFは不透明。",
             ["ResetIcon"] = "アイコンの外観をリセット",
-            ["ExportIcon"] = "アイコンを保存…",
+            ["ExportIcon"] = "アイコンをエクスポート…",
             ["Data"] = "設定と診断",
             ["Logging"] = "アプリのログを有効にする",
             ["OpenLog"] = "ログを開く",

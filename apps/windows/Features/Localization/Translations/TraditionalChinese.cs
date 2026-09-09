@@ -54,7 +54,7 @@ internal static class TraditionalChinese
             ["Background"] = "日曆背景",
             ["ColorHelp"] = "#AARRGGBB · AA 設定不透明度：00 為透明，FF 為不透明。",
             ["ResetIcon"] = "重設圖示外觀",
-            ["ExportIcon"] = "儲存圖示…",
+            ["ExportIcon"] = "匯出圖示…",
             ["Data"] = "設定與診斷",
             ["Logging"] = "啟用應用程式記錄",
             ["OpenLog"] = "開啟記錄",

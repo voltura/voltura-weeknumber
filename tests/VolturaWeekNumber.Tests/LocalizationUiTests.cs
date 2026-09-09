@@ -160,19 +160,23 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
 
                         foreach (var button in Descendants(window).OfType<Button>())
                         {
-                            if (button.Content is not string label || button.ActualWidth == 0
-                                || System.Windows.Data.BindingOperations.GetBindingExpression(button, ContentControl.ContentProperty)?.ParentBinding.Source is not Strings)
+                            var label = LocalizedButtonLabel(button);
+
+                            if (label is null || button.ActualWidth == 0)
                             {
                                 continue;
                             }
 
-                            var text = new FormattedText(label, Strings.Current.Culture, FlowDirection.LeftToRight,
+                            Assert.Equal(240, button.ActualWidth, 1);
+                            Assert.Equal(40, button.ActualHeight, 1);
+
+                            var text = new FormattedText(label.Value.Text, Strings.Current.Culture, FlowDirection.LeftToRight,
                                 new Typeface(button.FontFamily, button.FontStyle, button.FontWeight, button.FontStretch),
                                 button.FontSize, Brushes.Black, VisualTreeHelper.GetDpi(button).PixelsPerDip);
-
-                            if (text.Width > button.ActualWidth - button.Padding.Left - button.Padding.Right + 2)
+                            var contentWidth = label.Value.Container?.DesiredSize.Width ?? text.Width;
+                            if (contentWidth > button.ActualWidth - button.Padding.Left - button.Padding.Right + 2)
                             {
-                                failures.Add($"{language.Id}/{page}: {label} ({text.Width:F1}px in {button.ActualWidth}px button)");
+                                failures.Add($"{language.Id}/{page}: {label.Value.Text} ({contentWidth:F1}px in {button.ActualWidth}px button)");
                             }
                         }
                     }
@@ -213,7 +217,7 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
 
                     Assert.Equal(language.Id, picker.SelectedValue);
                     Assert.True(picker.Focusable && picker.IsTabStop);
-                    Assert.Equal(Strings.Current["Language"], System.Windows.Automation.AutomationProperties.GetName(picker));
+                    Assert.Equal(Strings.Current["LanguageHeading"], System.Windows.Automation.AutomationProperties.GetName(picker));
                     model.Editor.Theme = "dark";
                     window.UpdateLayout();
 
@@ -270,5 +274,36 @@ public sealed class LocalizationUiTests(WpfTestFixture fixture)
                 yield return descendant;
             }
         }
+    }
+
+    private static (string Text, FrameworkElement? Container)? LocalizedButtonLabel(Button button)
+    {
+        if (button.Content is string label
+            && System.Windows.Data.BindingOperations.GetBindingExpression(
+                button,
+                ContentControl.ContentProperty
+            )?.ParentBinding.Source is Strings)
+        {
+            return (label, null);
+        }
+
+        if (button.Content is not FrameworkElement container)
+        {
+            return null;
+        }
+
+        var localizedLabel = Descendants(container)
+            .Prepend(container)
+            .OfType<TextBlock>()
+            .SingleOrDefault(text =>
+                System.Windows.Data.BindingOperations.GetBindingExpression(
+                    text,
+                    TextBlock.TextProperty
+                )?.ParentBinding.Source is Strings
+            );
+
+        return localizedLabel is null
+            ? null
+            : (localizedLabel.Text, container);
     }
 }

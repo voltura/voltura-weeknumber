@@ -54,7 +54,7 @@ internal static class French
             ["Background"] = "Fond du calendrier",
             ["ColorHelp"] = "#AARRGGBB · AA définit l’opacité : 00 transparent, FF opaque.",
             ["ResetIcon"] = "Réinitialiser l’icône",
-            ["ExportIcon"] = "Enregistrer l’icône…",
+            ["ExportIcon"] = "Exporter l’icône…",
             ["Data"] = "Paramètres et diagnostic",
             ["Logging"] = "Activer le journal de l’application",
             ["OpenLog"] = "Ouvrir le journal",

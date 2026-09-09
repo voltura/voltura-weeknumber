@@ -54,7 +54,7 @@ internal static class Norwegian
             ["Background"] = "Kalenderbakgrunn",
             ["ColorHelp"] = "#AARRGGBB · AA angir ugjennomsiktighet: 00 gjennomsiktig, FF ugjennomsiktig.",
             ["ResetIcon"] = "Tilbakestill ikonets utseende",
-            ["ExportIcon"] = "Lagre ikon…",
+            ["ExportIcon"] = "Eksporter ikon…",
             ["Data"] = "Innstillinger og diagnostikk",
             ["Logging"] = "Aktiver programlogg",
             ["OpenLog"] = "Åpne logg",

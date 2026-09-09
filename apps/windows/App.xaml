@@ -9,6 +9,11 @@
     <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
     <Style x:Key="Caption" TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="FontSize" Value="12"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
     <Style x:Key="SectionTitle" TargetType="TextBlock"><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="FontSize" Value="17"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+    <Style x:Key="ButtonGlyph" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="RenderTransform"><Setter.Value><TranslateTransform Y="2"/></Setter.Value></Setter>
+    </Style>
     <!-- Shared flat button primitive adapted from Voltura Air's native-title-bar WPF UI. -->
     <Style TargetType="Button">
       <Setter Property="Width" Value="240"/><Setter Property="Height" Value="40"/>

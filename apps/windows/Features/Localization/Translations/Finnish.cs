@@ -54,7 +54,7 @@ internal static class Finnish
             ["Background"] = "Kalenterin tausta",
             ["ColorHelp"] = "#AARRGGBB · AA määrittää peittävyyden: 00 läpinäkyvä, FF peittävä.",
             ["ResetIcon"] = "Palauta kuvakkeen ulkoasu",
-            ["ExportIcon"] = "Tallenna kuvake…",
+            ["ExportIcon"] = "Vie kuvake…",
             ["Data"] = "Asetukset ja diagnostiikka",
             ["Logging"] = "Ota sovellusloki käyttöön",
             ["OpenLog"] = "Avaa loki",

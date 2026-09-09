@@ -54,7 +54,7 @@ internal static class Swedish
             ["Background"] = "Kalenderbakgrund",
             ["ColorHelp"] = "#AARRGGBB · AA anger opacitet: 00 transparent, FF ogenomskinlig.",
             ["ResetIcon"] = "Återställ ikonens utseende",
-            ["ExportIcon"] = "Spara ikon…",
+            ["ExportIcon"] = "Exportera ikon…",
             ["Data"] = "Inställningar och diagnostik",
             ["Logging"] = "Aktivera programlogg",
             ["OpenLog"] = "Öppna logg",

@@ -54,7 +54,7 @@ internal static class Polish
             ["Background"] = "Tło kalendarza",
             ["ColorHelp"] = "#AARRGGBB · AA określa krycie: 00 przezroczyste, FF nieprzezroczyste.",
             ["ResetIcon"] = "Przywróć wygląd ikony",
-            ["ExportIcon"] = "Zapisz ikonę…",
+            ["ExportIcon"] = "Eksportuj ikonę…",
             ["Data"] = "Ustawienia i diagnostyka",
             ["Logging"] = "Włącz dziennik aplikacji",
             ["OpenLog"] = "Otwórz dziennik",

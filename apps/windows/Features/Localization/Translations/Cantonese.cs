@@ -54,7 +54,7 @@ internal static class Cantonese
             ["Background"] = "日曆底色",
             ["ColorHelp"] = "#AARRGGBB · AA 設定不透明度：00 透明，FF 完全不透明。",
             ["ResetIcon"] = "重設圖示外觀",
-            ["ExportIcon"] = "儲存圖示…",
+            ["ExportIcon"] = "匯出圖示…",
             ["Data"] = "設定同診斷",
             ["Logging"] = "開啟程式記錄",
             ["OpenLog"] = "開啟記錄",

@@ -54,7 +54,7 @@ internal static class SimplifiedChinese
             ["Background"] = "日历背景",
             ["ColorHelp"] = "#AARRGGBB · AA 设置不透明度：00 为透明，FF 为不透明。",
             ["ResetIcon"] = "重置图标外观",
-            ["ExportIcon"] = "保存图标…",
+            ["ExportIcon"] = "导出图标…",
             ["Data"] = "设置和诊断",
             ["Logging"] = "启用应用日志",
             ["OpenLog"] = "打开日志",

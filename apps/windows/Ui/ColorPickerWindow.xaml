@@ -2,8 +2,18 @@
     Width="560" Height="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
   <DockPanel Margin="20">
     <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,16,-8,-8">
-      <Button Content="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}" IsCancel="True" Margin="0,0,8,8"/>
-      <Button Content="{Binding [UseColor], Source={x:Static ui:Strings.Current}}" IsDefault="True" Click="AcceptClick" Margin="0,0,8,8"/>
+      <Button IsCancel="True" Margin="0,0,8,8" AutomationProperties.Name="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}">
+        <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="&#xE711;" Style="{StaticResource ButtonGlyph}"/>
+          <TextBlock Text="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}"/>
+        </ui:SpacingStackPanel>
+      </Button>
+      <Button IsDefault="True" Click="AcceptClick" Margin="0,0,8,8" AutomationProperties.Name="{Binding [UseColor], Source={x:Static ui:Strings.Current}}">
+        <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="&#xE8FB;" Style="{StaticResource ButtonGlyph}"/>
+          <TextBlock Text="{Binding [UseColor], Source={x:Static ui:Strings.Current}}"/>
+        </ui:SpacingStackPanel>
+      </Button>
     </WrapPanel>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ui:SpacingStackPanel Spacing="10">
       <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="10" Padding="12"><ui:SpacingStackPanel Orientation="Horizontal" Spacing="14">

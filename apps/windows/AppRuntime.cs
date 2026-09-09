@@ -444,7 +444,16 @@ internal sealed class AppRuntime : IAsyncDisposable
                     ? Model.Editor.Foreground
                     : Model.Editor.Background;
 
-                AppSettings.ValidateColor(color);
+                try
+                {
+                    AppSettings.ValidateColor(color);
+                }
+                catch (InvalidDataException)
+                {
+                    color = foreground
+                        ? "#FFFFFFFF"
+                        : "#FF151B26";
+                }
 
                 var colorPicker = new ColorPickerWindow(
                     Strings.Current[foreground

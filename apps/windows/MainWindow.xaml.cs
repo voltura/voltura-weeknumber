@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Updates;
@@ -118,9 +120,17 @@ public partial class MainWindow : Window
         AutomaticUpdateCheck.Visibility = eligible
             ? Visibility.Visible
             : Visibility.Collapsed;
-        CheckUpdateButton.Content = Strings.Current[eligible
+        var checkUpdateLabel = Strings.Current[eligible
             ? "CheckUpdates"
             : "Downloads"];
+        CheckUpdateLabel.Text = checkUpdateLabel;
+        CheckUpdateGlyph.Text = eligible
+            ? "\uE72C"
+            : "\uE896";
+        System.Windows.Automation.AutomationProperties.SetName(
+            CheckUpdateButton,
+            checkUpdateLabel
+        );
         CheckUpdateButton.IsEnabled = !state.Busy;
         InstallButton.Visibility = state.Ready
             ? Visibility.Visible
@@ -180,5 +190,37 @@ public partial class MainWindow : Window
                 sibling.IsExpanded = false;
             }
         }
+    }
+
+    private void ExpanderHeaderMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs args
+    )
+    {
+        if (
+            sender is not Expander expander
+            || expander.Template.FindName("ToggleButtonBorder", expander)
+                is not FrameworkElement headerBackground
+            || expander.Template.FindName("HeaderSite", expander) is not ToggleButton headerToggle
+        )
+        {
+            return;
+        }
+
+        var position = args.GetPosition(headerBackground);
+
+        if (
+            position.X < 0
+            || position.X > headerBackground.ActualWidth
+            || position.Y < 0
+            || position.Y > headerBackground.ActualHeight
+        )
+        {
+            return;
+        }
+
+        _ = headerToggle.Focus();
+        expander.IsExpanded = !expander.IsExpanded;
+        args.Handled = true;
     }
 }

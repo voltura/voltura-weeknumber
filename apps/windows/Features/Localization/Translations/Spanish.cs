@@ -54,7 +54,7 @@ internal static class Spanish
             ["Background"] = "Fondo del calendario",
             ["ColorHelp"] = "#AARRGGBB · AA define la opacidad: 00 transparente, FF opaco.",
             ["ResetIcon"] = "Restablecer aspecto del icono",
-            ["ExportIcon"] = "Guardar icono…",
+            ["ExportIcon"] = "Exportar icono…",
             ["Data"] = "Configuración y diagnóstico",
             ["Logging"] = "Activar el registro de la aplicación",
             ["OpenLog"] = "Abrir registro",
