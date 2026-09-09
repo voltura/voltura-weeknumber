@@ -17,13 +17,14 @@ internal sealed class UpdateService : IAsyncDisposable
     private readonly SemaphoreSlim _scheduleChanged = new(0, 1);
     private Task? _worker;
     private bool _automatic;
-    private string? _installer;
+    private volatile string? _installer;
     private Process? _installerProcess;
     private readonly string? _publicKey;
     private readonly bool _full;
     public bool Eligible { get; }
     public bool Ready => _installer is not null;
-    public string Status { get; private set; } = string.Empty;
+    private volatile string _status = string.Empty;
+    public string Status => _status;
     public event Action? Changed;
     private string Pending => Path.Combine(_paths.Data, "Updates", "pending");
     private static Version CurrentVersion => typeof(UpdateService).Assembly.GetName().Version ?? new(1, 0, 0);
@@ -41,7 +42,7 @@ internal sealed class UpdateService : IAsyncDisposable
         if (resource is not null) { using var reader = new StreamReader(resource); _publicKey = reader.ReadToEnd(); }
         if (publicKey is not null) _publicKey = publicKey;
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("VolturaWeekNumber/1.0");
-        if (!Eligible) Status = "ManualUpdates";
+        if (!Eligible) _status = "ManualUpdates";
     }
 
     public void Start(bool automatic)
@@ -63,6 +64,7 @@ internal sealed class UpdateService : IAsyncDisposable
                 catch (Exception error) when (error is InvalidDataException or IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException)
                 { SetStatus("UpdateFailed"); } // A corrupt pending package must not stop future checks.
             }
+            long? lastAttempt = null;
             while (!_stop.IsCancellationRequested)
             {
                 if (!_automatic || Ready)
@@ -73,6 +75,13 @@ internal sealed class UpdateService : IAsyncDisposable
                 var stamp = Path.Combine(_paths.Data, "Updates", "last-check.txt");
                 var delay = File.Exists(stamp) ? TimeSpan.FromDays(1) - (DateTime.UtcNow - File.GetLastWriteTimeUtc(stamp)) : TimeSpan.FromMinutes(2);
                 if (delay > TimeSpan.FromDays(1)) delay = TimeSpan.FromDays(1);
+                // A locked/unwritable stamp (or a busy check gate) must not cause a hot retry loop.
+                // Use elapsed time so clock changes and settings signals cannot bypass the pause.
+                if (lastAttempt is { } attempted)
+                {
+                    var retryDelay = TimeSpan.FromMinutes(2) - Stopwatch.GetElapsedTime(attempted);
+                    if (delay < retryDelay) delay = retryDelay;
+                }
                 if (delay > TimeSpan.Zero)
                 {
                     using var waitStop = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
@@ -83,7 +92,11 @@ internal sealed class UpdateService : IAsyncDisposable
                     try { await Task.WhenAll(timer, signal); } catch (OperationCanceledException) when (!_stop.IsCancellationRequested) { }
                     if (completed == signal) continue;
                 }
-                if (_automatic) await CheckAsync();
+                if (_automatic)
+                {
+                    lastAttempt = Stopwatch.GetTimestamp();
+                    await CheckAsync();
+                }
             }
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested) { }
@@ -100,6 +113,9 @@ internal sealed class UpdateService : IAsyncDisposable
         var token = timeout.Token;
         try
         {
+            // Leave the UI context even when file/network awaits complete synchronously.
+            // This uses the shared thread pool; no dedicated thread or polling is needed.
+            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
             SetStatus("Checking");
             Directory.CreateDirectory(Path.Combine(_paths.Data, "Updates"));
             await File.WriteAllTextAsync(Path.Combine(_paths.Data, "Updates", "last-check.txt"), DateTimeOffset.UtcNow.ToString("O"), _stop.Token);
@@ -123,12 +139,13 @@ internal sealed class UpdateService : IAsyncDisposable
             var signature = await DownloadBytesAsync(AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.sig"), 1024, token);
             var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, CurrentVersion, _full);
             if (verified.Version != tag[1..]) throw new InvalidDataException("Release version mismatch.");
+            var installer = Path.Combine(Pending, verified.Asset.Name);
+            if (_installer == installer && File.Exists(installer)) { SetStatus("Ready"); return; }
             SetStatus("Downloading");
             Directory.CreateDirectory(Pending);
             var part = Path.Combine(Pending, "installer.pending");
             await DownloadFileAsync(AssetUri(verified.Asset.Name), part, verified.Asset.Size, token);
             await UpdateVerifier.VerifyFileAsync(part, verified.Asset, token);
-            var installer = Path.Combine(Pending, verified.Asset.Name);
             File.Move(part, installer, true);
             await File.WriteAllBytesAsync(Path.Combine(Pending, "signature.sig"), signature, _stop.Token);
             await File.WriteAllBytesAsync(Path.Combine(Pending, "manifest.pending"), manifest, _stop.Token);
@@ -146,6 +163,9 @@ internal sealed class UpdateService : IAsyncDisposable
 
     private async Task RestoreAsync(CancellationToken token)
     {
+        // Both startup restore and pre-install verification run outside the UI context.
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+        token.ThrowIfCancellationRequested();
         _installer = null;
         if (_publicKey is null || !File.Exists(Path.Combine(Pending, "manifest.json"))) return;
         var manifest = await ReadBoundedAsync(Path.Combine(Pending, "manifest.json"), 64 * 1024, token);
@@ -229,7 +249,7 @@ internal sealed class UpdateService : IAsyncDisposable
             await output.WriteAsync(buffer.AsMemory(0, read), token);
         }
     }
-    private void SetStatus(string status) { Status = status; Changed?.Invoke(); }
+    private void SetStatus(string status) { _status = status; Changed?.Invoke(); }
     public async ValueTask DisposeAsync()
     {
         await _stop.CancelAsync();

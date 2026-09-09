@@ -25,7 +25,7 @@ internal sealed class AppRuntime : IAsyncDisposable
     private readonly NativeTray _tray;
     private readonly SemaphoreSlim _actions = new(1, 1);
     private bool _hiddenExplained;
-    private bool _shuttingDown;
+    private volatile bool _shuttingDown;
     private bool _settingsDamaged;
     private int _refreshPending;
     private bool _updateReadyAnnounced;
@@ -74,7 +74,6 @@ internal sealed class AppRuntime : IAsyncDisposable
         ApplySettings();
         if (_settingsDamaged) Model.Status = Strings.Current["SettingsRecovery"];
         Refresh(false);
-        _updates.Start(_settings.Current.AutomaticUpdates);
         if (!hidden || _settingsDamaged) Window.Open();
         if (_settings.Current.StartupNotification && !_paths.Isolated) _tray.Notify("Voltura WeekNumber", Strings.Current["Started"], _settings.Current.SilentNotifications);
         _log.Record("Started");
@@ -166,6 +165,7 @@ internal sealed class AppRuntime : IAsyncDisposable
     {
         if (_shuttingDown || !await _actions.WaitAsync(0)) return;
         try { await ExecuteAsync(action); }
+        catch (OperationCanceledException) when (_shuttingDown) { }
         catch (Exception error) when (error is InvalidDataException or IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception or System.Security.SecurityException)
         {
             _log.Record(action, error);

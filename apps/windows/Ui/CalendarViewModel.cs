@@ -12,6 +12,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     private DateTime? _date = DateTime.Today;
     private AppSettings _settings = new();
     private string _status = string.Empty;
+    private (int Week, IconAppearance Appearance)? _previewKey;
     public event PropertyChangedEventHandler? PropertyChanged;
     public DateLookupViewModel DayOfYear { get; } = new(false);
     public DateLookupViewModel JulianDay { get; } = new(true);
@@ -24,7 +25,8 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     public BitmapSource? Preview { get; private set; }
     public string Status { get => _status; set { _status = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status))); } }
     public string VersionText { get; } = "Voltura WeekNumber " + typeof(CalendarViewModel).Assembly.GetName().Version?.ToString(3);
-    public void Apply(AppSettings settings) { _settings = settings; Editor.Load(settings); Editor.RefreshLabels(); Refresh(); }
+    // AppRuntime refreshes the calendar and tray together after applying settings.
+    public void Apply(AppSettings settings) { _settings = settings; Editor.Load(settings); Editor.RefreshLabels(); }
     public void Refresh()
     {
         DayOfYear.Refresh(DateTime.Today); JulianDay.Refresh(DateTime.Today);
@@ -38,7 +40,13 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
                 DateText = date.ToString("dddd, d MMMM yyyy", strings.Culture);
                 ConventionText = strings[_settings.Calendar.Mode switch { CalendarMode.Iso => "Iso", CalendarMode.Custom => "Custom", _ => "Regional" }];
                 WeekYearText = result.IsoYear is { } year && year != date.Year ? $"{strings["IsoYear"]}: {year}" : string.Empty;
-                Preview = CalendarIconRenderer.Render(result.Number, 128, IconAppearance.Resolve(_settings, ThemeManager.IsTaskbarDark(), System.Windows.SystemParameters.HighContrast));
+                var appearance = IconAppearance.Resolve(_settings, ThemeManager.IsTaskbarDark(), System.Windows.SystemParameters.HighContrast);
+                var previewKey = (result.Number, appearance);
+                if (Preview is null || _previewKey != previewKey)
+                {
+                    Preview = CalendarIconRenderer.Render(result.Number, 128, appearance);
+                    _previewKey = previewKey;
+                }
             }
             catch (ArgumentOutOfRangeException) { WeekText = "—"; DateText = strings["Invalid"]; Preview = null; }
         }

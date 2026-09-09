@@ -6,6 +6,8 @@ namespace VolturaWeekNumber.Ui;
 
 internal static class ThemeManager
 {
+    private static bool? _highContrast;
+
     internal static bool IsTaskbarDark()
     {
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
@@ -15,19 +17,38 @@ internal static class ThemeManager
     internal static void Apply(string choice)
     {
         var app = System.Windows.Application.Current;
+        var highContrast = SystemParameters.HighContrast;
         // Fluent theme selection is annotated experimental in .NET 10; isolate its use here.
 #pragma warning disable WPF0001
-        app.ThemeMode = choice switch { "light" => ThemeMode.Light, "dark" => ThemeMode.Dark, _ => ThemeMode.System };
+        var mode = choice switch { "light" => ThemeMode.Light, "dark" => ThemeMode.Dark, _ => ThemeMode.System };
+        // WPF handles system colors; reload on mode/contrast transitions, not unrelated events.
+        if (app.ThemeMode != mode || (_highContrast is { } previous && previous != highContrast)) app.ThemeMode = mode;
 #pragma warning restore WPF0001
+        _highContrast = highContrast;
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
         var dark = choice == "dark" || (choice == "system" && key?.GetValue("AppsUseLightTheme") is int value && value == 0);
-        var hc = SystemParameters.HighContrast;
-        app.Resources["WindowBrush"] = hc ? SystemColors.WindowBrush : Brush(dark ? "#111720" : "#F4F6FA");
-        app.Resources["SurfaceBrush"] = hc ? SystemColors.WindowBrush : Brush(dark ? "#1B2431" : "#FFFFFF");
-        app.Resources["TextBrush"] = hc ? SystemColors.WindowTextBrush : Brush(dark ? "#F1F5FB" : "#17253B");
-        app.Resources["MutedBrush"] = hc ? SystemColors.WindowTextBrush : Brush(dark ? "#B4C2D3" : "#52627A");
-        app.Resources["AccentBrush"] = hc ? SystemColors.HighlightBrush : Brush(dark ? "#87B5FF" : "#245CB4");
-        app.Resources["BorderBrush"] = hc ? SystemColors.WindowTextBrush : Brush(dark ? "#354155" : "#D9E0EB");
+        ApplyPalette(dark, highContrast);
     }
-    private static SolidColorBrush Brush(string value) => new((System.Windows.Media.Color)ColorConverter.ConvertFromString(value));
+
+    internal static void ApplyPalette(bool dark, bool highContrast)
+    {
+        // Resolve actual colors on every event, including palette changes while high contrast stays on.
+        SetBrush("WindowBrush", highContrast ? SystemColors.WindowColor : Rgb(dark ? 0x111720u : 0xF4F6FAu));
+        SetBrush("SurfaceBrush", highContrast ? SystemColors.WindowColor : Rgb(dark ? 0x1B2431u : 0xFFFFFFu));
+        SetBrush("TextBrush", highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0xF1F5FBu : 0x17253Bu));
+        SetBrush("MutedBrush", highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0xB4C2D3u : 0x52627Au));
+        SetBrush("AccentBrush", highContrast ? SystemColors.HighlightColor : Rgb(dark ? 0x87B5FFu : 0x245CB4u));
+        SetBrush("BorderBrush", highContrast ? SystemColors.WindowTextColor : Rgb(dark ? 0x354155u : 0xD9E0EBu));
+    }
+
+    private static Color Rgb(uint value) => Color.FromRgb((byte)(value >> 16), (byte)(value >> 8), (byte)value);
+
+    private static void SetBrush(string key, Color color)
+    {
+        var resources = System.Windows.Application.Current.Resources;
+        if (resources[key] is SolidColorBrush current && current.Color == color) return;
+        var brush = new SolidColorBrush(color);
+        brush.Freeze();
+        resources[key] = brush;
+    }
 }

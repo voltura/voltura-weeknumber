@@ -19,6 +19,7 @@ internal sealed partial class NativeTray : IDisposable
     private bool _disposed;
     private string _tooltip = "Voltura WeekNumber";
     private (int Week, int Size, IconAppearance Appearance)? _rendered;
+    private (string Language, bool Dark)? _menuAppearance;
     public event Action? OpenRequested;
     public event Action? PreferencesRequested;
     public event Action? ExitRequested;
@@ -39,14 +40,16 @@ internal sealed partial class NativeTray : IDisposable
 
     public void RebuildMenu()
     {
+        var text = Ui.Strings.Current;
+        var dark = Ui.ThemeManager.IsTaskbarDark();
+        var appearance = (text.Culture.Name, dark);
+        if (_menuAppearance == appearance) return;
         foreach (Forms.ToolStripItem item in _menu.Items.Cast<Forms.ToolStripItem>().ToArray()) item.Dispose();
         _menu.Items.Clear();
-        var text = Ui.Strings.Current;
         _menu.Items.Add(text["WeekTab"], null, (_, _) => OpenRequested?.Invoke());
         _menu.Items.Add(text["Preferences"], null, (_, _) => PreferencesRequested?.Invoke());
         _menu.Items.Add(new Forms.ToolStripSeparator());
         _menu.Items.Add(text["Exit"], null, (_, _) => ExitRequested?.Invoke());
-        var dark = Ui.ThemeManager.IsTaskbarDark();
         var renderer = new TrayMenuRenderer(dark);
         _menu.BackColor = renderer.Surface;
         _menu.ForeColor = renderer.Text;
@@ -57,6 +60,7 @@ internal sealed partial class NativeTray : IDisposable
             item.BackColor = renderer.Surface;
             item.ForeColor = renderer.Text;
         }
+        _menuAppearance = appearance;
     }
 
     public void Update(int week, IconAppearance appearance, string tooltip)
