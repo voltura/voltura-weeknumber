@@ -212,7 +212,9 @@ internal sealed class AppRuntime : IAsyncDisposable
         );
     }
 
-    private void Refresh(bool notify)
+    private void Refresh(bool notify) => Refresh(notify, DateTimeOffset.Now);
+
+    internal void Refresh(bool notify, DateTimeOffset now)
     {
         if (_shuttingDown)
         {
@@ -221,7 +223,6 @@ internal sealed class AppRuntime : IAsyncDisposable
         }
 
         _midnight.Stop();
-        var now = DateTimeOffset.Now;
         var date = DateOnly.FromDateTime(now.LocalDateTime);
         var settings = _settings.Current;
         var region = CultureInfo.CurrentCulture;
@@ -237,13 +238,26 @@ internal sealed class AppRuntime : IAsyncDisposable
             $"{settings.Calendar.Mode}/{region.Calendar.GetType().FullName}/{firstDay}/{rule}";
         var rulesUnchanged = _calendarIdentity == identity;
 
-        _calendarIdentity = identity;
-        var result = WeekCalculator.Calculate(date, settings.Calendar, region);
-        var text =
-            $"{Strings.Current["Week"]} {result.Number:00}\n{date.ToString("dddd, d MMMM yyyy", Strings.Current.Culture)}";
+        WeekResult? result = null;
+
+        try
+        {
+            result = WeekCalculator.Calculate(date, settings.Calendar, region);
+        }
+        catch (ArgumentOutOfRangeException error)
+        {
+            _log.Record("Calendar refresh", error);
+        }
+
+        // A failed calculation must neither leave a stale week in the tray nor
+        // announce a new week when a supported date becomes available again.
+        _calendarIdentity = result is null ? null : identity;
+        var text = result is null
+            ? $"{Strings.Current["Week"]} —\n{Strings.Current["Invalid"]}"
+            : $"{Strings.Current["Week"]} {result.Number:00}\n{date.ToString("dddd, d MMMM yyyy", Strings.Current.Culture)}";
 
         _tray.Update(
-            result.Number,
+            result?.Number,
             IconAppearance.Resolve(
                 settings,
                 ThemeManager.IsTaskbarDark(),
@@ -253,7 +267,8 @@ internal sealed class AppRuntime : IAsyncDisposable
         );
 
         if (
-            _tracker.Observe(result, notify && rulesUnchanged)
+            result is not null
+            && _tracker.Observe(result, notify && rulesUnchanged)
             && settings.WeekNotification
             && !_paths.Isolated
         )

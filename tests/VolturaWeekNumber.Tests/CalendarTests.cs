@@ -6,6 +6,50 @@ namespace VolturaWeekNumber.Tests;
 
 public sealed class CalendarTests
 {
+    [Fact]
+    public void FirstDayRuleCanProduceWeek54()
+    {
+        var result = WeekCalculator.Calculate(
+            new(2000, 12, 31),
+            new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
+            CultureInfo.GetCultureInfo("en-US")
+        );
+
+        Assert.Equal(54, result.Number);
+        Assert.Equal(new DateOnly(2000, 12, 31), result.WeekStart);
+    }
+
+    [Fact]
+    public void RegionalCalendarRejectsUnsupportedDateWhileIsoStillWorks()
+    {
+        var region = CultureInfo.GetCultureInfo("ar-SA");
+        var date = new DateOnly(1800, 1, 1);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            WeekCalculator.Calculate(date, new(), region)
+        );
+        Assert.Equal(1, WeekCalculator.Calculate(date, new(CalendarMode.Iso), region).Number);
+        Assert.InRange(WeekCalculator.Calculate(new(2026, 9, 9), new(), region).Number, 1, 53);
+    }
+
+    [Fact]
+    public void HebrewLeapYearCanProduceWeek56()
+    {
+        var result = WeekCalculator.Calculate(
+            new(2022, 9, 25),
+            new(CalendarMode.Custom, DayOfWeek.Sunday, CalendarWeekRule.FirstDay),
+            new HebrewCulture()
+        );
+
+        Assert.Equal(56, result.Number);
+        Assert.Null(result.IsoYear);
+    }
+
+    private sealed class HebrewCulture() : CultureInfo("he-IL")
+    {
+        public override System.Globalization.Calendar Calendar { get; } = new HebrewCalendar();
+    }
+
     [Theory]
     [InlineData(2024, 12, 31, 1, 2025)]
     [InlineData(2025, 12, 29, 1, 2026)]

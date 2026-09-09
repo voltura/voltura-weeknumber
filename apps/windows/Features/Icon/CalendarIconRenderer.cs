@@ -40,9 +40,11 @@ public static class CalendarIconRenderer
 {
     public static IReadOnlyList<int> Sizes { get; } =
         Array.AsReadOnly(new[] { 16, 20, 24, 28, 32, 36, 40, 48, 64, 96, 128, 256 });
-    public static BitmapSource Render(int week, int size, IconAppearance appearance)
+    public static BitmapSource Render(int? week, int size, IconAppearance appearance)
     {
-        if (week is < 1 or > 54)
+        // Leap years in lunisolar calendars can contain up to 385 days.
+        // Null represents a date outside the active calendar's supported range.
+        if (week is < 1 or > 56)
         {
             throw new ArgumentOutOfRangeException(nameof(week));
         }
@@ -92,7 +94,7 @@ public static class CalendarIconRenderer
 
             var fontSize = size * (size <= 24 ? .69 : .65);
             var text = new FormattedText(
-                week.ToString("D2", CultureInfo.InvariantCulture),
+                week?.ToString("D2", CultureInfo.InvariantCulture) ?? "—",
                 CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight,
                 new Typeface(
@@ -127,7 +129,7 @@ public static class CalendarIconRenderer
     }
 
     public static byte[] EncodeIco(
-        int week,
+        int? week,
         IconAppearance appearance,
         IReadOnlyList<int>? sizes = null
     )
@@ -196,7 +198,7 @@ public static class CalendarIconRenderer
 
                 dc.DrawText(
                     new FormattedText(
-                        dark ? "Dark taskbar • 01–53" : "Light taskbar • 01–53",
+                        dark ? "Dark taskbar • 01–56" : "Light taskbar • 01–56",
                         CultureInfo.InvariantCulture,
                         FlowDirection.LeftToRight,
                         new Typeface("Segoe UI"),
@@ -206,18 +208,18 @@ public static class CalendarIconRenderer
                     ),
                     new Point(20, y + 12)
                 );
-                for (var week = 1; week <= 53; week++)
+                for (var week = 1; week <= 56; week++)
                 {
-                    var col = (week - 1) % 18;
-                    var row = (week - 1) / 18;
+                    var col = (week - 1) % 19;
+                    var row = (week - 1) / 19;
 
                     dc.DrawImage(
                         Render(week, 16, appearance),
-                        new Rect(22 + col * 60, y + 60 + row * 52, 16, 16)
+                        new Rect(16 + col * 57, y + 60 + row * 52, 16, 16)
                     );
                     dc.DrawImage(
                         Render(week, 24, appearance),
-                        new Rect(42 + col * 60, y + 56 + row * 52, 24, 24)
+                        new Rect(36 + col * 57, y + 56 + row * 52, 24, 24)
                     );
                 }
                 var x = 20;

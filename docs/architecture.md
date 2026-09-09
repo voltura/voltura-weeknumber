@@ -12,6 +12,8 @@ Voltura WeekNumber is a Windows x64 application built with .NET 10 and WPF. The 
 
 `NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.
 
+Dates outside the regional calendar's supported range show an unavailable week (—) in the tray while midnight scheduling remains active. The next valid refresh restores the week and resets the notification baseline. Icons support weeks 1–56, including longer lunisolar leap years.
+
 The executable declares PerMonitorV2 DPI awareness. Window placement respects monitor work areas. Display changes, activation, and tray reopening trigger recovery checks; a stale window DPI is handled through a native move and bounds restoration so Windows can deliver its DPI-change message.
 
 `WindowWorkAreaPlacement` retains the requested logical size while hidden and across display changes. Only an interactive user resize updates that preference; native bounds changes do not. Recovery fits the retained size to the current work area.

@@ -18,7 +18,7 @@ internal sealed partial class NativeTray : IDisposable
     private bool _added;
     private bool _disposed;
     private string _tooltip = "Voltura WeekNumber";
-    private (int Week, int Size, IconAppearance Appearance)? _rendered;
+    private (int? Week, int Size, IconAppearance Appearance)? _rendered;
     private (string Language, bool Dark)? _menuAppearance;
     public event Action? OpenRequested;
     public event Action? PreferencesRequested;
@@ -91,7 +91,7 @@ internal sealed partial class NativeTray : IDisposable
         _menuAppearance = appearance;
     }
 
-    public void Update(int week, IconAppearance appearance, string tooltip)
+    public void Update(int? week, IconAppearance appearance, string tooltip)
     {
         if (_disposed)
         {

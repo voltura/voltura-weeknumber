@@ -19,7 +19,9 @@ public sealed class IconTests
             {
                 foreach (var dark in Themes)
                 {
-                    foreach (var week in Enumerable.Range(1, 53))
+                    foreach (
+                        var week in Enumerable.Range(1, 56).Select(week => (int?)week).Append(null)
+                    )
                     {
                         var bytes = CalendarIconRenderer.EncodeIco(
                             week,
