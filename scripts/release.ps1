@@ -109,6 +109,13 @@ if ($metadata.version -ne $Version)
     [IO.File]::WriteAllText($versionPath, (($metadata | ConvertTo-Json -Compress) + "`n"))
 }
 
+foreach ($path in @($versionPath, $notes))
+{
+    $content = [IO.File]::ReadAllText($path)
+    $normalized = $content -replace '\r\n|\r|\n', "`r`n"
+    if ($content -cne $normalized) { [IO.File]::WriteAllText($path, $normalized) }
+}
+
 # Validate the key, build/test once, and sign before committing or pushing.
 & "$PSScriptRoot\sign-update.ps1" -KeyPath $KeyPath -BuildPackages -SkipTests:$NoTests
 $assets = @(
