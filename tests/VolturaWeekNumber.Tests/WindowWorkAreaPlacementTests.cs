@@ -1,6 +1,6 @@
-using Xunit;
-using VolturaWeekNumber.Platform;
 using System.Windows;
+using VolturaWeekNumber.Platform;
+using Xunit;
 using WpfSize = System.Windows.Size;
 
 namespace VolturaWeekNumber.Tests;
@@ -13,15 +13,19 @@ public sealed class WindowWorkAreaPlacementTests
     [InlineData(216u, 216u, false)]
     [InlineData(0u, 216u, false)]
     [InlineData(216u, 0u, false)]
-    public void OnlyKnownMismatchedDpiRequiresRecovery(uint windowDpi, uint monitorDpi, bool expected) =>
-        Assert.Equal(expected, WindowWorkAreaPlacement.NeedsDpiRecovery(windowDpi, monitorDpi));
+    public void OnlyKnownMismatchedDpiRequiresRecovery(
+        uint windowDpi,
+        uint monitorDpi,
+        bool expected
+    ) => Assert.Equal(expected, WindowWorkAreaPlacement.NeedsDpiRecovery(windowDpi, monitorDpi));
 
     [Fact]
     public void OversizedWindowIsConstrainedToWorkArea()
     {
         var bounds = WindowWorkAreaPlacement.CalculateBounds(
             new Rect(0, 0, 800, 600),
-            new WpfSize(1160, 760));
+            new WpfSize(1160, 760)
+        );
 
         Assert.Equal(new Rect(0, 0, 800, 600), bounds);
     }
@@ -31,7 +35,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var bounds = WindowWorkAreaPlacement.CalculateBounds(
             new Rect(0, 0, 1600, 900),
-            new WpfSize(1160, 760));
+            new WpfSize(1160, 760)
+        );
 
         Assert.Equal(new WpfSize(1160, 760), bounds.Size);
     }
@@ -41,7 +46,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var bounds = WindowWorkAreaPlacement.CalculateBounds(
             new Rect(100, 50, 1600, 900),
-            new WpfSize(1160, 760));
+            new WpfSize(1160, 760)
+        );
 
         Assert.Equal(new Rect(320, 120, 1160, 760), bounds);
     }
@@ -51,7 +57,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var bounds = WindowWorkAreaPlacement.CalculateBounds(
             new Rect(-1920, -100, 1920, 1080),
-            new WpfSize(1160, 760));
+            new WpfSize(1160, 760)
+        );
 
         Assert.Equal(new Rect(-1540, 60, 1160, 760), bounds);
     }
@@ -61,7 +68,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var position = WindowWorkAreaPlacement.CalculateVisibleTopLeft(
             new Rect(200, 100, 1160, 760),
-            new Rect(0, 0, 1920, 1040));
+            new Rect(0, 0, 1920, 1040)
+        );
 
         Assert.Equal(new Point(200, 100), position);
     }
@@ -71,7 +79,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var position = WindowWorkAreaPlacement.CalculateVisibleTopLeft(
             new Rect(1000, 500, 1160, 760),
-            new Rect(0, 0, 1920, 1040));
+            new Rect(0, 0, 1920, 1040)
+        );
 
         Assert.Equal(new Point(760, 280), position);
     }
@@ -81,7 +90,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var position = WindowWorkAreaPlacement.CalculateVisibleTopLeft(
             new Rect(-2100, -300, 1160, 760),
-            new Rect(-1920, -100, 1920, 1040));
+            new Rect(-1920, -100, 1920, 1040)
+        );
 
         Assert.Equal(new Point(-1920, -100), position);
     }
@@ -91,7 +101,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var position = WindowWorkAreaPlacement.CalculateVisibleTopLeft(
             new Rect(600, 400, 2610, 1710),
-            new Rect(0, 0, 1920, 1040));
+            new Rect(0, 0, 1920, 1040)
+        );
 
         Assert.Equal(new Point(0, 0), position);
     }
@@ -101,7 +112,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            new WpfSize(1920, 1032));
+            new WpfSize(1920, 1032)
+        );
 
         Assert.Equal(new WpfSize(1160, 760), size);
     }
@@ -111,7 +123,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            new WpfSize(1000, 700));
+            new WpfSize(1000, 700)
+        );
 
         Assert.Equal(new WpfSize(1000, 700), size);
     }
@@ -121,7 +134,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(1160, 760),
-            new WpfSize(853, 459));
+            new WpfSize(853, 459)
+        );
 
         Assert.Equal(new WpfSize(853, 459), size);
     }
@@ -131,7 +145,8 @@ public sealed class WindowWorkAreaPlacementTests
     {
         var size = WindowWorkAreaPlacement.CalculateSizeAfterWorkAreaChange(
             new WpfSize(700, 420),
-            new WpfSize(1920, 1032));
+            new WpfSize(1920, 1032)
+        );
 
         Assert.Equal(new WpfSize(700, 420), size);
     }

@@ -3,18 +3,27 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Threading;
+using VolturaWeekNumber.Features.Updates;
 using VolturaWeekNumber.Platform;
 using VolturaWeekNumber.Ui;
 
 namespace VolturaWeekNumber;
 
-public enum MainPage { WeekNumber, DayOfYear, JulianDay, Preferences, About }
+public enum MainPage
+{
+    WeekNumber,
+    DayOfYear,
+    JulianDay,
+    Preferences,
+    About,
+}
 
 public partial class MainWindow : Window
 {
     public event Action<string>? ActionRequested;
     public event Action? HiddenToTray;
     private bool _exit;
+
     public MainWindow(CalendarViewModel model)
     {
         InitializeComponent();
@@ -25,57 +34,120 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += OnPageChanged;
         AddHandler(Expander.ExpandedEvent, new RoutedEventHandler(OnExpanded));
     }
+
     public void Open(MainPage tab = MainPage.WeekNumber)
     {
         Show();
-        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
         WindowWorkAreaPlacement.EnsureVisibleOnCurrentMonitor(this);
         Activate();
         // Showing the window restores focus and can reselect the previously focused tab.
         Tabs.SelectedIndex = (int)tab;
         FocusDatePageHeader();
     }
+
     private void OnPageChanged(object sender, SelectionChangedEventArgs args)
     {
-        if (args.OriginalSource == Tabs) FocusDatePageHeader();
+        if (args.OriginalSource == Tabs)
+        {
+            FocusDatePageHeader();
+        }
     }
+
     private void FocusDatePageHeader()
     {
-        if (Tabs.SelectedIndex is < 0 or > (int)MainPage.JulianDay) return;
+        if (Tabs.SelectedIndex is < 0 or > (int)MainPage.JulianDay)
+        {
+
+            return;
+        }
+
         var selectedPage = Tabs.SelectedItem as TabItem;
         // Let TabControl finish its automatic content focus before keeping focus on navigation.
-        _ = Dispatcher.InvokeAsync(() =>
-        {
-            if (IsActive && selectedPage is not null && Tabs.SelectedItem == selectedPage)
-                selectedPage.Focus();
-        }, DispatcherPriority.Loaded);
+
+        _ = Dispatcher.InvokeAsync(
+            () =>
+            {
+                if (IsActive && selectedPage is not null && Tabs.SelectedItem == selectedPage)
+                {
+                    selectedPage.Focus();
+                }
+            },
+            DispatcherPriority.Loaded
+        );
     }
-    public void UpdateLanguage() => Language = XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
-    public void UpdateState(string status, bool ready, bool eligible)
+
+    public void UpdateLanguage() =>
+        Language = XmlLanguage.GetLanguage(Strings.Current.Culture.Name);
+
+    internal void UpdateState(UpdateState state, bool eligible)
     {
-        UpdateStatus.Text = Strings.Current[status];
+        UpdateStatus.Text = Strings.Current[state.Status.ToString()];
         AutomaticUpdateCheck.Visibility = eligible ? Visibility.Visible : Visibility.Collapsed;
         CheckUpdateButton.Content = Strings.Current[eligible ? "CheckUpdates" : "Downloads"];
-        InstallButton.Visibility = ready ? Visibility.Visible : Visibility.Collapsed;
+        CheckUpdateButton.IsEnabled = !state.Busy;
+        InstallButton.Visibility = state.Ready ? Visibility.Visible : Visibility.Collapsed;
     }
-    public void Exit() { _exit = true; Close(); }
+
+    public void Exit()
+    {
+        _exit = true;
+        Close();
+    }
+
     internal void PrepareReview() => PreferencesScroll.ScrollToHome();
+
     private void OnClosing(object? sender, CancelEventArgs args)
     {
-        if (_exit) return;
+        if (_exit)
+        {
+
+            return;
+        }
+
         args.Cancel = true;
         Hide();
         HiddenToTray?.Invoke();
     }
-    private void TodayClick(object sender, RoutedEventArgs args) => ((CalendarViewModel)DataContext).SelectedDate = DateTime.Today;
-    private void ActionClick(object sender, RoutedEventArgs args) { if (sender is Button { Tag: string action }) ActionRequested?.Invoke(action); }
+
+    private void TodayClick(object sender, RoutedEventArgs args) =>
+        ((CalendarViewModel)DataContext).SelectedDate = DateTime.Today;
+
+    private void ActionClick(object sender, RoutedEventArgs args)
+    {
+        if (sender is Button { Tag: string action })
+        {
+            ActionRequested?.Invoke(action);
+        }
+    }
+
     private void AutomaticUpdatesChanged(object sender, RoutedEventArgs args)
     {
-        if (IsLoaded) ActionRequested?.Invoke("auto-updates");
+        if (IsLoaded)
+        {
+            ActionRequested?.Invoke("auto-updates");
+        }
     }
+
     private void OnExpanded(object sender, RoutedEventArgs args)
     {
-        if (args.OriginalSource is not Expander expanded || expanded.Parent is not Panel parent) return;
-        foreach (var sibling in parent.Children.OfType<Expander>()) if (sibling != expanded) sibling.IsExpanded = false;
+        if (args.OriginalSource is not Expander expanded || expanded.Parent is not Panel parent)
+        {
+
+            return;
+        }
+
+        foreach (var sibling in parent.Children.OfType<Expander>())
+        {
+            if (sibling != expanded)
+            {
+                sibling.IsExpanded = false;
+            }
+        }
     }
 }

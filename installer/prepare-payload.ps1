@@ -8,11 +8,18 @@ Set-StrictMode -Version Latest
 $manifestPath = Join-Path $Payload 'payload.json'
 $entries = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $manifest = @($entries)
-foreach ($entry in $manifest) {
-    if (-not $entry.path -or $entry.path -eq 'Uninstall.exe') { throw 'Invalid original payload manifest.' }
+
+foreach ($entry in $manifest)
+{
+    if (-not $entry.path -or $entry.path -eq 'Uninstall.exe')
+    {
+        throw 'Invalid original payload manifest.'
+    }
 }
+
 $uninstaller = Get-Item -LiteralPath (Join-Path $Payload 'Uninstall.exe')
 $manifest += @{
+
     path = 'Uninstall.exe'
     size = $uninstaller.Length
     sha256 = (Get-FileHash -LiteralPath $uninstaller.FullName -Algorithm SHA256).Hash

@@ -19,13 +19,17 @@ public sealed class DateLookupTests
     public void OrdinalRoundTrips(int year, int month, int day, int ordinal)
     {
         var date = new DateOnly(year, month, day);
+
         Assert.Equal(ordinal, date.DayOfYear);
         Assert.Equal(date, DateLookup.FromDayOfYear(year, ordinal));
     }
 
     [Theory]
-    [InlineData(0, 1)] [InlineData(10000, 1)] [InlineData(2026, 366)]
-    [InlineData(2024, 367)] [InlineData(2024, 0)]
+    [InlineData(0, 1)]
+    [InlineData(10000, 1)]
+    [InlineData(2026, 366)]
+    [InlineData(2024, 367)]
+    [InlineData(2024, 0)]
     public void InvalidOrdinalsAreRejected(int year, int day) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => DateLookup.FromDayOfYear(year, day));
 
@@ -38,13 +42,17 @@ public sealed class DateLookupTests
         for (var day = 0; day <= DateOnly.MaxValue.DayNumber; day++)
         {
             var date = DateOnly.FromDayNumber(day);
+
             Assert.Equal(1721426 + day, DateLookup.ToJulianDay(date));
             Assert.Equal(date, DateLookup.FromJulianDay(1721426 + day));
         }
     }
 
     [Theory]
-    [InlineData(int.MinValue)] [InlineData(1721425)] [InlineData(5373485)] [InlineData(int.MaxValue)]
+    [InlineData(int.MinValue)]
+    [InlineData(1721425)]
+    [InlineData(5373485)]
+    [InlineData(int.MaxValue)]
     public void InvalidJulianDaysAreRejected(int day) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => DateLookup.FromJulianDay(day));
 
@@ -54,8 +62,10 @@ public sealed class DateLookupTests
         var ordinal = new DateLookupViewModel(false);
         var julian = new DateLookupViewModel(true);
         var tomorrow = DateTime.Today.AddDays(1);
+
         ordinal.SelectedDate = new DateTime(2024, 1, 1);
-        ordinal.Refresh(tomorrow); julian.Refresh(tomorrow);
+        ordinal.Refresh(tomorrow);
+        julian.Refresh(tomorrow);
         Assert.Equal("001", ordinal.Result);
         Assert.Equal(tomorrow, julian.SelectedDate);
         ordinal.Today();
@@ -70,7 +80,13 @@ public sealed class DateLookupTests
     [InlineData(true, "-1", "")]
     public void InvalidLookupPreservesSelection(bool julian, string number, string year)
     {
-        var model = new DateLookupViewModel(julian) { SelectedDate = new DateTime(2000, 1, 1), NumberInput = number, YearInput = year };
+        var model = new DateLookupViewModel(julian)
+        {
+            SelectedDate = new DateTime(2000, 1, 1),
+            NumberInput = number,
+            YearInput = year,
+        };
+
         model.Convert();
         Assert.Equal(new DateTime(2000, 1, 1), model.SelectedDate);
         Assert.NotEmpty(model.Error);
@@ -80,8 +96,10 @@ public sealed class DateLookupTests
     public void SuccessfulReverseLookupClearsError()
     {
         var model = new DateLookupViewModel(false) { YearInput = "2024", NumberInput = "bad" };
+
         model.Convert();
-        model.NumberInput = "060"; model.Convert();
+        model.NumberInput = "060";
+        model.Convert();
         Assert.Empty(model.Error);
         Assert.Equal(new DateTime(2024, 2, 29), model.SelectedDate);
         model.SelectedDate = null;

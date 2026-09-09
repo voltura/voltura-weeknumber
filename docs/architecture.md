@@ -24,7 +24,9 @@ Optional application logging uses a bounded channel, one writer, and two rotatin
 
 ## Updates and installation
 
-`UpdateService` owns its HTTP client, schedule, cancellation, synchronization gate, and installer-process reference. Update eligibility requires the running path to match the per-user uninstall registration. Portable, development, and isolated profiles use manual updates.
+`UpdateService` owns HTTP, one operation gate, a disposable pending package, and an immutable UI state. Automatic checks run two minutes after startup and then daily while enabled; the schedule is in memory. Manual checks use the same operation. Update eligibility requires the running path to match the per-user uninstall registration. Portable, development, and isolated profiles use manual updates.
+
+Signature verification establishes authenticity; the service separately decides whether a version is newer. Startup restores a verified newer package or discards obsolete, incomplete, or damaged cache files. Cache cleanup is best effort and never claims that the app is up to date: only a successful online check does that. Replacing a package removes its old manifest first and publishes the new manifest last. Installation reverifies the package and holds the operation gate until setup exits. The UI receives its status and install action together; failures identify checking, downloading, verification, or launching setup. The optional application log records the failed operation and exception type.
 
 A pinned RSA public key verifies signed manifest bytes. The selected installer must match the signed version, package variant, filename, size, and SHA-256. Downloads and redirects are restricted to allowed HTTPS origins; reads are bounded. The package is verified again before launch, and installation requires a user action.
 

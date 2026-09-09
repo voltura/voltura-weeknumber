@@ -11,6 +11,7 @@ public sealed class UiStateTests
     {
         var saved = new AppSettings();
         var editor = new SettingsEditor();
+
         editor.Load(saved);
         Assert.False(editor.HasChanges);
         editor.StartWithWindows = !saved.StartWithWindows;
@@ -31,26 +32,32 @@ public sealed class UiStateTests
     {
         var editor = new SettingsEditor();
         var saved = new AppSettings { AutomaticIcon = false };
+
         editor.Load(saved);
         editor.Edit(saved with { AutomaticIcon = true });
         Assert.True(editor.HasChanges);
         var draft = editor.Value with { AutomaticUpdates = false };
+
         editor.Load(saved with { AutomaticUpdates = false });
         editor.Edit(draft);
         Assert.True(editor.HasChanges);
         editor.AutomaticIcon = false;
         Assert.False(editor.HasChanges);
     }
+
     [Fact]
     public void EditingSettingsDoesNotReplaceChoiceIdentities()
     {
         var editor = new SettingsEditor();
         var themes = editor.Themes;
         var selected = themes[1];
+
         editor.Load(new AppSettings { Theme = "light", Language = "de" });
         editor.RefreshLabels();
         editor.StartWithWindows = true;
-        Assert.Same(themes, editor.Themes); Assert.Same(selected, editor.Themes[1]);
-        Assert.Equal("light", editor.Theme); Assert.Equal("de", editor.Language);
+        Assert.Same(themes, editor.Themes);
+        Assert.Same(selected, editor.Themes[1]);
+        Assert.Equal("light", editor.Theme);
+        Assert.Equal("de", editor.Language);
     }
 }

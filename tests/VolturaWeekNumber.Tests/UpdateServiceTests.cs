@@ -2,8 +2,14 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using VolturaWeekNumber.Features.Icon;
 using VolturaWeekNumber.Features.Updates;
 using VolturaWeekNumber.Platform;
+using VolturaWeekNumber.Ui;
 using Xunit;
 
 namespace VolturaWeekNumber.Tests;
@@ -11,65 +17,49 @@ namespace VolturaWeekNumber.Tests;
 [Collection("WPF")]
 public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "VolturaWeekNumber-tests", Guid.NewGuid().ToString("N"));
-    [Fact]
-    public async Task LockedOverdueStampDoesNotSpinAndManualCheckCanRecover()
-    {
-        using var key = RSA.Create(2048);
-        var handler = new ReleaseHandler(key);
-        await using var service = new UpdateService(new(_root, false, true), handler, key.ExportSubjectPublicKeyInfoPem(), true, false);
-        var updates = Path.Combine(_root, "Updates");
-        Directory.CreateDirectory(updates);
-        var stamp = Path.Combine(updates, "last-check.txt");
-        await File.WriteAllTextAsync(stamp, "old", TestContext.Current.CancellationToken);
-        File.SetLastWriteTimeUtc(stamp, DateTime.UtcNow.AddDays(-2));
-        var failed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var failures = 0;
-        service.Changed += () =>
-        {
-            if (service.Status != "UpdateFailed") return;
-            Interlocked.Increment(ref failures);
-            failed.TrySetResult();
-        };
-        using (File.Open(stamp, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            fixture.Run(() => service.Start(true));
-            await failed.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
-            fixture.Run(() => { service.Start(false); service.Start(true); });
-            await Task.Delay(250, TestContext.Current.CancellationToken);
-            Assert.Equal(1, Volatile.Read(ref failures));
-            Assert.Empty(handler.Requests);
-        }
-        // The automatic retry pause must not delay a user-initiated check after the file is available.
-        await service.CheckAsync();
-        Assert.Equal("Ready", service.Status);
-        Assert.True(service.Ready);
-    }
+    private readonly string _root = Path.Combine(
+        Path.GetTempPath(),
+        "VolturaWeekNumber-tests",
+        Guid.NewGuid().ToString("N")
+    );
 
     [Fact]
     public async Task RechecksReuseReadyInstallerButDownloadNewerOrMissingPackages()
     {
         using var key = RSA.Create(2048);
         var handler = new ReleaseHandler(key);
-        await using var service = new UpdateService(new(_root, false, true), handler, key.ExportSubjectPublicKeyInfoPem(), true, false);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
         await service.CheckAsync();
-        var installer = Directory.GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe").Single();
-        // Rechecking must neither read/hash nor overwrite an already verified installer.
-        using (File.Open(installer, FileMode.Open, FileAccess.Read, FileShare.None))
-        {
-            await service.CheckAsync();
-            Assert.Equal("Ready", service.Status);
-        }
+        var installer = Directory
+            .GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe")
+            .Single();
+
+        await service.CheckAsync();
+        Assert.Equal(UpdateStatus.Ready, service.State.Status);
         Assert.Single(handler.Requests, name => name.EndsWith(".exe", StringComparison.Ordinal));
         File.Delete(installer);
         await service.CheckAsync();
-        Assert.True(service.Ready);
+        Assert.True(service.State.Ready);
         Assert.True(File.Exists(installer));
-        Assert.Equal(2, handler.Requests.Count(name => name.EndsWith(".exe", StringComparison.Ordinal)));
+        Assert.Equal(
+            2,
+            handler.Requests.Count(name => name.EndsWith(".exe", StringComparison.Ordinal))
+        );
         handler.SetRelease(key, "1.2.0");
         await service.CheckAsync();
-        Assert.Equal("Ready", service.Status);
-        Assert.EndsWith("1.2.0-win-x64.exe", Directory.GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe").Single(), StringComparison.Ordinal);
+        Assert.Equal(UpdateStatus.Ready, service.State.Status);
+        Assert.EndsWith(
+            "1.2.0-win-x64.exe",
+            Directory.GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe").Single(),
+            StringComparison.Ordinal
+        );
     }
 
     [Fact]
@@ -77,10 +67,17 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
     {
         using var key = RSA.Create(2048);
         var handler = new ReleaseHandler(key);
-        await using var service = new UpdateService(new(_root, false, true), handler, key.ExportSubjectPublicKeyInfoPem(), true, false);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
         Task check = Task.CompletedTask;
         var dispatcherThread = 0;
         var callbackThreads = new List<int>();
+
         service.Changed += () => callbackThreads.Add(Environment.CurrentManagedThreadId);
         fixture.Run(() =>
         {
@@ -88,14 +85,23 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             check = service.CheckAsync();
         });
         await check;
-        Assert.True(service.Ready);
+        Assert.True(service.State.Ready);
         Assert.NotEmpty(callbackThreads);
         Assert.All(callbackThreads, thread => Assert.NotEqual(dispatcherThread, thread));
         Assert.All(handler.RequestThreads, thread => Assert.NotEqual(dispatcherThread, thread));
         callbackThreads.Clear();
-        fixture.Run(() => check = service.RestorePendingAsync());
+        await using var restart = new UpdateService(
+            new(_root, false, true),
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
+        restart.Changed += () => callbackThreads.Add(Environment.CurrentManagedThreadId);
+        fixture.Run(() => check = restart.RestorePendingAsync());
         await check;
-        Assert.Equal("Ready", service.Status);
+        Assert.Equal(UpdateStatus.Ready, restart.State.Status);
         Assert.Single(callbackThreads);
         Assert.NotEqual(dispatcherThread, callbackThreads[0]);
     }
@@ -120,59 +126,470 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
             await shutdown.WaitAsync(TestContext.Current.CancellationToken);
         }
         await check;
-        Assert.False(service.Ready);
+        Assert.False(service.State.Ready);
     }
+
     [Fact]
     public async Task VerifiedDownloadRestoresAfterRestartAndCorruptContentIsRejected()
     {
         using var key = RSA.Create(2048);
         var paths = new AppPaths(_root, false, true);
-        await using (var service = new UpdateService(paths, new ReleaseHandler(key), key.ExportSubjectPublicKeyInfoPem(), true, false))
+
+        await using (
+            var service = new UpdateService(
+                paths,
+                new ReleaseHandler(key),
+                key.ExportSubjectPublicKeyInfoPem(),
+                true,
+                false
+            )
+        )
         {
             await service.CheckAsync();
-            Assert.True(service.Ready); Assert.Equal("Ready", service.Status);
+            Assert.True(service.State.Ready);
+            Assert.Equal(UpdateStatus.Ready, service.State.Status);
         }
-        await using var restored = new UpdateService(paths, new ReleaseHandler(key), key.ExportSubjectPublicKeyInfoPem(), true, false);
+        await using var restored = new UpdateService(
+            paths,
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
         await restored.RestorePendingAsync();
-        Assert.True(restored.Ready);
-        var installer = Directory.GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe").Single();
+        Assert.True(restored.State.Ready);
+        var installer = Directory
+            .GetFiles(Path.Combine(_root, "Updates", "pending"), "*.exe")
+            .Single();
+
         await File.WriteAllBytesAsync(installer, [9, 9, 9], TestContext.Current.CancellationToken);
-        await Assert.ThrowsAsync<InvalidDataException>(() => restored.RestorePendingAsync());
-        Assert.False(restored.Ready);
+        Assert.False(await restored.InstallAsync());
+        Assert.Equal(UpdateStatus.UpdateVerificationFailed, restored.State.Status);
+        Assert.False(restored.State.Ready);
     }
+
     [Theory]
-    [InlineData("corrupt")]
-    [InlineData("oversized")]
-    [InlineData("bad-origin")]
-    [InlineData("malformed")]
-    [InlineData("offline")]
-    public async Task FailedDownloadNeverBecomesReady(string failure)
+    [InlineData("corrupt", "UpdateVerificationFailed")]
+    [InlineData("oversized", "UpdateDownloadFailed")]
+    [InlineData("bad-origin", "UpdateDownloadFailed")]
+    [InlineData("malformed", "UpdateCheckFailed")]
+    [InlineData("offline", "UpdateCheckFailed")]
+    public async Task FailedDownloadNeverBecomesReady(string failure, string expectedStatus)
     {
         using var key = RSA.Create(2048);
-        await using var service = new UpdateService(new(_root, false, true), new ReleaseHandler(key, failure), key.ExportSubjectPublicKeyInfoPem(), true, false);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            new ReleaseHandler(key, failure),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
         await service.CheckAsync();
-        Assert.False(service.Ready); Assert.Equal("UpdateFailed", service.Status);
+        Assert.False(service.State.Ready);
+        Assert.Equal(expectedStatus, service.State.Status.ToString());
         Assert.False(File.Exists(Path.Combine(_root, "Updates", "pending", "manifest.json")));
     }
+
     [Fact]
     public async Task InterruptedMetadataCannotRestoreButCanBeDownloadedAgain()
     {
         using var key = RSA.Create(2048);
         var pending = Path.Combine(_root, "Updates", "pending");
+
         Directory.CreateDirectory(pending);
-        await File.WriteAllTextAsync(Path.Combine(pending, "manifest.pending"), "incomplete", TestContext.Current.CancellationToken);
-        await using var service = new UpdateService(new(_root, false, true), new ReleaseHandler(key), key.ExportSubjectPublicKeyInfoPem(), true, false);
-        await service.RestorePendingAsync(); Assert.False(service.Ready);
-        await service.CheckAsync(); Assert.True(service.Ready);
+        await File.WriteAllTextAsync(
+            Path.Combine(pending, "manifest.pending"),
+            "incomplete",
+            TestContext.Current.CancellationToken
+        );
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
+        await service.RestorePendingAsync();
+        Assert.False(service.State.Ready);
+        await service.CheckAsync();
+        Assert.True(service.State.Ready);
     }
+
     [Fact]
     public async Task PortableCopyCannotDownloadOrBecomeEligible()
     {
         using var key = RSA.Create(2048);
-        await using var service = new UpdateService(new(_root, true, false), new ReleaseHandler(key), key.ExportSubjectPublicKeyInfoPem());
-        await service.CheckAsync(); Assert.False(service.Eligible); Assert.False(service.Ready);
+        await using var service = new UpdateService(
+            new(_root, true, false),
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem()
+        );
+
+        await service.CheckAsync();
+        Assert.False(service.Eligible);
+        Assert.False(service.State.Ready);
+        Assert.False(await service.InstallAsync());
     }
-    public void Dispose() { if (Directory.Exists(_root)) Directory.Delete(_root, true); }
+
+    [Theory]
+    [InlineData(false, "1.1.0")]
+    [InlineData(true, "1.1.0")]
+    [InlineData(false, "1.2.0")]
+    [InlineData(true, "1.2.0")]
+    public async Task InstalledUpgradeExpiresCacheAndOnlyOnlineCheckReportsCurrent(
+        bool full,
+        string installed
+    )
+    {
+        using var key = RSA.Create(2048);
+        var paths = new AppPaths(_root, false, true);
+
+        await using (
+            var previous = new UpdateService(
+                paths,
+                new ReleaseHandler(key),
+                key.ExportSubjectPublicKeyInfoPem(),
+                true,
+                full
+            )
+        )
+        {
+            await previous.CheckAsync();
+            Assert.True(previous.State.Ready);
+        }
+        var handler = new ReleaseHandler(key);
+        await using var upgraded = new UpdateService(
+            paths,
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            full,
+            Version.Parse(installed)
+        );
+
+        await upgraded.RestorePendingAsync();
+        Assert.Equal(UpdateStatus.Idle, upgraded.State.Status);
+        Assert.False(upgraded.State.Ready);
+        Assert.Empty(Directory.GetFiles(Path.Combine(_root, "Updates", "pending")));
+        Assert.Empty(handler.Requests);
+        await upgraded.CheckAsync();
+        Assert.Equal(UpdateStatus.Current, upgraded.State.Status);
+        Assert.Equal("latest", Assert.Single(handler.Requests));
+        await upgraded.RestorePendingAsync();
+        Assert.Equal(UpdateStatus.Current, upgraded.State.Status);
+    }
+
+    [Theory]
+    [InlineData("manifest.json")]
+    [InlineData("signature.sig")]
+    [InlineData("VolturaWeekNumber-Setup-1.1.0-win-x64.exe")]
+    public async Task DamagedCacheIsDiscardedOnStartupAndCanBeDownloadedAgain(string damaged)
+    {
+        using var key = RSA.Create(2048);
+        var paths = new AppPaths(_root, false, true);
+
+        await using (
+            var previous = new UpdateService(
+                paths,
+                new ReleaseHandler(key),
+                key.ExportSubjectPublicKeyInfoPem(),
+                true,
+                false
+            )
+        )
+        {
+            await previous.CheckAsync();
+        }
+
+        await File.WriteAllBytesAsync(
+            Path.Combine(_root, "Updates", "pending", damaged),
+            [9, 9, 9],
+            TestContext.Current.CancellationToken
+        );
+        await using var restarted = new UpdateService(
+            paths,
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
+        await restarted.RestorePendingAsync();
+        Assert.Equal(UpdateStatus.Idle, restarted.State.Status);
+        Assert.Empty(Directory.GetFiles(Path.Combine(_root, "Updates", "pending")));
+        await restarted.CheckAsync();
+        Assert.True(restarted.State.Ready);
+    }
+
+    [Fact]
+    public async Task FailedRecheckAndCurrentReleaseNeverLeaveAnInstallAction()
+    {
+        using var key = RSA.Create(2048);
+        var handler = new ReleaseHandler(key);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
+        await service.CheckAsync();
+        Assert.True(service.State.Ready);
+        handler.Failure = "offline";
+        await service.CheckAsync();
+        Assert.Equal(UpdateStatus.UpdateCheckFailed, service.State.Status);
+        Assert.Null(service.State.Installer);
+        handler.Failure = "";
+        await service.CheckAsync();
+        Assert.True(service.State.Ready);
+        Assert.Single(handler.Requests, name => name.EndsWith(".exe", StringComparison.Ordinal));
+        handler.SetRelease(key, "1.0.0");
+        await service.CheckAsync();
+        Assert.Equal(UpdateStatus.Current, service.State.Status);
+        Assert.Null(service.State.Installer);
+        Assert.Empty(Directory.GetFiles(Path.Combine(_root, "Updates", "pending")));
+    }
+
+    [Fact]
+    public async Task InterruptedReplacementCannotRestoreAMixedPackage()
+    {
+        using var key = RSA.Create(2048);
+        var handler = new ReleaseHandler(key);
+        var paths = new AppPaths(_root, false, true);
+
+        await using (
+            var service = new UpdateService(
+                paths,
+                handler,
+                key.ExportSubjectPublicKeyInfoPem(),
+                true,
+                false
+            )
+        )
+        {
+            await service.CheckAsync();
+            handler.SetRelease(key, "1.2.0");
+            handler.Failure = "oversized";
+            await service.CheckAsync();
+            Assert.Equal(UpdateStatus.UpdateDownloadFailed, service.State.Status);
+            Assert.False(File.Exists(Path.Combine(_root, "Updates", "pending", "manifest.json")));
+        }
+        var retryHandler = new ReleaseHandler(key);
+
+        retryHandler.SetRelease(key, "1.2.0");
+        await using var restart = new UpdateService(
+            paths,
+            retryHandler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+
+        await restart.RestorePendingAsync();
+        Assert.Equal(UpdateStatus.Idle, restart.State.Status);
+        await restart.CheckAsync();
+        Assert.True(restart.State.Ready);
+        Assert.EndsWith("1.2.0-win-x64.exe", restart.State.Installer, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task LockedObsoleteInstallerDoesNotFailCheckOrDeleteUnrelatedFiles()
+    {
+        using var key = RSA.Create(2048);
+        var paths = new AppPaths(_root, false, true);
+        string installer;
+        await using (
+            var previous = new UpdateService(
+                paths,
+                new ReleaseHandler(key),
+                key.ExportSubjectPublicKeyInfoPem(),
+                true,
+                false
+            )
+        )
+        {
+            await previous.CheckAsync();
+            installer = previous.State.Installer!;
+        }
+        var unrelated = Path.Combine(Path.GetDirectoryName(installer)!, "keep.txt");
+
+        await File.WriteAllTextAsync(unrelated, "user data", TestContext.Current.CancellationToken);
+        await using var upgraded = new UpdateService(
+            paths,
+            new ReleaseHandler(key),
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false,
+            new(1, 1, 0)
+        );
+
+        using (File.Open(installer, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            await upgraded.RestorePendingAsync();
+            Assert.Equal(UpdateStatus.Idle, upgraded.State.Status);
+            await upgraded.CheckAsync();
+            Assert.Equal(UpdateStatus.Current, upgraded.State.Status);
+        }
+        await upgraded.CheckAsync();
+        Assert.False(File.Exists(installer));
+        Assert.Equal(
+            "user data",
+            await File.ReadAllTextAsync(unrelated, TestContext.Current.CancellationToken)
+        );
+    }
+
+    [Fact]
+    public async Task OpenInstallerPreventsConcurrentOperationsAndCancelAllowsRetry()
+    {
+        using var key = RSA.Create(2048);
+        var opened = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var closed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var launches = 0;
+        var handler = new ReleaseHandler(key);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false,
+            install: async (path, token) =>
+            {
+                Assert.True(File.Exists(path));
+                launches++;
+                opened.TrySetResult();
+                await closed.Task.WaitAsync(token);
+            }
+        );
+
+        await service.CheckAsync();
+        var install = service.InstallAsync();
+
+        try
+        {
+            await opened.Task.WaitAsync(
+                TimeSpan.FromSeconds(10),
+                TestContext.Current.CancellationToken
+            );
+            Assert.True(service.State.Busy);
+            var requests = handler.Requests.Count;
+
+            await service.CheckAsync();
+            Assert.False(await service.InstallAsync());
+            Assert.Equal(requests, handler.Requests.Count);
+            Assert.Equal(1, launches);
+        }
+        finally
+        {
+            closed.TrySetResult();
+        }
+        Assert.True(await install);
+        Assert.True(service.State.Ready);
+        Assert.True(await service.InstallAsync());
+        Assert.Equal(2, launches);
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("sv")]
+    [InlineData("de")]
+    public async Task AboutActionsFollowCheckFailureAndRecovery(string language)
+    {
+        using var key = RSA.Create(2048);
+        var handler = new ReleaseHandler(key);
+        await using var service = new UpdateService(
+            new(_root, false, true),
+            handler,
+            key.ExportSubjectPublicKeyInfoPem(),
+            true,
+            false
+        );
+        MainWindow window = null!;
+        fixture.Run(() =>
+        {
+            Strings.Current.SetLanguage(language);
+            window = new(new CalendarViewModel()) { Width = 560 };
+            window.Open(MainPage.About);
+        });
+        service.Changed += () =>
+            fixture.Run(() =>
+            {
+                window.UpdateState(service.State, service.Eligible);
+                window.UpdateLayout();
+                var status = Assert.IsType<TextBlock>(window.FindName("UpdateStatus"));
+                var check = Assert.IsType<Button>(window.FindName("CheckUpdateButton"));
+                var install = Assert.IsType<Button>(window.FindName("InstallButton"));
+
+                Assert.NotEqual(service.State.Status.ToString(), status.Text);
+                Assert.Equal(
+                    service.State.Status != UpdateStatus.Checking
+                        && service.State.Status != UpdateStatus.Downloading,
+                    check.IsEnabled
+                );
+                Assert.Equal(
+                    service.State.Status == UpdateStatus.Ready
+                        ? Visibility.Visible
+                        : Visibility.Collapsed,
+                    install.Visibility
+                );
+                var output = Environment.GetEnvironmentVariable("VOLTURA_UPDATE_REVIEW_DIR");
+
+                if (output is null)
+                {
+
+                    return;
+                }
+
+                Directory.CreateDirectory(output);
+                var bitmap = new RenderTargetBitmap(
+                    (int)window.ActualWidth,
+                    (int)window.ActualHeight,
+                    96,
+                    96,
+                    PixelFormats.Pbgra32
+                );
+
+                bitmap.Render(window);
+                File.WriteAllBytes(
+                    Path.Combine(output, $"about-{language}-{service.State.Status}.png"),
+                    CalendarIconRenderer.Png(bitmap)
+                );
+            });
+        try
+        {
+            await service.CheckAsync();
+            handler.Failure = "offline";
+            await service.CheckAsync();
+            Assert.Equal(UpdateStatus.UpdateCheckFailed, service.State.Status);
+            handler.Failure = "";
+            handler.SetRelease(key, "1.0.0");
+            await service.CheckAsync();
+            Assert.Equal(UpdateStatus.Current, service.State.Status);
+            handler.SetRelease(key, "1.2.0");
+            handler.Failure = "corrupt";
+            await service.CheckAsync();
+            Assert.Equal(UpdateStatus.UpdateVerificationFailed, service.State.Status);
+        }
+        finally
+        {
+            fixture.Run(() =>
+            {
+                window.Exit();
+                Strings.Current.SetLanguage("system");
+            });
+        }
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_root))
+        {
+            Directory.Delete(_root, true);
+        }
+    }
 
     private sealed class ReleaseHandler : HttpMessageHandler
     {
@@ -180,52 +597,125 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
         private string Installer => $"VolturaWeekNumber-Setup-{_version}-win-x64.exe";
         private byte[] _manifest = [];
         private byte[] _signature = [];
-        private readonly string _failure;
+        public string Failure { get; set; }
         public List<string> Requests { get; } = [];
         public List<int> RequestThreads { get; } = [];
         public ReleaseHandler(RSA key, string failure = "")
         {
-            _failure = failure;
+            Failure = failure;
             SetRelease(key, _version);
         }
+
         public void SetRelease(RSA key, string version)
         {
             _version = version;
-            _manifest = JsonSerializer.SerializeToUtf8Bytes(new { schema = 1, version = _version, assets = new[] { new { name = Installer, size = 3, sha256 = Convert.ToHexString(SHA256.HashData(new byte[] { 1, 2, 3 })) } } });
+            _manifest = JsonSerializer.SerializeToUtf8Bytes(
+                new
+                {
+                    schema = 1,
+                    version = _version,
+                    assets = new[]
+                    {
+                        Installer,
+                        Installer.Replace(".exe", "-full.exe", StringComparison.Ordinal),
+                    }.Select(name => new
+                    {
+                        name,
+                        size = 3,
+                        sha256 = Convert.ToHexString(SHA256.HashData(new byte[] { 1, 2, 3 })),
+                    }),
+                }
+            );
             _signature = key.SignData(_manifest, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
         }
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
-            if (_failure == "offline") throw new HttpRequestException("Simulated offline.");
+            if (Failure == "offline")
+            {
+                throw new HttpRequestException("Simulated offline.");
+            }
+
             var name = Path.GetFileName(request.RequestUri!.AbsolutePath);
+
             Requests.Add(name);
             RequestThreads.Add(Environment.CurrentManagedThreadId);
             byte[] body;
+
             if (name == "latest")
             {
-                body = _failure == "malformed" ? "{}"u8.ToArray() : JsonSerializer.SerializeToUtf8Bytes(new
-                {
-                    tag_name = "v" + _version, draft = false, prerelease = false,
-                    assets = new[] { Installer, $"VolturaWeekNumber-Update-{_version}.json", $"VolturaWeekNumber-Update-{_version}.sig" }.Select(asset => new
-                    { name = asset, browser_download_url = $"https://{(_failure == "bad-origin" ? "example.com" : "github.com")}/voltura/voltura-weeknumber/releases/download/v{_version}/{asset}" }).ToArray()
-                });
+                body =
+                    Failure == "malformed"
+                        ? "{}"u8.ToArray()
+                        : JsonSerializer.SerializeToUtf8Bytes(
+                            new
+                            {
+                                tag_name = "v" + _version,
+                                draft = false,
+                                prerelease = false,
+                                assets = new[]
+                                {
+                                    Installer,
+                                    Installer.Replace(
+                                        ".exe",
+                                        "-full.exe",
+                                        StringComparison.Ordinal
+                                    ),
+                                    $"VolturaWeekNumber-Update-{_version}.json",
+                                    $"VolturaWeekNumber-Update-{_version}.sig",
+                                }
+                                    .Select(asset => new
+                                    {
+                                        name = asset,
+                                        browser_download_url = $"https://{(Failure == "bad-origin" ? "example.com" : "github.com")}/voltura/voltura-weeknumber/releases/download/v{_version}/{asset}",
+                                    })
+                                    .ToArray(),
+                            }
+                        );
             }
-            else if (name.EndsWith(".json", StringComparison.Ordinal)) body = _manifest;
-            else if (name.EndsWith(".sig", StringComparison.Ordinal)) body = _signature;
-            else body = _failure switch { "corrupt" => [4, 5, 6], "oversized" => [1, 2, 3, 4], _ => [1, 2, 3] };
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(body) });
+            else if (name.EndsWith(".json", StringComparison.Ordinal))
+            {
+                body = _manifest;
+            }
+            else if (name.EndsWith(".sig", StringComparison.Ordinal))
+            {
+                body = _signature;
+            }
+            else
+            {
+                body = Failure switch
+                {
+                    "corrupt" => [4, 5, 6],
+
+                    "oversized" => [1, 2, 3, 4],
+
+                    _ => [1, 2, 3],
+                };
+            }
+
+            return Task.FromResult(
+                new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(body) }
+            );
         }
     }
 
     private sealed class WaitingHandler : HttpMessageHandler
     {
-        public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource Started { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
         public int Requests { get; private set; }
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
             Requests++;
             Started.SetResult();
             await Task.Delay(Timeout.Infinite, cancellationToken);
+
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
     }

@@ -10,46 +10,93 @@ namespace VolturaWeekNumber.Features.Updates;
 internal sealed class UpdateService : IAsyncDisposable
 {
     public const string ProjectUrl = "https://github.com/voltura/voltura-weeknumber";
-    private readonly AppPaths _paths;
+    private static readonly string[] MetadataFiles =
+    [
+        "manifest.json",
+        "manifest.pending",
+        "signature.sig",
+        "installer.pending",
+    ];
     private readonly HttpClient _http;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly CancellationTokenSource _stop = new();
-    private readonly SemaphoreSlim _scheduleChanged = new(0, 1);
-    private Task? _worker;
-    private bool _automatic;
-    private volatile string? _installer;
-    private Process? _installerProcess;
-    private readonly string? _publicKey;
+    private readonly string _pending;
+    private readonly string _publicKey;
     private readonly bool _full;
+    private readonly Version _current;
+    private readonly ApplicationLog? _log;
+    private readonly Func<string, CancellationToken, Task> _install;
+    private Task? _worker;
+    private volatile bool _automatic;
+    private volatile UpdateState _state = new(UpdateStatus.Idle);
+    public UpdateState State => _state;
     public bool Eligible { get; }
-    public bool Ready => _installer is not null;
-    private volatile string _status = string.Empty;
-    public string Status => _status;
     public event Action? Changed;
-    private string Pending => Path.Combine(_paths.Data, "Updates", "pending");
-    private static Version CurrentVersion => typeof(UpdateService).Assembly.GetName().Version ?? new(1, 0, 0);
 
-    internal UpdateService(AppPaths paths, HttpMessageHandler? handler = null, string? publicKey = null, bool? eligible = null, bool? full = null)
+    internal UpdateService(
+        AppPaths paths,
+        HttpMessageHandler? handler = null,
+        string? publicKey = null,
+        bool? eligible = null,
+        bool? full = null,
+        Version? current = null,
+        ApplicationLog? log = null,
+        Func<string, CancellationToken, Task>? install = null
+    )
     {
-        _paths = paths;
-        _http = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false }) { Timeout = TimeSpan.FromMinutes(5) };
-        using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\VolturaWeekNumber");
+        _pending = Path.Combine(paths.Data, "Updates", "pending");
+        _log = log;
+        _install = install ?? LaunchInstallerAsync;
+        _current = current ?? typeof(UpdateService).Assembly.GetName().Version ?? new(1, 0, 0);
+        _http = new HttpClient(
+            handler ?? new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false }
+        )
+        {
+            Timeout = TimeSpan.FromMinutes(5),
+        };
+        using var key = Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VolturaWeekNumber"
+        );
         var location = key?.GetValue("InstallLocation") as string;
-        Eligible = eligible ?? (!paths.Portable && !paths.Isolated && location is not null &&
-            Path.GetFullPath(location).TrimEnd(Path.DirectorySeparatorChar).Equals(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase));
+
+        Eligible =
+            eligible
+            ?? (
+                !paths.Portable
+                && !paths.Isolated
+                && location is not null
+                && Path.GetFullPath(location)
+                    .TrimEnd(Path.DirectorySeparatorChar)
+                    .Equals(
+                        AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar),
+                        StringComparison.OrdinalIgnoreCase
+                    )
+            );
         _full = full ?? (key?.GetValue("PackageVariant") as string == "full");
-        using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("VolturaWeekNumber.Features.Updates.update-signing-public.pem");
-        if (resource is not null) { using var reader = new StreamReader(resource); _publicKey = reader.ReadToEnd(); }
-        if (publicKey is not null) _publicKey = publicKey;
+        using var resource = Assembly
+            .GetExecutingAssembly()
+            .GetManifestResourceStream(
+                "VolturaWeekNumber.Features.Updates.update-signing-public.pem"
+            );
+        using var reader = new StreamReader(
+            resource
+                ?? throw new InvalidOperationException(
+                    "Release verification key is not configured."
+                )
+        );
+
+        _publicKey = publicKey ?? reader.ReadToEnd();
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("VolturaWeekNumber/1.0");
-        if (!Eligible) _status = "ManualUpdates";
+
+        if (!Eligible)
+        {
+            _state = new(UpdateStatus.ManualUpdates);
+        }
     }
 
     public void Start(bool automatic)
     {
-        var changed = _automatic != automatic;
         _automatic = automatic;
-        if (changed && _scheduleChanged.CurrentCount == 0) _scheduleChanged.Release();
         _worker ??= RunAsync();
     }
 
@@ -57,206 +104,516 @@ internal sealed class UpdateService : IAsyncDisposable
     {
         try
         {
-            if (!Eligible) return;
-            if (Eligible)
+            if (!Eligible)
             {
-                try { await RestorePendingAsync(); }
-                catch (Exception error) when (error is InvalidDataException or IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException)
-                { SetStatus("UpdateFailed"); } // A corrupt pending package must not stop future checks.
+
+                return;
             }
-            long? lastAttempt = null;
+
+            await RestorePendingAsync();
+            await Task.Delay(TimeSpan.FromMinutes(2), _stop.Token);
+
             while (!_stop.IsCancellationRequested)
             {
-                if (!_automatic || Ready)
+                if (_automatic && !State.Ready)
                 {
-                    await _scheduleChanged.WaitAsync(_stop.Token);
-                    continue;
-                }
-                var stamp = Path.Combine(_paths.Data, "Updates", "last-check.txt");
-                var delay = File.Exists(stamp) ? TimeSpan.FromDays(1) - (DateTime.UtcNow - File.GetLastWriteTimeUtc(stamp)) : TimeSpan.FromMinutes(2);
-                if (delay > TimeSpan.FromDays(1)) delay = TimeSpan.FromDays(1);
-                // A locked/unwritable stamp (or a busy check gate) must not cause a hot retry loop.
-                // Use elapsed time so clock changes and settings signals cannot bypass the pause.
-                if (lastAttempt is { } attempted)
-                {
-                    var retryDelay = TimeSpan.FromMinutes(2) - Stopwatch.GetElapsedTime(attempted);
-                    if (delay < retryDelay) delay = retryDelay;
-                }
-                if (delay > TimeSpan.Zero)
-                {
-                    using var waitStop = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
-                    var timer = Task.Delay(delay, waitStop.Token);
-                    var signal = _scheduleChanged.WaitAsync(waitStop.Token);
-                    var completed = await Task.WhenAny(timer, signal);
-                    await waitStop.CancelAsync();
-                    try { await Task.WhenAll(timer, signal); } catch (OperationCanceledException) when (!_stop.IsCancellationRequested) { }
-                    if (completed == signal) continue;
-                }
-                if (_automatic)
-                {
-                    lastAttempt = Stopwatch.GetTimestamp();
                     await CheckAsync();
                 }
+
+                await Task.Delay(TimeSpan.FromDays(1), _stop.Token);
             }
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested) { }
-        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException or JsonException or InvalidOperationException)
-        { SetStatus("UpdateFailed"); }
     }
 
     public async Task CheckAsync()
     {
-        if (!Eligible) { SetStatus("ManualUpdates"); return; }
-        if (!await _gate.WaitAsync(0, _stop.Token)) return;
+        if (!Eligible || State.Busy)
+        {
+
+            return;
+        }
+
+        await _gate.WaitAsync(_stop.Token);
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
+
         timeout.CancelAfter(TimeSpan.FromMinutes(10));
         var token = timeout.Token;
+        var failure = UpdateStatus.UpdateCheckFailed;
+
         try
         {
-            // Leave the UI context even when file/network awaits complete synchronously.
-            // This uses the shared thread pool; no dedicated thread or polling is needed.
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-            SetStatus("Checking");
-            Directory.CreateDirectory(Path.Combine(_paths.Data, "Updates"));
-            await File.WriteAllTextAsync(Path.Combine(_paths.Data, "Updates", "last-check.txt"), DateTimeOffset.UtcNow.ToString("O"), _stop.Token);
-            if (_publicKey is null) throw new InvalidDataException("Release verification key is not configured.");
-            var metadata = await DownloadBytesAsync(new Uri("https://api.github.com/repos/voltura/voltura-weeknumber/releases/latest"), 256 * 1024, token);
+            SetState(UpdateStatus.Checking);
+            var metadata = await DownloadBytesAsync(
+                new Uri("https://api.github.com/repos/voltura/voltura-weeknumber/releases/latest"),
+                256 * 1024,
+                token
+            );
             using var document = JsonDocument.Parse(metadata);
             var root = document.RootElement;
             var tag = root.GetProperty("tag_name").GetString() ?? string.Empty;
-            if (root.GetProperty("draft").GetBoolean() || root.GetProperty("prerelease").GetBoolean() || !tag.StartsWith('v') || !UpdateVerifier.TryVersion(tag[1..], out var latest)) throw new InvalidDataException("Invalid release.");
-            if (latest <= CurrentVersion) { SetStatus("Current"); return; }
+
+            if (
+                root.GetProperty("draft").GetBoolean()
+                || root.GetProperty("prerelease").GetBoolean()
+                || !tag.StartsWith('v')
+                || !UpdateVerifier.TryVersion(tag[1..], out var latest)
+            )
+            {
+                throw new InvalidDataException("Invalid release.");
+            }
+
+            if (latest <= _current)
+            {
+                DiscardPending();
+                SetState(UpdateStatus.Current);
+
+                return;
+            }
+
+            var cached = await RecoverPendingAsync(token);
+            var expected =
+                $"VolturaWeekNumber-Setup-{tag[1..]}-win-x64{(_full ? "-full" : "")}.exe";
+
+            if (cached is not null && Path.GetFileName(cached) == expected)
+            {
+                SetState(UpdateStatus.Ready, cached);
+
+                return;
+            }
+
             var assets = root.GetProperty("assets").EnumerateArray().ToArray();
+
             Uri AssetUri(string name)
             {
-                var matches = assets.Where(value => value.GetProperty("name").GetString() == name).ToArray();
-                if (matches.Length != 1) throw new InvalidDataException("Missing release asset.");
+                var matches = assets
+                    .Where(value => value.GetProperty("name").GetString() == name)
+                    .ToArray();
+
+                if (matches.Length != 1)
+                {
+                    throw new InvalidDataException("Missing release asset.");
+                }
+
                 var uri = new Uri(matches[0].GetProperty("browser_download_url").GetString()!);
-                if (uri.Host != "github.com" || !uri.AbsolutePath.StartsWith("/voltura/voltura-weeknumber/releases/download/", StringComparison.Ordinal)) throw new InvalidDataException("Unexpected release origin.");
+
+                if (
+                    uri.Host != "github.com"
+                    || !uri.AbsolutePath.StartsWith(
+                        "/voltura/voltura-weeknumber/releases/download/",
+                        StringComparison.Ordinal
+                    )
+                )
+                {
+                    throw new InvalidDataException("Unexpected release origin.");
+                }
+
                 return uri;
             }
-            var manifest = await DownloadBytesAsync(AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.json"), 64 * 1024, token);
-            var signature = await DownloadBytesAsync(AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.sig"), 1024, token);
-            var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, CurrentVersion, _full);
-            if (verified.Version != tag[1..]) throw new InvalidDataException("Release version mismatch.");
-            var installer = Path.Combine(Pending, verified.Asset.Name);
-            if (_installer == installer && File.Exists(installer)) { SetStatus("Ready"); return; }
-            SetStatus("Downloading");
-            Directory.CreateDirectory(Pending);
-            var part = Path.Combine(Pending, "installer.pending");
-            await DownloadFileAsync(AssetUri(verified.Asset.Name), part, verified.Asset.Size, token);
+            failure = UpdateStatus.UpdateDownloadFailed;
+            var manifest = await DownloadBytesAsync(
+                AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.json"),
+                64 * 1024,
+                token
+            );
+            var signature = await DownloadBytesAsync(
+                AssetUri($"VolturaWeekNumber-Update-{tag[1..]}.sig"),
+                1024,
+                token
+            );
+
+            failure = UpdateStatus.UpdateVerificationFailed;
+            var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, _full);
+
+            if (verified.Version != tag[1..])
+            {
+                throw new InvalidDataException("Release version mismatch.");
+            }
+
+            failure = UpdateStatus.UpdateDownloadFailed;
+            SetState(UpdateStatus.Downloading);
+            Directory.CreateDirectory(_pending);
+            // One package, with the manifest as its commit marker. Invalidate before replacement.
+            File.Delete(Path.Combine(_pending, "manifest.json"));
+            DiscardPending();
+            var part = Path.Combine(_pending, "installer.pending");
+
+            await using (
+                var output = new FileStream(
+                    part,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None,
+                    81920,
+                    true
+                )
+            )
+            {
+                await DownloadAsync(
+                    AssetUri(verified.Asset.Name),
+                    output,
+                    verified.Asset.Size,
+                    token
+                );
+            }
+
+            failure = UpdateStatus.UpdateVerificationFailed;
             await UpdateVerifier.VerifyFileAsync(part, verified.Asset, token);
+            failure = UpdateStatus.UpdateDownloadFailed;
+            var installer = Path.Combine(_pending, verified.Asset.Name);
+
             File.Move(part, installer, true);
-            await File.WriteAllBytesAsync(Path.Combine(Pending, "signature.sig"), signature, _stop.Token);
-            await File.WriteAllBytesAsync(Path.Combine(Pending, "manifest.pending"), manifest, _stop.Token);
-            File.Move(Path.Combine(Pending, "manifest.pending"), Path.Combine(Pending, "manifest.json"), true);
-            _installer = installer;
-            foreach (var obsolete in Directory.EnumerateFiles(Pending, "VolturaWeekNumber-Setup-*-win-x64*.exe"))
-                if (!obsolete.Equals(installer, StringComparison.OrdinalIgnoreCase)) File.Delete(obsolete);
-            SetStatus("Ready");
+            await File.WriteAllBytesAsync(
+                Path.Combine(_pending, "signature.sig"),
+                signature,
+                token
+            );
+            await File.WriteAllBytesAsync(
+                Path.Combine(_pending, "manifest.pending"),
+                manifest,
+                token
+            );
+            File.Move(
+                Path.Combine(_pending, "manifest.pending"),
+                Path.Combine(_pending, "manifest.json"),
+                true
+            );
+            SetState(UpdateStatus.Ready, installer);
         }
         catch (OperationCanceledException) when (_stop.IsCancellationRequested) { }
-        catch (Exception ex) when (ex is InvalidDataException or HttpRequestException or IOException or UnauthorizedAccessException or JsonException or System.Security.Cryptography.CryptographicException or InvalidOperationException or KeyNotFoundException or FormatException or OperationCanceledException or ArgumentException)
-        { SetStatus("UpdateFailed"); }
-        finally { _gate.Release(); }
-    }
-
-    private async Task RestoreAsync(CancellationToken token)
-    {
-        // Both startup restore and pre-install verification run outside the UI context.
-        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-        token.ThrowIfCancellationRequested();
-        _installer = null;
-        if (_publicKey is null || !File.Exists(Path.Combine(Pending, "manifest.json"))) return;
-        var manifest = await ReadBoundedAsync(Path.Combine(Pending, "manifest.json"), 64 * 1024, token);
-        var signature = await ReadBoundedAsync(Path.Combine(Pending, "signature.sig"), 1024, token);
-        var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, CurrentVersion, _full);
-        var installer = Path.Combine(Pending, verified.Asset.Name);
-        await UpdateVerifier.VerifyFileAsync(installer, verified.Asset, token);
-        _installer = installer;
-        SetStatus("Ready");
+        catch (Exception error) when (IsUpdateError(error))
+        {
+            Fail(failure, error);
+        }
+        finally
+        {
+            _gate.Release();
+        }
     }
 
     internal async Task RestorePendingAsync()
     {
+        if (!Eligible)
+        {
+
+            return;
+        }
+
         await _gate.WaitAsync(_stop.Token);
-        try { await RestoreAsync(_stop.Token); }
-        finally { _gate.Release(); }
+        try
+        {
+            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+
+            if (State.Status != UpdateStatus.Idle)
+            {
+
+                return; // Do not overwrite a completed manual check.
+            }
+
+            var installer = await RecoverPendingAsync(_stop.Token);
+
+            SetState(installer is null ? UpdateStatus.Idle : UpdateStatus.Ready, installer);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    private async Task<string?> RecoverPendingAsync(CancellationToken token)
+    {
+        try
+        {
+
+            return await ReadPendingAsync(token);
+        }
+        catch (Exception error)
+            when (IsUpdateError(error) && error is not OperationCanceledException)
+        {
+            _log?.Record("Discard unusable update cache", error);
+            DiscardPending();
+
+            return null;
+        }
+    }
+
+    private async Task<string?> ReadPendingAsync(CancellationToken token)
+    {
+        if (!File.Exists(Path.Combine(_pending, "manifest.json")))
+        {
+            DiscardPending();
+
+            return null;
+        }
+
+        var manifest = await ReadBoundedAsync(
+            Path.Combine(_pending, "manifest.json"),
+            64 * 1024,
+            token
+        );
+        var signature = await ReadBoundedAsync(
+            Path.Combine(_pending, "signature.sig"),
+            1024,
+            token
+        );
+        var verified = UpdateVerifier.Verify(manifest, signature, _publicKey, _full);
+        // A valid package already installed is ordinary cache expiry, not a verification error.
+
+        if (Version.Parse(verified.Version) <= _current)
+        {
+            DiscardPending();
+
+            return null;
+        }
+
+        var installer = Path.Combine(_pending, verified.Asset.Name);
+
+        await UpdateVerifier.VerifyFileAsync(installer, verified.Asset, token);
+
+        return installer;
     }
 
     public async Task<bool> InstallAsync()
     {
+        if (!Eligible || State.Busy)
+        {
+
+            return false;
+        }
+
         await _gate.WaitAsync(_stop.Token);
+        var failure = UpdateStatus.UpdateVerificationFailed;
+
         try
         {
-            if (_installerProcess is { HasExited: false }) return false;
-            _installerProcess?.Dispose();
-            _installerProcess = null;
-            await RestoreAsync(_stop.Token);
-            if (_installer is null) return false;
-            _installerProcess = Process.Start(new ProcessStartInfo(_installer) { UseShellExecute = true, Arguments = "/AUTOUPDATE" });
-            return _installerProcess is not null;
+            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+            SetState(UpdateStatus.Installing);
+            var installer =
+                await ReadPendingAsync(_stop.Token)
+                ?? throw new InvalidDataException("No newer cached update.");
+
+            failure = UpdateStatus.UpdateInstallFailed;
+            // Keep the gate until setup exits so checks cannot replace its files while it runs.
+            await _install(installer, _stop.Token);
+            SetState(UpdateStatus.Ready, installer); // Setup closed without stopping this app (e.g. Cancel).
+
+            return true;
         }
-        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception or System.Security.Cryptography.CryptographicException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException)
-        { SetStatus("UpdateFailed"); return false; }
-        finally { _gate.Release(); }
+        catch (OperationCanceledException) when (_stop.IsCancellationRequested)
+        {
+
+            return false;
+        }
+        catch (Exception error)
+            when (IsUpdateError(error) || error is System.ComponentModel.Win32Exception)
+        {
+            Fail(failure, error);
+
+            return false;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    private static async Task LaunchInstallerAsync(string installer, CancellationToken token)
+    {
+        using var process =
+            Process.Start(
+                new ProcessStartInfo(installer)
+                {
+                    UseShellExecute = true,
+                    Arguments = "/AUTOUPDATE",
+                }
+            ) ?? throw new InvalidOperationException("Installer did not start.");
+
+        await process.WaitForExitAsync(token);
+    }
+
+    private void DiscardPending()
+    {
+        // Nonrecursive and limited to updater-owned files. Cleanup must not break a valid check.
+        try
+        {
+            if (!Directory.Exists(_pending))
+            {
+
+                return;
+            }
+
+            var paths = Directory
+                .EnumerateFiles(_pending, "VolturaWeekNumber-Setup-*.exe")
+                .Concat(MetadataFiles.Select(name => Path.Combine(_pending, name)));
+
+            foreach (var path in paths)
+            {
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+                {
+                    _log?.Record("Clean update cache", error);
+                }
+            }
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            _log?.Record("Clean update cache", error);
+        }
     }
 
     private async Task<HttpResponseMessage> GetAsync(Uri uri, CancellationToken token)
     {
         for (var redirects = 0; redirects < 4; redirects++)
         {
-            if (uri.Scheme != "https" || (uri.Host is not ("github.com" or "api.github.com" or "release-assets.githubusercontent.com" or "objects.githubusercontent.com"))) throw new InvalidDataException("Unexpected download origin.");
-            var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
-            if ((int)response.StatusCode is >= 300 and < 400 && response.Headers.Location is { } location)
-            { uri = location.IsAbsoluteUri ? location : new Uri(uri, location); response.Dispose(); continue; }
-            if (!response.IsSuccessStatusCode) { response.Dispose(); throw new HttpRequestException("Download failed."); }
+            if (
+                uri.Scheme != "https"
+                || (
+                    uri.Host
+                    is not (
+                        "github.com"
+                        or "api.github.com"
+                        or "release-assets.githubusercontent.com"
+                        or "objects.githubusercontent.com"
+                    )
+                )
+            )
+            {
+                throw new InvalidDataException("Unexpected download origin.");
+            }
+
+            var response = await _http.GetAsync(
+                uri,
+                HttpCompletionOption.ResponseHeadersRead,
+                token
+            );
+
+            if (
+                (int)response.StatusCode is >= 300 and < 400
+                && response.Headers.Location is { } location
+            )
+            {
+                uri = location.IsAbsoluteUri ? location : new Uri(uri, location);
+                response.Dispose();
+                continue;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var status = response.StatusCode;
+
+                response.Dispose();
+                throw new HttpRequestException("Download failed.", null, status);
+            }
+
             return response;
         }
         throw new InvalidDataException("Too many redirects.");
     }
+
     private async Task<byte[]> DownloadBytesAsync(Uri uri, int maximum, CancellationToken token)
     {
-        using var response = await GetAsync(uri, token);
-        await using var stream = await response.Content.ReadAsStreamAsync(token);
         using var output = new MemoryStream();
-        await CopyBoundedAsync(stream, output, maximum, token);
+
+        await DownloadAsync(uri, output, maximum, token);
+
         return output.ToArray();
     }
-    private async Task DownloadFileAsync(Uri uri, string path, long maximum, CancellationToken token)
+
+    private async Task DownloadAsync(Uri uri, Stream output, long maximum, CancellationToken token)
     {
         using var response = await GetAsync(uri, token);
         await using var input = await response.Content.ReadAsStreamAsync(token);
-        await using var output = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true);
+
         await CopyBoundedAsync(input, output, maximum, token);
     }
-    private static async Task<byte[]> ReadBoundedAsync(string path, int maximum, CancellationToken token)
+
+    private static async Task<byte[]> ReadBoundedAsync(
+        string path,
+        int maximum,
+        CancellationToken token
+    )
     {
         await using var file = File.OpenRead(path);
         using var output = new MemoryStream();
+
         await CopyBoundedAsync(file, output, maximum, token);
+
         return output.ToArray();
     }
-    private static async Task CopyBoundedAsync(Stream input, Stream output, long maximum, CancellationToken token)
+
+    private static async Task CopyBoundedAsync(
+        Stream input,
+        Stream output,
+        long maximum,
+        CancellationToken token
+    )
     {
-        var buffer = new byte[81920]; long total = 0;
+        var buffer = new byte[81920];
+        long total = 0;
+
         while (true)
         {
             var read = await input.ReadAsync(buffer, token);
-            if (read == 0) break;
+
+            if (read == 0)
+            {
+                break;
+            }
+
             total += read;
-            if (total > maximum) throw new InvalidDataException("Download exceeds size limit.");
+
+            if (total > maximum)
+            {
+                throw new InvalidDataException("Download exceeds size limit.");
+            }
+
             await output.WriteAsync(buffer.AsMemory(0, read), token);
         }
     }
-    private void SetStatus(string status) { _status = status; Changed?.Invoke(); }
+
+    private static bool IsUpdateError(Exception error) =>
+        error
+            is InvalidDataException
+                or HttpRequestException
+                or IOException
+                or UnauthorizedAccessException
+                or JsonException
+                or System.Security.Cryptography.CryptographicException
+                or InvalidOperationException
+                or KeyNotFoundException
+                or FormatException
+                or OperationCanceledException
+                or ArgumentException;
+
+    private void Fail(UpdateStatus status, Exception error)
+    {
+        _log?.Record(status.ToString(), error);
+        SetState(status);
+    }
+
+    private void SetState(UpdateStatus status, string? installer = null)
+    {
+        _state = new(status, installer);
+        Changed?.Invoke();
+    }
+
     public async ValueTask DisposeAsync()
     {
         await _stop.CancelAsync();
-        if (_worker is not null) await _worker;
+
+        if (_worker is not null)
+        {
+            await _worker;
+        }
+
         await _gate.WaitAsync();
         _gate.Release();
-        _installerProcess?.Dispose();
-        _http.Dispose(); _gate.Dispose(); _scheduleChanged.Dispose(); _stop.Dispose();
+        _http.Dispose();
+        _gate.Dispose();
+        _stop.Dispose();
     }
 }

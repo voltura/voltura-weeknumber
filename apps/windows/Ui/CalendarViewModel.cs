@@ -17,40 +17,99 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     public DateLookupViewModel DayOfYear { get; } = new(false);
     public DateLookupViewModel JulianDay { get; } = new(true);
     public SettingsEditor Editor { get; } = new();
-    public DateTime? SelectedDate { get => _date; set { _date = value; Refresh(); } }
+    public DateTime? SelectedDate
+    {
+        get => _date;
+        set
+        {
+            _date = value;
+            Refresh();
+        }
+    }
     public string WeekText { get; private set; } = string.Empty;
     public string DateText { get; private set; } = string.Empty;
     public string ConventionText { get; private set; } = string.Empty;
     public string WeekYearText { get; private set; } = string.Empty;
     public BitmapSource? Preview { get; private set; }
-    public string Status { get => _status; set { _status = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status))); } }
-    public string VersionText { get; } = "Voltura WeekNumber " + typeof(CalendarViewModel).Assembly.GetName().Version?.ToString(3);
+    public string Status
+    {
+        get => _status;
+        set
+        {
+            _status = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+        }
+    }
+    public string VersionText { get; } =
+        "Voltura WeekNumber " + typeof(CalendarViewModel).Assembly.GetName().Version?.ToString(3);
+
     // AppRuntime refreshes the calendar and tray together after applying settings.
-    public void Apply(AppSettings settings) { _settings = settings; Editor.Load(settings); Editor.RefreshLabels(); }
+    public void Apply(AppSettings settings)
+    {
+        _settings = settings;
+        Editor.Load(settings);
+        Editor.RefreshLabels();
+    }
+
     public void Refresh()
     {
-        DayOfYear.Refresh(DateTime.Today); JulianDay.Refresh(DateTime.Today);
+        DayOfYear.Refresh(DateTime.Today);
+        JulianDay.Refresh(DateTime.Today);
         var strings = Strings.Current;
+
         if (_date is { } date)
         {
             try
             {
-                var result = WeekCalculator.Calculate(DateOnly.FromDateTime(date), _settings.Calendar, CultureInfo.CurrentCulture);
+                var result = WeekCalculator.Calculate(
+                    DateOnly.FromDateTime(date),
+                    _settings.Calendar,
+                    CultureInfo.CurrentCulture
+                );
+
                 WeekText = $"{strings["Week"]} {result.Number:00}";
                 DateText = date.ToString("dddd, d MMMM yyyy", strings.Culture);
-                ConventionText = strings[_settings.Calendar.Mode switch { CalendarMode.Iso => "Iso", CalendarMode.Custom => "Custom", _ => "Regional" }];
-                WeekYearText = result.IsoYear is { } year && year != date.Year ? $"{strings["IsoYear"]}: {year}" : string.Empty;
-                var appearance = IconAppearance.Resolve(_settings, ThemeManager.IsTaskbarDark(), System.Windows.SystemParameters.HighContrast);
+                ConventionText = strings[
+                    _settings.Calendar.Mode switch
+                    {
+                        CalendarMode.Iso => "Iso",
+
+                        CalendarMode.Custom => "Custom",
+
+                        _ => "Regional",
+                    }
+                ];
+                WeekYearText =
+                    result.IsoYear is { } year && year != date.Year
+                        ? $"{strings["IsoYear"]}: {year}"
+                        : string.Empty;
+                var appearance = IconAppearance.Resolve(
+                    _settings,
+                    ThemeManager.IsTaskbarDark(),
+                    System.Windows.SystemParameters.HighContrast
+                );
                 var previewKey = (result.Number, appearance);
+
                 if (Preview is null || _previewKey != previewKey)
                 {
                     Preview = CalendarIconRenderer.Render(result.Number, 128, appearance);
                     _previewKey = previewKey;
                 }
             }
-            catch (ArgumentOutOfRangeException) { WeekText = "—"; DateText = strings["Invalid"]; Preview = null; }
+            catch (ArgumentOutOfRangeException)
+            {
+                WeekText = "—";
+                DateText = strings["Invalid"];
+                Preview = null;
+            }
         }
-        else { WeekText = "—"; DateText = strings["ChooseDate"]; Preview = null; }
+        else
+        {
+            WeekText = "—";
+            DateText = strings["ChooseDate"];
+            Preview = null;
+        }
+
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
     }
 }

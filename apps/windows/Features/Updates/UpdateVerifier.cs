@@ -4,43 +4,111 @@ using System.Text.Json;
 namespace VolturaWeekNumber.Features.Updates;
 
 public sealed record UpdateAsset(string Name, long Size, string Sha256);
+
 public sealed record VerifiedUpdate(string Version, UpdateAsset Asset);
 
 public static class UpdateVerifier
 {
     public const long MaximumInstallerBytes = 250 * 1024 * 1024;
-    public static VerifiedUpdate Verify(byte[] manifest, byte[] signature, string publicKey, Version current, bool full)
+
+    public static VerifiedUpdate Verify(
+        byte[] manifest,
+        byte[] signature,
+        string publicKey,
+        bool full
+    )
     {
         ArgumentNullException.ThrowIfNull(manifest);
-        if (manifest.Length > 64 * 1024) throw new InvalidDataException("Update manifest too large.");
+
+        if (manifest.Length > 64 * 1024)
+        {
+            throw new InvalidDataException("Update manifest too large.");
+        }
+
         using var rsa = RSA.Create();
+
         rsa.ImportFromPem(publicKey);
-        if (!rsa.VerifyData(manifest, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss)) throw new InvalidDataException("Invalid signature.");
+
+        if (!rsa.VerifyData(manifest, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss))
+        {
+            throw new InvalidDataException("Invalid signature.");
+        }
+
         using var json = JsonDocument.Parse(manifest);
         var root = json.RootElement;
-        if (root.GetProperty("schema").GetInt32() != 1) throw new InvalidDataException("Unsupported manifest.");
+
+        if (root.GetProperty("schema").GetInt32() != 1)
+        {
+            throw new InvalidDataException("Unsupported manifest.");
+        }
+
         var versionText = root.GetProperty("version").GetString() ?? string.Empty;
-        if (!TryVersion(versionText, out var version) || version <= current) throw new InvalidDataException("Not a newer version.");
+
+        if (!TryVersion(versionText, out _))
+        {
+            throw new InvalidDataException("Invalid update version.");
+        }
+
         var expected = $"VolturaWeekNumber-Setup-{versionText}-win-x64{(full ? "-full" : "")}.exe";
-        var matches = root.GetProperty("assets").EnumerateArray().Where(asset => asset.GetProperty("name").GetString() == expected).ToArray();
-        if (matches.Length != 1) throw new InvalidDataException("Installer missing or duplicated.");
+        var matches = root.GetProperty("assets")
+            .EnumerateArray()
+            .Where(asset => asset.GetProperty("name").GetString() == expected)
+            .ToArray();
+
+        if (matches.Length != 1)
+        {
+            throw new InvalidDataException("Installer missing or duplicated.");
+        }
+
         var entry = matches[0];
         var size = entry.GetProperty("size").GetInt64();
         var hash = entry.GetProperty("sha256").GetString() ?? string.Empty;
-        if (size <= 0 || size > MaximumInstallerBytes || hash.Length != 64 || !hash.All(Uri.IsHexDigit)) throw new InvalidDataException("Invalid asset metadata.");
+
+        if (
+            size <= 0
+            || size > MaximumInstallerBytes
+            || hash.Length != 64
+            || !hash.All(Uri.IsHexDigit)
+        )
+        {
+            throw new InvalidDataException("Invalid asset metadata.");
+        }
+
         return new(versionText, new(expected, size, hash));
     }
+
     public static bool TryVersion(string text, out Version version)
     {
         version = new();
         var parts = text.Split('.');
-        return parts.Length == 3 && parts.All(part => part.Length > 0 && (part.Length == 1 || part[0] != '0') && part.All(char.IsAsciiDigit)) && Version.TryParse(text, out version!);
+
+        return parts.Length == 3
+            && parts.All(part =>
+                part.Length > 0
+                && (part.Length == 1 || part[0] != '0')
+                && part.All(char.IsAsciiDigit)
+            )
+            && Version.TryParse(text, out version!);
     }
-    public static async Task VerifyFileAsync(string path, UpdateAsset asset, CancellationToken token)
+
+    public static async Task VerifyFileAsync(
+        string path,
+        UpdateAsset asset,
+        CancellationToken token
+    )
     {
         await using var stream = File.OpenRead(path);
-        if (stream.Length != asset.Size) throw new InvalidDataException("Incorrect installer size.");
+
+        if (stream.Length != asset.Size)
+        {
+            throw new InvalidDataException("Incorrect installer size.");
+        }
+
         var hash = await SHA256.HashDataAsync(stream, token);
-        if (!Convert.ToHexString(hash).Equals(asset.Sha256, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("Incorrect installer hash.");
+
+        if (!Convert.ToHexString(hash).Equals(asset.Sha256, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidDataException("Incorrect installer hash.");
+        }
     }
 }

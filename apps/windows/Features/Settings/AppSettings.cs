@@ -19,16 +19,45 @@ public sealed record AppSettings
     public string Background { get; init; } = "#FF151B26";
     public bool Logging { get; init; }
     public bool AutomaticUpdates { get; init; } = true;
-
     public void Validate()
     {
-        if (Schema != 1) throw new InvalidDataException("Unsupported settings version.");
-        if (Language is not ("system" or "en" or "sv" or "de") || Theme is not ("system" or "light" or "dark"))
+        if (Schema != 1)
+        {
+            throw new InvalidDataException("Unsupported settings version.");
+        }
+
+        if (
+            Language is not ("system" or "en" or "sv" or "de")
+            || Theme is not ("system" or "light" or "dark")
+        )
+        {
             throw new InvalidDataException("Invalid language or appearance.");
-        if (Calendar is null || !Enum.IsDefined(Calendar.Mode) || !Enum.IsDefined(Calendar.FirstDay) || !Enum.IsDefined(Calendar.Rule))
+        }
+
+        if (
+            Calendar is null
+            || !Enum.IsDefined(Calendar.Mode)
+            || !Enum.IsDefined(Calendar.FirstDay)
+            || !Enum.IsDefined(Calendar.Rule)
+        )
+        {
             throw new InvalidDataException("Invalid calendar options.");
+        }
+
         foreach (var color in new[] { Foreground, Background })
-            if (color is null || !Regex.IsMatch(color, "^#[0-9A-Fa-f]{8}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100)))
+        {
+            if (
+                color is null
+                || !Regex.IsMatch(
+                    color,
+                    "^#[0-9A-Fa-f]{8}$",
+                    RegexOptions.CultureInvariant,
+                    TimeSpan.FromMilliseconds(100)
+                )
+            )
+            {
                 throw new InvalidDataException("Colors must use #AARRGGBB.");
+            }
+        }
     }
 }
