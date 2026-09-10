@@ -15,7 +15,17 @@
 !ifndef VARIANT
   !define VARIANT "standard"
 !endif
-Name "Voltura WeekNumber ${VERSION}"
+!define APP_NAME "Voltura WeekNumber"
+!define PUBLISHER "Voltura AB"
+!define DEVELOPER "Joakim Skoglund"
+!define PRODUCT_URL "https://voltura.github.io/voltura-weeknumber"
+!define POSTAL_ADDRESS "Voltura AB, H${U+00E4}stholmsv${U+00E4}gen 33, SE-131 71 Nacka, Sweden"
+!if "${VARIANT}" == "full"
+  !define INSTALLER_FILE_SUFFIX "-full"
+!else
+  !define INSTALLER_FILE_SUFFIX ""
+!endif
+Name "${APP_NAME}"
 OutFile "${OUTPUT}"
 InstallDir "$LOCALAPPDATA\Programs\VolturaWeekNumber"
 RequestExecutionLevel user
@@ -24,10 +34,15 @@ ManifestDPIAware true
 ManifestSupportedOS all
 SetCompressor lzma
 VIProductVersion "${VERSION}.0"
-VIAddVersionKey /LANG=1033 "ProductName" "Voltura WeekNumber"
-VIAddVersionKey /LANG=1033 "FileDescription" "Voltura WeekNumber Setup"
+VIAddVersionKey /LANG=1033 "ProductName" "${APP_NAME}"
+VIAddVersionKey /LANG=1033 "CompanyName" "${PUBLISHER}"
+VIAddVersionKey /LANG=1033 "FileDescription" "${APP_NAME} Installer"
 VIAddVersionKey /LANG=1033 "FileVersion" "${VERSION}"
-VIAddVersionKey /LANG=1033 "LegalCopyright" "Copyright (c) 2026 Voltura AB"
+VIAddVersionKey /LANG=1033 "ProductVersion" "${VERSION}"
+VIAddVersionKey /LANG=1033 "OriginalFilename" "VolturaWeekNumber-Setup-${VERSION}-win-x64${INSTALLER_FILE_SUFFIX}.exe"
+VIAddVersionKey /LANG=1033 "InternalName" "VolturaWeekNumberSetup"
+VIAddVersionKey /LANG=1033 "LegalCopyright" "Copyright (c) 2026 ${PUBLISHER}"
+VIAddVersionKey /LANG=1033 "Comments" "Developer: ${DEVELOPER}; Website: ${PRODUCT_URL}; Address: ${POSTAL_ADDRESS}"
 !define MUI_ICON "..\apps\windows\Assets\App.ico"
 !define MUI_ABORTWARNING
 ; Unicode setup must offer every language, regardless of the Windows code page.

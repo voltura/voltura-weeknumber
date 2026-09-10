@@ -11,6 +11,17 @@
     <!-- The executable manifest establishes awareness before WPF initializes. -->
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
     <ApplicationIcon Condition="Exists('Assets/App.ico')">Assets/App.ico</ApplicationIcon>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Title>Voltura WeekNumber</Title>
+    <AssemblyTitle>Voltura WeekNumber</AssemblyTitle>
+    <Product>Voltura WeekNumber</Product>
+    <Company>Voltura AB</Company>
+    <Authors>Voltura AB</Authors>
+    <Copyright>Copyright (c) 2026 Voltura AB</Copyright>
+    <Description>Keep the current week number visible beside the Windows clock.</Description>
   </PropertyGroup>
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="Switch.System.Windows.DoNotScaleForDpiChanges" Value="false" />
