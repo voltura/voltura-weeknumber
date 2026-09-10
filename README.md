@@ -59,7 +59,7 @@
     <article class="capability-card">
       <span class="capability-kicker">Browse</span>
       <h3>Calendar</h3>
-      <p>Browse years, months, and weeks with clear week numbers and date ranges.</p>
+      <p>Browse years, months, and weeks with clear week numbers and date ranges. Pin the window on top while you plan.</p>
     </article>
     <article class="capability-card">
       <span class="capability-kicker">Compare</span>
@@ -79,12 +79,12 @@
     <article class="capability-card">
       <span class="capability-kicker">Convert</span>
       <h3>Date tools</h3>
-      <p>Find a date’s day-of-year or Julian day number.</p>
+      <p>Find a date’s day-of-year or Julian day number, or convert either number back to a date.</p>
     </article>
     <article class="capability-card">
-      <span class="capability-kicker">Pin</span>
-      <h3>Always on top</h3>
-      <p>Keep the window above your other apps while you plan.</p>
+      <span class="capability-kicker">Quick access</span>
+      <h3>Keyboard shortcuts</h3>
+      <p>Choose global shortcuts to open Week number or Calendar from another app while Voltura WeekNumber is running.</p>
     </article>
   </div>
 </section>
@@ -146,6 +146,7 @@
     <div class="detail-body">
       <p>English, Swedish, German, French, Danish, Finnish, Icelandic, Norwegian Bokmål, Polish, Italian, Spanish, Cantonese, Japanese, Brazilian Portuguese, Simplified Chinese, Traditional Chinese, Dutch, Korean, Russian, Turkish, and Indonesian are included.</p>
       <p>Choose a language independently of your calendar rules. You can also customize the tray icon, export it as an ICO file, choose light, dark, or system appearance, and import or export your preferences.</p>
+      <p>In Preferences, assign separate keyboard shortcuts for Week number and Calendar. Preview your key combination as you press it, edit or clear a saved shortcut, and get feedback if a shortcut is invalid or already in use.</p>
     </div>
   </details>
   <details>
