@@ -175,5 +175,5 @@
     <a href="https://github.com/voltura/voltura-weeknumber"><img src="https://img.shields.io/github/stars/voltura/voltura-weeknumber?style=flat-square&amp;color=12a894" alt="GitHub stars"></a>
     <a href="https://github.com/voltura/voltura-weeknumber"><img src="https://img.shields.io/github/last-commit/voltura/voltura-weeknumber?style=flat-square&amp;color=12a894" alt="Last commit"></a>
   </div>
-  <p>Made by <strong>Voltura AB</strong>. Support development through <a href="https://ko-fi.com/G2G74W5F8">Ko-fi</a> or <a href="https://www.paypal.com/donate?hosted_button_id=7PN65YXN64DBG">PayPal</a>.</p>
+  <p>Made by <a href="https://voltura.se/" aria-label="Voltura AB home">Voltura AB</a>. Support development through <a href="https://ko-fi.com/G2G74W5F8">Ko-fi</a> or <a href="https://www.paypal.com/donate?hosted_button_id=7PN65YXN64DBG">PayPal</a>.</p>
 </section>

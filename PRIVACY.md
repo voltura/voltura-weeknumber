@@ -13,6 +13,8 @@ Voltura WeekNumber is a desktop calendar utility from Voltura AB. It requires no
 
 Starting with Windows creates an application-specific entry in the current user's Windows registry. The installed app also has uninstall registration and a Start menu shortcut.
 
+The app also attempts to make its tray icon visible and, once per Windows user, save a position near the clock using the current user's Windows tray settings. A `TrayOrderPlacementAttempted` marker under `HKCU\Software\Voltura\WeekNumber` remains after uninstall so reinstalling does not repeat the placement attempt. It contains no personal information.
+
 ## Network requests
 
 Automatic updates are enabled by default for installed copies and can be disabled on the About page. Update checks use the GitHub API; update metadata, signatures, and installers are downloaded from GitHub release infrastructure over HTTPS. Requests include an application user-agent, and the server receives normal network information such as your IP address and the requested resource. Settings and calendar lookups are not attached to these requests. You choose when to install the downloaded update.

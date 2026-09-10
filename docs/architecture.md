@@ -18,6 +18,8 @@ The Calendar tab uses `CalendarBrowserViewModel` for transient Year → Month �
 
 `NativeTray` owns the hidden native window, notification identity, tray menu, and SafeHandle-backed icon. Rendering depends on week number, appearance, and icon pixel size. Explorer recreation republishes the icon. Silent notifications use the native per-notification flag without changing Windows sound preferences.
 
+After visibility promotion, `TrayIconPlacement` makes one best-effort attempt per Windows user to save WeekNumber at the rightmost end of Explorer's application-icon order. It records `TrayOrderPlacementAttempted` under `HKCU\Software\Voltura\WeekNumber` before accessing the order; the marker survives updates and reinstalls. It reuses the existing five-second registration window, preserves other icons' relative order, abandons changed or unsupported registry data, and contains failures silently. Placement adds no shell refresh, restart, prompt, installer dependency, or continuing enforcement. Explorer may apply or discard the saved order naturally. Isolated test/review mode disables both promotion and placement.
+
 Dates outside the regional calendar's supported range show an unavailable week (—) in the tray while midnight scheduling remains active. The next valid refresh restores the week and resets the notification baseline. Icons support weeks 1–56, including longer lunisolar leap years.
 
 The executable declares PerMonitorV2 DPI awareness. Window placement respects monitor work areas. Display changes, activation, and tray reopening trigger recovery checks; a stale window DPI is handled through a native move and bounds restoration so Windows can deliver its DPI-change message.
