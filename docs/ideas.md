@@ -1,11 +1,6 @@
-# Three features worth adding
+# Two features worth adding
 
 | # | Feature | Why it fits Voltura WeekNumber | Evidence |
 |---|---|---|---|
-| 6 | **Configurable global hotkey** | Open the calendar immediately—preferably near the pointer—without finding the tray icon. | [PowerToys date-picker request](https://github.com/microsoft/PowerToys/issues/26432) |
 | 7 | **Optional floating week widget** | A draggable mini-widget could show the week number, date range, and week progress; automatically hide during fullscreen use. | [WeekNum](https://github.com/pbuzdygan/weeknum), [Windows Week Numbers](https://github.com/GripChomp/Windows-Week-Numbers) |
 | 8 | **iCalendar export** | Export a selected week—or every numbered week in a year—as local `.ics` entries for Outlook and other calendars. | [Week Numbers with Widget](https://apps.apple.com/us/app/week-numbers-with-widget/id795134805), [weekisit.com](https://weekisit.com/week-numbers-2026) |
-
-My recommended next feature is **6**. Treat the floating widget and calendar export as optional larger additions.
-
-I would deliberately avoid appointments, tasks, reminders, or Google/Outlook synchronization. Products such as [Rainlendar](https://www.rainlendar.net/) and [Calendar Flyout](https://leptuch.com/apps/calendar-flyout/index.html) already occupy that broader market; copying them would weaken Voltura’s focused “the week number is the feature” positioning.

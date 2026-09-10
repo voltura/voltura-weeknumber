@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using Microsoft.Win32.SafeHandles;
 using VolturaWeekNumber.Features.Icon;
+using VolturaWeekNumber.Features.Settings;
 using Forms = System.Windows.Forms;
 
 namespace VolturaWeekNumber.Platform;
@@ -13,6 +14,7 @@ internal sealed partial class NativeTray : IDisposable
     private readonly HwndSource _source;
     private readonly uint _taskbarCreated;
     private readonly TrayIconVisibilityPromoter? _visibilityPromoter;
+    private readonly ActivationShortcutRegistry _activationShortcuts;
     private readonly Forms.ContextMenuStrip _menu = new();
     private SafeIconHandle? _icon;
     private bool _added;
@@ -25,11 +27,12 @@ internal sealed partial class NativeTray : IDisposable
     public event Action? ExitRequested;
     public event Action? DisplayChanged;
     public event Action? NotificationClicked;
+    internal event Action<ActivationTarget>? ActivationRequested;
     internal bool IsPerMonitorV2 =>
         AreDpiAwarenessContextsEqual(GetWindowDpiAwarenessContext(_source.Handle), new nint(-4));
     internal uint CurrentDpi => GetDpiForWindow(_source.Handle);
     internal int RenderCount { get; private set; }
-    public NativeTray(bool promoteVisibility = true)
+    public NativeTray(bool promoteVisibility = true, IHotKeyApi? hotKeyApi = null)
     {
         _source = new HwndSource(
             new HwndSourceParameters("VolturaWeekNumber.Tray")
@@ -40,6 +43,11 @@ internal sealed partial class NativeTray : IDisposable
             }
         );
         _source.AddHook(WndProc);
+        _activationShortcuts = new(
+            _source.Handle,
+            hotKeyApi ?? new Win32HotKeyApi()
+        );
+        _activationShortcuts.Activated += target => ActivationRequested?.Invoke(target);
         _taskbarCreated = RegisterWindowMessage("TaskbarCreated");
 
         if (promoteVisibility)
@@ -95,6 +103,26 @@ internal sealed partial class NativeTray : IDisposable
 
         _menuAppearance = appearance;
     }
+
+    internal void ConfigureActivationShortcuts(
+        ActivationShortcut? weekNumber,
+        ActivationShortcut? calendar
+    ) => _activationShortcuts.Configure(weekNumber, calendar);
+
+    internal bool CanAssignShortcut(
+        ActivationTarget target,
+        ActivationShortcut? shortcut
+    ) => _activationShortcuts.IsAvailable(target, shortcut);
+
+    internal bool TryReplaceShortcut(
+        ActivationTarget target,
+        ActivationShortcut? shortcut
+    ) => _activationShortcuts.TryReplace(target, shortcut);
+
+    internal bool TryReplaceShortcuts(
+        ActivationShortcut? weekNumber,
+        ActivationShortcut? calendar
+    ) => _activationShortcuts.TryReplaceAll(weekNumber, calendar);
 
     public void Update(int? week, IconAppearance appearance, string tooltip)
     {
@@ -287,6 +315,10 @@ internal sealed partial class NativeTray : IDisposable
                 );
             }
         }
+        else if (message == ActivationShortcutRegistry.HotKeyMessage)
+        {
+            handled = _activationShortcuts.ProcessMessage(wParam);
+        }
 
         return 0;
     }
@@ -305,6 +337,7 @@ internal sealed partial class NativeTray : IDisposable
 
         _disposed = true;
         _visibilityPromoter?.Dispose();
+        _activationShortcuts.Dispose();
 
         var data = Data();
 

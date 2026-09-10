@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Updates;
+using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Platform;
 using VolturaWeekNumber.Ui;
 
@@ -26,6 +27,7 @@ public enum MainPage
 public partial class MainWindow : Window
 {
     public event Action<string>? ActionRequested;
+    public event Action<ActivationTarget>? ShortcutAssignmentRequested;
     public event Action? HiddenToTray;
     private bool _exit;
     private readonly IClipboardWriter _clipboard;
@@ -304,6 +306,14 @@ public partial class MainWindow : Window
         if (sender is Button { Tag: string action })
         {
             ActionRequested?.Invoke(action);
+        }
+    }
+
+    private void ShortcutClick(object sender, RoutedEventArgs args)
+    {
+        if (sender is Button { Tag: ActivationTarget target })
+        {
+            ShortcutAssignmentRequested?.Invoke(target);
         }
     }
 

@@ -21,6 +21,8 @@ public sealed record AppSettings
     public string Background { get; init; } = "#FF151B26";
     public bool Logging { get; init; }
     public bool AutomaticUpdates { get; init; } = true;
+    public ActivationShortcut? WeekNumberShortcut { get; init; }
+    public ActivationShortcut? CalendarShortcut { get; init; }
     public void Validate()
     {
         if (Schema != 1)
@@ -49,6 +51,14 @@ public sealed record AppSettings
         foreach (var color in new[] { Foreground, Background })
         {
             ValidateColor(color);
+        }
+
+        WeekNumberShortcut?.Validate();
+        CalendarShortcut?.Validate();
+
+        if (WeekNumberShortcut is not null && WeekNumberShortcut == CalendarShortcut)
+        {
+            throw new InvalidDataException("Activation shortcuts must be different.");
         }
     }
 

@@ -51,7 +51,12 @@ internal sealed class AppRuntime : IAsyncDisposable
             WindowDpiDiagnostics.Attach(Window, message => _log.Record(message));
         }
 
-        _tray = new NativeTray(promoteVisibility: !paths.Isolated);
+        _tray = new NativeTray(
+            promoteVisibility: !paths.Isolated,
+            hotKeyApi: paths.Isolated
+                ? new InMemoryHotKeyApi()
+                : null
+        );
         _midnight = new DispatcherTimer(DispatcherPriority.Background, Window.Dispatcher);
         _midnight.Tick += OnMidnight;
         _tray.OpenRequested += Open;
@@ -59,7 +64,9 @@ internal sealed class AppRuntime : IAsyncDisposable
         _tray.ExitRequested += RequestExit;
         _tray.DisplayChanged += QueueRefresh;
         _tray.NotificationClicked += NotificationClicked;
+        _tray.ActivationRequested += ActivateShortcut;
         Window.ActionRequested += ActionRequested;
+        Window.ShortcutAssignmentRequested += AssignShortcut;
         Window.HiddenToTray += OnHidden;
         _updates.Changed += UpdateChanged;
         SystemEvents.TimeChanged += OnTimeChanged;
@@ -132,6 +139,19 @@ internal sealed class AppRuntime : IAsyncDisposable
         return SaveAsync(value);
     }
 
+    internal Task ApplyReviewShortcutAsync(
+        ActivationTarget target,
+        ActivationShortcut? shortcut
+    )
+    {
+        if (!_paths.Isolated)
+        {
+            throw new InvalidOperationException("Review shortcuts require an isolated profile.");
+        }
+
+        return SaveShortcutAsync(target, shortcut);
+    }
+
     private void NotificationClicked() =>
         Window.Open(_updates.State.Ready
             ? MainPage.About
@@ -146,6 +166,10 @@ internal sealed class AppRuntime : IAsyncDisposable
         Model.Apply(settings);
         Window.ApplyAlwaysOnTop(settings.AlwaysOnTop);
         Window.UpdateLanguage();
+        _tray.ConfigureActivationShortcuts(
+            settings.WeekNumberShortcut,
+            settings.CalendarShortcut
+        );
         _log.Enabled = settings.Logging || _traceDpi;
         _tray.RebuildMenu();
         _updates.Start(settings.AutomaticUpdates);
@@ -365,6 +389,125 @@ internal sealed class AppRuntime : IAsyncDisposable
         }
     }
 
+    private void ActivateShortcut(ActivationTarget target)
+    {
+        if (_shuttingDown)
+        {
+            return;
+        }
+
+        _ = Window.Dispatcher.BeginInvoke(() => Window.Open(
+            target == ActivationTarget.WeekNumber
+                ? MainPage.WeekNumber
+                : MainPage.Calendar
+        ));
+    }
+
+    private async void AssignShortcut(ActivationTarget target)
+    {
+        if (_shuttingDown || !await _actions.WaitAsync(0))
+        {
+            return;
+        }
+
+        try
+        {
+            Window.SetActionsBusy(true);
+
+            if (_settingsDamaged)
+            {
+                Model.Status = Strings.Current["SettingsRecovery"];
+
+                return;
+            }
+
+            var initial = target == ActivationTarget.WeekNumber
+                ? _settings.Current.WeekNumberShortcut
+                : _settings.Current.CalendarShortcut;
+            var dialog = new ShortcutAssignmentWindow(
+                target,
+                initial,
+                (candidateTarget, candidate) =>
+                    _tray.CanAssignShortcut(candidateTarget, candidate)
+            )
+            {
+                Owner = Window,
+            };
+            var accepted = dialog.ShowDialog();
+
+            if (dialog.CaptureFailure is { } captureFailure)
+            {
+                throw new InvalidOperationException(captureFailure.Message, captureFailure);
+            }
+
+            if (accepted == true && dialog.Result is { } result)
+            {
+                await SaveShortcutAsync(result.Target, result.Shortcut);
+            }
+        }
+        catch (Exception error)
+            when (error
+                    is InvalidDataException
+                        or IOException
+                        or UnauthorizedAccessException
+                        or ArgumentException
+                        or InvalidOperationException
+                        or System.ComponentModel.Win32Exception
+                        or System.Security.SecurityException
+            )
+        {
+            _log.Record("activation-shortcut", error);
+            Model.Status = Strings.Current["Error"] + " " + error.Message;
+        }
+        finally
+        {
+            Window.SetActionsBusy(false);
+            _actions.Release();
+        }
+    }
+
+    private async Task SaveShortcutAsync(
+        ActivationTarget target,
+        ActivationShortcut? shortcut
+    )
+    {
+        var previous = target == ActivationTarget.WeekNumber
+            ? _settings.Current.WeekNumberShortcut
+            : _settings.Current.CalendarShortcut;
+
+        if (!_tray.TryReplaceShortcut(target, shortcut))
+        {
+            Model.Status = Strings.Current["ShortcutConflict"];
+
+            return;
+        }
+
+        var draft = Model.Editor.Value;
+        var saved = target == ActivationTarget.WeekNumber
+            ? _settings.Current with { WeekNumberShortcut = shortcut }
+            : _settings.Current with { CalendarShortcut = shortcut };
+
+        try
+        {
+            saved.Validate();
+            await _settings.SaveAsync(saved);
+        }
+        catch
+        {
+            _ = _tray.TryReplaceShortcut(target, previous);
+
+            throw;
+        }
+
+        ApplySettings();
+        Refresh(false);
+        Model.Editor.Edit(target == ActivationTarget.WeekNumber
+            ? draft with { WeekNumberShortcut = shortcut }
+            : draft with { CalendarShortcut = shortcut });
+        Model.Status = Strings.Current["Saved"];
+        _log.Record("Activation shortcut saved");
+    }
+
     private async Task SaveAsync(AppSettings value, bool imported = false)
     {
         value.Validate();
@@ -377,18 +520,39 @@ internal sealed class AppRuntime : IAsyncDisposable
         }
 
         var previous = _settings.Current;
+        var shortcutsChanged = value.WeekNumberShortcut != previous.WeekNumberShortcut
+            || value.CalendarShortcut != previous.CalendarShortcut;
 
-        if (!_paths.Isolated && value.StartWithWindows != previous.StartWithWindows)
+        if (
+            shortcutsChanged
+            && !_tray.TryReplaceShortcuts(
+                value.WeekNumberShortcut,
+                value.CalendarShortcut
+            )
+        )
         {
-            StartupRegistration.Apply(value.StartWithWindows);
+            throw new InvalidDataException(Strings.Current["ShortcutConflict"]);
         }
 
         try
         {
+            if (!_paths.Isolated && value.StartWithWindows != previous.StartWithWindows)
+            {
+                StartupRegistration.Apply(value.StartWithWindows);
+            }
+
             await _settings.SaveAsync(value);
         }
         catch
         {
+            if (shortcutsChanged)
+            {
+                _ = _tray.TryReplaceShortcuts(
+                    previous.WeekNumberShortcut,
+                    previous.CalendarShortcut
+                );
+            }
+
             if (!_paths.Isolated && value.StartWithWindows != previous.StartWithWindows)
             {
                 StartupRegistration.Apply(previous.StartWithWindows);
@@ -642,7 +806,9 @@ internal sealed class AppRuntime : IAsyncDisposable
         SystemEvents.UserPreferenceChanged -= OnPreferencesChanged;
         SystemEvents.DisplaySettingsChanged -= OnTimeChanged;
         Window.ActionRequested -= ActionRequested;
+        Window.ShortcutAssignmentRequested -= AssignShortcut;
         Window.HiddenToTray -= OnHidden;
+        _tray.ActivationRequested -= ActivateShortcut;
         _updates.Changed -= UpdateChanged;
         await _updates.DisposeAsync();
         await _actions.WaitAsync();

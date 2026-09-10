@@ -1,4 +1,4 @@
-<Window x:Class="VolturaWeekNumber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui"
+<Window x:Class="VolturaWeekNumber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui" xmlns:settings="clr-namespace:VolturaWeekNumber.Features.Settings"
   Title="Voltura WeekNumber" Width="800" Height="640" MinWidth="560" MinHeight="280" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
   <Window.Resources>
     <Style x:Key="HeaderPinToggle" TargetType="ToggleButton">
@@ -189,11 +189,11 @@
           </TextBlock>
           <ScrollViewer x:Name="PreferencesScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <ui:SpacingStackPanel Spacing="8">
-              <Expander Header="{Binding [General], Source={x:Static ui:Strings.Current}}" IsExpanded="True" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
+              <Expander x:Name="ApplicationPreferences" Header="{Binding [General], Source={x:Static ui:Strings.Current}}" IsExpanded="True" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
-                  <TextBlock Text="{Binding [LanguageHeading], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock x:Name="LanguagePreferenceHeading" Text="{Binding [LanguageHeading], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                   <ComboBox ItemsSource="{Binding Languages}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Language}" AutomationProperties.Name="{Binding [LanguageHeading], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBlock Text="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock x:Name="AppearancePreferenceHeading" Text="{Binding [Theme], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                   <ComboBox ItemsSource="{Binding Themes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Theme}" AutomationProperties.Name="{Binding [Theme], Source={x:Static ui:Strings.Current}}"/>
                   <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -204,25 +204,60 @@
                       <TextBlock Text="{Binding [AlwaysOnTop], Source={x:Static ui:Strings.Current}}" TextWrapping="Wrap"/>
                     </CheckBox>
                   </Grid>
+                  <TextBlock x:Name="ActivationPreferenceHeading" Text="{Binding [Activation], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}" Margin="0,12,0,2"/>
+                  <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12">
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                      <TextBlock Text="{Binding [DisplayWeekNumber], Source={x:Static ui:Strings.Current}}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                      <Button Grid.Column="2" Width="Auto" Click="ShortcutClick" Tag="{x:Static settings:ActivationTarget.WeekNumber}" AutomationProperties.Name="{Binding [DisplayWeekNumber], Source={x:Static ui:Strings.Current}}" AutomationProperties.HelpText="{Binding [EditShortcut], Source={x:Static ui:Strings.Current}}">
+                        <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="MinWidth" Value="0"/><Setter Property="Height" Value="Auto"/><Setter Property="MinHeight" Value="38"/><Setter Property="Padding" Value="4"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/><Style.Triggers><DataTrigger Binding="{Binding WeekNumberShortcut}" Value="{x:Null}"><Setter Property="MinWidth" Value="154"/><Setter Property="Padding" Value="14,8"/><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="BorderThickness" Value="1"/></DataTrigger></Style.Triggers></Style></Button.Style>
+                        <Grid>
+                          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="7"><ui:SpacingStackPanel.Style><Style TargetType="ui:SpacingStackPanel"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding WeekNumberShortcut}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></ui:SpacingStackPanel.Style><TextBlock Text="+" FontSize="18"/><TextBlock Text="{Binding [AssignShortcut], Source={x:Static ui:Strings.Current}}" VerticalAlignment="Center"/></ui:SpacingStackPanel>
+                          <ui:SpacingStackPanel x:Name="EditWeekNumberShortcut" Orientation="Horizontal" Spacing="7">
+                            <ui:SpacingStackPanel.Style><Style TargetType="ui:SpacingStackPanel"><Style.Triggers><DataTrigger Binding="{Binding WeekNumberShortcut}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></ui:SpacingStackPanel.Style>
+                            <ItemsControl ItemsSource="{Binding WeekNumberShortcutKeys}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border MinWidth="32" Height="32" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="6" Margin="2,0" Padding="8,4"><Grid><TextBlock Text="{Binding Text}" FontSize="14" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"><TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"><Style.Triggers><DataTrigger Binding="{Binding Glyph}" Value="True"><Setter Property="FontFamily" Value="Segoe Fluent Icons"/></DataTrigger><DataTrigger Binding="{Binding Large}" Value="True"><Setter Property="FontSize" Value="17"/></DataTrigger><DataTrigger Binding="{Binding WindowsLogo}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><Path Data="M0,0 H7 V7 H0 Z M9,0 H16 V7 H9 Z M0,9 H7 V16 H0 Z M9,9 H16 V16 H9 Z" Width="14" Height="14" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"><Path.Style><Style TargetType="Path"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Fill" Value="{DynamicResource AccentTextBrush}"/><Style.Triggers><DataTrigger Binding="{Binding WindowsLogo}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Path.Style></Path></Grid></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                            <TextBlock Text="&#xE70F;" Style="{StaticResource ButtonGlyph}" Foreground="{DynamicResource TextBrush}" FontSize="18" Margin="4,0,0,0"/>
+                          </ui:SpacingStackPanel>
+                        </Grid>
+                      </Button>
+                    </Grid>
+                  </Border>
+                  <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14,12">
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                      <TextBlock Text="{Binding [DisplayCalendar], Source={x:Static ui:Strings.Current}}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                      <Button Grid.Column="2" Width="Auto" Click="ShortcutClick" Tag="{x:Static settings:ActivationTarget.Calendar}" AutomationProperties.Name="{Binding [DisplayCalendar], Source={x:Static ui:Strings.Current}}" AutomationProperties.HelpText="{Binding [EditShortcut], Source={x:Static ui:Strings.Current}}">
+                        <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="MinWidth" Value="0"/><Setter Property="Height" Value="Auto"/><Setter Property="MinHeight" Value="38"/><Setter Property="Padding" Value="4"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/><Style.Triggers><DataTrigger Binding="{Binding CalendarShortcut}" Value="{x:Null}"><Setter Property="MinWidth" Value="154"/><Setter Property="Padding" Value="14,8"/><Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="BorderThickness" Value="1"/></DataTrigger></Style.Triggers></Style></Button.Style>
+                        <Grid>
+                          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="7"><ui:SpacingStackPanel.Style><Style TargetType="ui:SpacingStackPanel"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding CalendarShortcut}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></ui:SpacingStackPanel.Style><TextBlock Text="+" FontSize="18"/><TextBlock Text="{Binding [AssignShortcut], Source={x:Static ui:Strings.Current}}" VerticalAlignment="Center"/></ui:SpacingStackPanel>
+                          <ui:SpacingStackPanel x:Name="EditCalendarShortcut" Orientation="Horizontal" Spacing="7">
+                            <ui:SpacingStackPanel.Style><Style TargetType="ui:SpacingStackPanel"><Style.Triggers><DataTrigger Binding="{Binding CalendarShortcut}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></ui:SpacingStackPanel.Style>
+                            <ItemsControl ItemsSource="{Binding CalendarShortcutKeys}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border MinWidth="32" Height="32" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="6" Margin="2,0" Padding="8,4"><Grid><TextBlock Text="{Binding Text}" FontSize="14" Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"><TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"><Style.Triggers><DataTrigger Binding="{Binding Glyph}" Value="True"><Setter Property="FontFamily" Value="Segoe Fluent Icons"/></DataTrigger><DataTrigger Binding="{Binding Large}" Value="True"><Setter Property="FontSize" Value="17"/></DataTrigger><DataTrigger Binding="{Binding WindowsLogo}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock><Path Data="M0,0 H7 V7 H0 Z M9,0 H16 V7 H9 Z M0,9 H7 V16 H0 Z M9,9 H16 V16 H9 Z" Width="14" Height="14" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"><Path.Style><Style TargetType="Path"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Fill" Value="{DynamicResource AccentTextBrush}"/><Style.Triggers><DataTrigger Binding="{Binding WindowsLogo}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Path.Style></Path></Grid></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                            <TextBlock Text="&#xE70F;" Style="{StaticResource ButtonGlyph}" Foreground="{DynamicResource TextBrush}" FontSize="18" Margin="4,0,0,0"/>
+                          </ui:SpacingStackPanel>
+                        </Grid>
+                      </Button>
+                    </Grid>
+                  </Border>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
+              <Expander x:Name="CalendarPreferences" Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
                   <ComboBox ItemsSource="{Binding Modes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Mode}" AutomationProperties.Name="{Binding [Convention], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBlock Text="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock x:Name="FirstDayPreferenceHeading" Text="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                   <ComboBox ItemsSource="{Binding Days}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding FirstDay}" IsEnabled="{Binding CustomCalendar}" AutomationProperties.Name="{Binding [FirstDay], Source={x:Static ui:Strings.Current}}"/>
-                  <TextBlock Text="{Binding [Rule], Source={x:Static ui:Strings.Current}}"/>
+                  <TextBlock x:Name="RulePreferenceHeading" Text="{Binding [Rule], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                   <ComboBox ItemsSource="{Binding Rules}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Rule}" IsEnabled="{Binding CustomCalendar}" AutomationProperties.Name="{Binding [Rule], Source={x:Static ui:Strings.Current}}"/>
                 </ui:SpacingStackPanel>
               </Expander>
-              <Expander Header="{Binding [Icon], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
+              <Expander x:Name="IconPreferences" Header="{Binding [Icon], Source={x:Static ui:Strings.Current}}" VerticalContentAlignment="Stretch" PreviewMouseLeftButtonDown="ExpanderHeaderMouseLeftButtonDown">
                 <ui:SpacingStackPanel Spacing="8" Margin="0,10,0,0" DataContext="{Binding Editor}">
                   <CheckBox IsChecked="{Binding AutomaticIcon}" Content="{Binding [AutoIcon], Source={x:Static ui:Strings.Current}}"/>
                   <ui:SpacingStackPanel Spacing="8" IsEnabled="{Binding CustomIcon}">
                     <ui:SpacingStackPanel.Style>
                       <Style TargetType="ui:SpacingStackPanel"><Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger></Style.Triggers></Style>
                     </ui:SpacingStackPanel.Style>
-                    <TextBlock Text="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
+                    <TextBlock x:Name="ForegroundPreferenceHeading" Text="{Binding [Foreground], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                     <Grid>
                       <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="160"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                       <Border x:Name="ForegroundSwatch" Width="40" Height="40" Background="{Binding Foreground}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" AutomationProperties.Name="{Binding [Foreground], Source={x:Static ui:Strings.Current}}"/>
@@ -234,7 +269,7 @@
                         </ui:SpacingStackPanel>
                       </Button>
                     </Grid>
-                    <TextBlock Text="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>
+                    <TextBlock x:Name="BackgroundPreferenceHeading" Text="{Binding [Background], Source={x:Static ui:Strings.Current}}" Style="{StaticResource PreferenceSubheader}"/>
                     <Grid>
                       <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="160"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                       <Border x:Name="BackgroundSwatch" Width="40" Height="40" Background="{Binding Background}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" AutomationProperties.Name="{Binding [Background], Source={x:Static ui:Strings.Current}}"/>

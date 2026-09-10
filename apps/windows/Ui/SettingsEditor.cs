@@ -103,7 +103,20 @@ public sealed class SettingsEditor : INotifyPropertyChanged
         get => _value.AutomaticUpdates;
         set => Change(_value with { AutomaticUpdates = value });
     }
-
+    public ActivationShortcut? WeekNumberShortcut
+    {
+        get => _value.WeekNumberShortcut;
+        set => Change(_value with { WeekNumberShortcut = value });
+    }
+    public ActivationShortcut? CalendarShortcut
+    {
+        get => _value.CalendarShortcut;
+        set => Change(_value with { CalendarShortcut = value });
+    }
+    public IReadOnlyList<ShortcutKeyPart> WeekNumberShortcutKeys =>
+        ShortcutDisplay.Parts(WeekNumberShortcut);
+    public IReadOnlyList<ShortcutKeyPart> CalendarShortcutKeys =>
+        ShortcutDisplay.Parts(CalendarShortcut);
     public void Load(AppSettings settings)
     {
         _saved = settings;

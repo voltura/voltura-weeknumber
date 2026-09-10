@@ -16,6 +16,17 @@ namespace VolturaWeekNumber.Tests;
 [Collection("WPF")]
 public sealed class PreferencesUiTests(WpfTestFixture fixture)
 {
+    private static readonly string[] PreferenceSubheaderNames =
+    [
+        "LanguagePreferenceHeading",
+        "AppearancePreferenceHeading",
+        "ActivationPreferenceHeading",
+        "FirstDayPreferenceHeading",
+        "RulePreferenceHeading",
+        "ForegroundPreferenceHeading",
+        "BackgroundPreferenceHeading",
+    ];
+
     private static readonly Point[] HeaderEdgePoints =
     [
         new(12, double.NaN),
@@ -255,6 +266,103 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
         });
     }
 
+    [Fact]
+    public void ActivationRowsStayAlignedAndSwitchFromAssignTextToKeyCaps()
+    {
+        fixture.Run(() =>
+        {
+            Strings.Current.SetLanguage("en");
+
+            var model = new CalendarViewModel();
+            var window = OpenPreferences(model);
+
+            try
+            {
+                var application = Descendants(window).OfType<Expander>()
+                    .Single(expander => Equals(expander.Header, "Application"));
+
+                application.IsExpanded = true;
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                window.UpdateLayout();
+
+                var buttons = Descendants(application).OfType<Button>()
+                    .Where(button => button.Tag is ActivationTarget)
+                    .OrderBy(button => (ActivationTarget)button.Tag)
+                    .ToArray();
+
+                Assert.Equal(2, buttons.Length);
+                Assert.Equal(
+                    ["+", "Assign shortcut"],
+                    Descendants(buttons[0]).OfType<TextBlock>()
+                        .Where(text => text.IsVisible)
+                        .Select(text => text.Text)
+                        .ToArray()
+                );
+
+                foreach (var button in buttons)
+                {
+                    var row = Assert.IsType<Grid>(VisualTreeHelper.GetParent(button));
+                    var label = row.Children.OfType<TextBlock>().Single();
+                    var labelCenter = label.TranslatePoint(new Point(), row).Y
+                        + label.ActualHeight / 2;
+                    var buttonCenter = button.TranslatePoint(new Point(), row).Y
+                        + button.ActualHeight / 2;
+
+                    Assert.True(label.TranslatePoint(new Point(), row).X < button.TranslatePoint(new Point(), row).X);
+                    Assert.Equal(labelCenter, buttonCenter, 1);
+                }
+
+                model.Editor.WeekNumberShortcut = new(true, true, false, false, 0x57);
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.DataBind);
+                window.UpdateLayout();
+
+                var visible = Descendants(buttons[0]).OfType<TextBlock>()
+                    .Where(text => text.IsVisible)
+                    .Select(text => text.Text)
+                    .ToArray();
+
+                Assert.Contains("W", visible);
+                Assert.Contains("\uE70F", visible);
+                Assert.DoesNotContain("Assign shortcut", visible);
+
+                window.Width = window.MinWidth;
+                window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+                window.UpdateLayout();
+                Assert.True(PreferencesScroll(window).ScrollableHeight > 0);
+            }
+            finally
+            {
+                window.Exit();
+            }
+        });
+    }
+
+    [Fact]
+    public void PreferenceSubheadersUseOneTypographyAcrossSections()
+    {
+        fixture.Run(() =>
+        {
+            var window = OpenPreferences(new CalendarViewModel());
+
+            try
+            {
+                var headings = PreferenceSubheaderNames.Select(name =>
+                    Assert.IsType<TextBlock>(window.FindName(name))
+                );
+
+                foreach (var heading in headings)
+                {
+                    Assert.Equal(16, heading.FontSize);
+                    Assert.Equal(FontWeights.SemiBold, heading.FontWeight);
+                }
+            }
+            finally
+            {
+                window.Exit();
+            }
+        });
+    }
+
     private static MainWindow OpenPreferences(CalendarViewModel model)
     {
         var window = new MainWindow(model);
@@ -265,6 +373,9 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
 
         return window;
     }
+
+    private static ScrollViewer PreferencesScroll(MainWindow window) =>
+        Assert.IsType<ScrollViewer>(window.FindName("PreferencesScroll"));
 
     private static void AssertColorRow(Border swatch, string action)
     {

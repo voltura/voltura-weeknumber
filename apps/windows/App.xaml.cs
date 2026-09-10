@@ -5,7 +5,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Icon;
+using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Platform;
+using VolturaWeekNumber.Ui;
 
 namespace VolturaWeekNumber;
 
@@ -170,6 +172,106 @@ public partial class App : System.Windows.Application
                         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                         Capture(_runtime.Window, Path.Combine(output, "calendar-week-" + theme + ".png"));
                     }
+
+                    _runtime.Window.Open(MainPage.Preferences);
+                    _runtime.Window.ApplicationPreferences.IsExpanded = true;
+                    _runtime.Window.CalendarPreferences.IsExpanded = false;
+                    _runtime.Window.IconPreferences.IsExpanded = false;
+                    _runtime.Window.PreferencesScroll.ScrollToTop();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "preferences-" + theme + ".png")
+                    );
+
+                    var reviewDraft = _runtime.Model.Editor.Value;
+
+                    _runtime.Model.Editor.WeekNumberShortcut = new(
+                        true,
+                        false,
+                        false,
+                        true,
+                        0x59
+                    );
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.DataBind);
+                    _runtime.Window.UpdateLayout();
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "preferences-assigned-" + theme + ".png")
+                    );
+                    _runtime.Model.Editor.Edit(reviewDraft);
+
+                    _runtime.Window.Width = _runtime.Window.MinWidth;
+                    _runtime.Window.UpdateLayout();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "preferences-narrow-" + theme + ".png")
+                    );
+                    _runtime.Window.Width = reviewWidth;
+
+                    _runtime.Window.ApplicationPreferences.IsExpanded = false;
+                    _runtime.Window.CalendarPreferences.IsExpanded = true;
+                    _runtime.Window.IconPreferences.IsExpanded = false;
+                    _runtime.Window.UpdateLayout();
+                    _runtime.Window.PreferencesScroll.ScrollToTop();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    _runtime.Window.UpdateLayout();
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "preferences-calendar-" + theme + ".png")
+                    );
+                    _runtime.Window.ApplicationPreferences.IsExpanded = false;
+                    _runtime.Window.CalendarPreferences.IsExpanded = false;
+                    _runtime.Window.IconPreferences.IsExpanded = true;
+                    _runtime.Window.UpdateLayout();
+                    _runtime.Window.PreferencesScroll.ScrollToTop();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    _runtime.Window.UpdateLayout();
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "preferences-icon-" + theme + ".png")
+                    );
+                    _runtime.Window.ApplicationPreferences.IsExpanded = true;
+                    _runtime.Window.CalendarPreferences.IsExpanded = false;
+                    _runtime.Window.IconPreferences.IsExpanded = false;
+
+                    var shortcutDialog = new ShortcutAssignmentWindow(
+                        ActivationTarget.WeekNumber,
+                        null,
+                        (_, _) => false,
+                        _ => new PassiveShortcutCaptureHook()
+                    )
+                    {
+                        Owner = _runtime.Window,
+                    };
+
+                    shortcutDialog.Show();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    shortcutDialog.UpdateLayout();
+                    Capture(
+                        shortcutDialog,
+                        Path.Combine(output, "shortcut-empty-" + theme + ".png")
+                    );
+                    shortcutDialog.SetReviewCandidate(
+                        new(true, false, false, true, 0x59)
+                    );
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.DataBind);
+                    shortcutDialog.UpdateLayout();
+                    Capture(
+                        shortcutDialog,
+                        Path.Combine(output, "shortcut-conflict-" + theme + ".png")
+                    );
+                    shortcutDialog.SetReviewCandidate(
+                        new(false, false, false, false, 0x08)
+                    );
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.DataBind);
+                    shortcutDialog.UpdateLayout();
+                    Capture(
+                        shortcutDialog,
+                        Path.Combine(output, "shortcut-invalid-" + theme + ".png")
+                    );
+                    shortcutDialog.Close();
 
                     _runtime.Window.Open();
                 }

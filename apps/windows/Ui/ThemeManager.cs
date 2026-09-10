@@ -98,12 +98,66 @@ internal static class ThemeManager
                     : 0x245CB4u)
         );
         SetBrush(
+            "AccentTextBrush",
+            highContrast
+                ? SystemColors.HighlightTextColor
+                : Rgb(dark
+                    ? 0x111720u
+                    : 0xFFFFFFu)
+        );
+        SetBrush(
             "BorderBrush",
             highContrast
                 ? SystemColors.WindowTextColor
                 : Rgb(dark
                     ? 0x354155u
                     : 0xD9E0EBu)
+        );
+        SetBrush(
+            "WarningBrush",
+            highContrast
+                ? SystemColors.WindowColor
+                : Rgb(dark
+                    ? 0x594600u
+                    : 0xFFF4CEu)
+        );
+        SetBrush(
+            "WarningTextBrush",
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0xFFF4CEu
+                    : 0x5C4400u)
+        );
+        SetBrush(
+            "ErrorBrush",
+            highContrast
+                ? SystemColors.WindowColor
+                : Rgb(dark
+                    ? 0x442326u
+                    : 0xFDE7E9u)
+        );
+        SetBrush(
+            "ErrorTextBrush",
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0xFFB3B8u
+                    : 0xA4262Cu)
+        );
+        SetBrush(
+            "ErrorAccentBrush",
+            highContrast
+                ? SystemColors.HighlightColor
+                : Rgb(dark
+                    ? 0xA94850u
+                    : 0xB84950u)
+        );
+        SetBrush(
+            "ErrorAccentTextBrush",
+            highContrast
+                ? SystemColors.HighlightTextColor
+                : Rgb(0xFFFFFFu)
         );
     }
 

@@ -23,6 +23,8 @@ public sealed class SettingsTests : IDisposable
             Background = "#00123456",
             Logging = true,
             AlwaysOnTop = true,
+            WeekNumberShortcut = new(true, true, false, false, 0x57),
+            CalendarShortcut = new(false, true, true, false, 0x43),
         };
 
         await store.SaveAsync(settings);
@@ -31,7 +33,7 @@ public sealed class SettingsTests : IDisposable
     }
 
     [Fact]
-    public async Task SettingsWithoutAlwaysOnTopRemainUnpinned()
+    public async Task OlderSettingsKeepNewOptionsAtTheirDefaults()
     {
         Directory.CreateDirectory(_directory);
 
@@ -43,7 +45,63 @@ public sealed class SettingsTests : IDisposable
             TestContext.Current.CancellationToken
         );
 
-        Assert.False((await SettingsStore.ReadAsync(path)).AlwaysOnTop);
+        var settings = await SettingsStore.ReadAsync(path);
+
+        Assert.False(settings.AlwaysOnTop);
+        Assert.Null(settings.WeekNumberShortcut);
+        Assert.Null(settings.CalendarShortcut);
+    }
+
+    [Fact]
+    public async Task ClearedShortcutsRoundTripThroughExportAndImport()
+    {
+        Directory.CreateDirectory(_directory);
+
+        var path = Path.Combine(_directory, "export.json");
+        var assigned = new AppSettings
+        {
+            WeekNumberShortcut = new(false, true, true, false, 0x57),
+        };
+
+        await SettingsStore.WriteAsync(path, assigned);
+
+        var imported = await SettingsStore.ReadAsync(path);
+
+        Assert.Equal(assigned.WeekNumberShortcut, imported.WeekNumberShortcut);
+
+        var cleared = imported with { WeekNumberShortcut = null };
+
+        await SettingsStore.WriteAsync(path, cleared);
+        Assert.Null((await SettingsStore.ReadAsync(path)).WeekNumberShortcut);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidShortcuts))]
+    public void MalformedActivationShortcutsAreRejected(ActivationShortcut shortcut) =>
+        Assert.Throws<InvalidDataException>(() => new AppSettings
+        {
+            WeekNumberShortcut = shortcut,
+        }.Validate());
+
+    public static TheoryData<ActivationShortcut> InvalidShortcuts =>
+    [
+        new ActivationShortcut(false, false, false, false, 0x57),
+        new ActivationShortcut(false, true, false, false, 0),
+        new ActivationShortcut(false, true, false, false, 0x11),
+        new ActivationShortcut(false, true, false, false, 0x7B),
+        new ActivationShortcut(false, false, false, true, 0x09),
+    ];
+
+    [Fact]
+    public void DuplicateActivationShortcutsAreRejected()
+    {
+        var shortcut = new ActivationShortcut(false, true, true, false, 0x57);
+
+        Assert.Throws<InvalidDataException>(() => new AppSettings
+        {
+            WeekNumberShortcut = shortcut,
+            CalendarShortcut = shortcut,
+        }.Validate());
     }
 
     [Fact]
