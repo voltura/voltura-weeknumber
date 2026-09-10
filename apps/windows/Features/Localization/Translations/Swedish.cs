@@ -56,6 +56,7 @@ internal static class Swedish
             ["Light"] = "Ljust",
             ["Dark"] = "Mörkt",
             ["Autostart"] = "Starta med Windows",
+            ["AlwaysOnTop"] = "Alltid överst",
             ["Notifications"] = "Aviseringar",
             ["StartupNote"] = "Avisera när programmet startar",
             ["WeekNote"] = "Avisera när en ny vecka börjar",

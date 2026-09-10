@@ -56,6 +56,7 @@ internal static class English
             ["Light"] = "Light",
             ["Dark"] = "Dark",
             ["Autostart"] = "Start with Windows",
+            ["AlwaysOnTop"] = "Always on top",
             ["Notifications"] = "Notifications",
             ["StartupNote"] = "Notify when the app starts",
             ["WeekNote"] = "Notify when a new week begins",

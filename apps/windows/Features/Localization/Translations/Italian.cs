@@ -56,6 +56,7 @@ internal static class Italian
             ["Light"] = "Chiaro",
             ["Dark"] = "Scuro",
             ["Autostart"] = "Avvia con Windows",
+            ["AlwaysOnTop"] = "Sempre in primo piano",
             ["Notifications"] = "Notifiche",
             ["StartupNote"] = "Notifica all’avvio dell’applicazione",
             ["WeekNote"] = "Notifica all’inizio di una settimana",

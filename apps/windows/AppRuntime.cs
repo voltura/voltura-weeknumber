@@ -144,6 +144,7 @@ internal sealed class AppRuntime : IAsyncDisposable
         Strings.Current.SetLanguage(settings.Language);
         ThemeManager.Apply(settings.Theme);
         Model.Apply(settings);
+        Window.ApplyAlwaysOnTop(settings.AlwaysOnTop);
         Window.UpdateLanguage();
         _log.Enabled = settings.Logging || _traceDpi;
         _tray.RebuildMenu();
@@ -423,6 +424,45 @@ internal sealed class AppRuntime : IAsyncDisposable
                 );
                 Model.Editor.Edit(draft);
                 break;
+            case "always-on-top":
+                {
+                    var alwaysOnTopDraft = Model.Editor.Value;
+
+                    if (_settingsDamaged)
+                    {
+                        Model.Editor.Edit(alwaysOnTopDraft with
+                        {
+                            AlwaysOnTop = _settings.Current.AlwaysOnTop,
+                        });
+                        Window.ApplyAlwaysOnTop(_settings.Current.AlwaysOnTop);
+                        Model.Status = Strings.Current["SettingsRecovery"];
+
+                        break;
+                    }
+
+                    try
+                    {
+                        await SaveAsync(
+                            _settings.Current with
+                            {
+                                AlwaysOnTop = alwaysOnTopDraft.AlwaysOnTop,
+                            }
+                        );
+                        Model.Editor.Edit(alwaysOnTopDraft);
+                    }
+                    catch
+                    {
+                        Model.Editor.Edit(alwaysOnTopDraft with
+                        {
+                            AlwaysOnTop = _settings.Current.AlwaysOnTop,
+                        });
+                        Window.ApplyAlwaysOnTop(_settings.Current.AlwaysOnTop);
+
+                        throw;
+                    }
+
+                    break;
+                }
             case "discard":
                 Model.Editor.Load(_settings.Current);
                 Model.Status = string.Empty;

@@ -56,6 +56,7 @@ internal static class Polish
             ["Light"] = "Jasny",
             ["Dark"] = "Ciemny",
             ["Autostart"] = "Uruchamiaj z Windows",
+            ["AlwaysOnTop"] = "Zawsze na wierzchu",
             ["Notifications"] = "Powiadomienia",
             ["StartupNote"] = "Powiadamiaj przy uruchomieniu",
             ["WeekNote"] = "Powiadamiaj o nowym tygodniu",

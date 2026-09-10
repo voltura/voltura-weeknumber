@@ -56,6 +56,7 @@ internal static class French
             ["Light"] = "Clair",
             ["Dark"] = "Sombre",
             ["Autostart"] = "Démarrer avec Windows",
+            ["AlwaysOnTop"] = "Toujours au premier plan",
             ["Notifications"] = "Notifications",
             ["StartupNote"] = "Notifier au démarrage",
             ["WeekNote"] = "Notifier au début d’une semaine",

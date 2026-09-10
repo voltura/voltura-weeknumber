@@ -56,6 +56,7 @@ internal static class Korean
             ["Light"] = "밝게",
             ["Dark"] = "어둡게",
             ["Autostart"] = "Windows 시작 시 실행",
+            ["AlwaysOnTop"] = "항상 위",
             ["Notifications"] = "알림",
             ["StartupNote"] = "앱 시작 시 알림",
             ["WeekNote"] = "새로운 주가 시작될 때 알림",

@@ -56,6 +56,7 @@ internal static class Indonesian
             ["Light"] = "Terang",
             ["Dark"] = "Gelap",
             ["Autostart"] = "Jalankan saat Windows dimulai",
+            ["AlwaysOnTop"] = "Selalu di atas",
             ["Notifications"] = "Notifikasi",
             ["StartupNote"] = "Beri tahu saat aplikasi dimulai",
             ["WeekNote"] = "Beri tahu saat minggu baru dimulai",

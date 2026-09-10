@@ -56,6 +56,7 @@ internal static class Norwegian
             ["Light"] = "Lyst",
             ["Dark"] = "Mørkt",
             ["Autostart"] = "Start med Windows",
+            ["AlwaysOnTop"] = "Alltid øverst",
             ["Notifications"] = "Varsler",
             ["StartupNote"] = "Varsle når programmet starter",
             ["WeekNote"] = "Varsle når en ny uke begynner",

@@ -56,6 +56,7 @@ internal static class Finnish
             ["Light"] = "Vaalea",
             ["Dark"] = "Tumma",
             ["Autostart"] = "Käynnistä Windowsin mukana",
+            ["AlwaysOnTop"] = "Aina päällimmäisenä",
             ["Notifications"] = "Ilmoitukset",
             ["StartupNote"] = "Ilmoita sovelluksen käynnistyessä",
             ["WeekNote"] = "Ilmoita uuden viikon alkaessa",

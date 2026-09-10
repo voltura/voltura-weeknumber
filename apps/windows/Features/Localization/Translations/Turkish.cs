@@ -56,6 +56,7 @@ internal static class Turkish
             ["Light"] = "Açık",
             ["Dark"] = "Koyu",
             ["Autostart"] = "Windows ile başlat",
+            ["AlwaysOnTop"] = "Her zaman üstte",
             ["Notifications"] = "Bildirimler",
             ["StartupNote"] = "Uygulama başladığında bildir",
             ["WeekNote"] = "Yeni bir hafta başladığında bildir",

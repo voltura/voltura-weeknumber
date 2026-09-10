@@ -56,6 +56,7 @@ internal static class German
             ["Light"] = "Hell",
             ["Dark"] = "Dunkel",
             ["Autostart"] = "Mit Windows starten",
+            ["AlwaysOnTop"] = "Immer im Vordergrund",
             ["Notifications"] = "Benachrichtigungen",
             ["StartupNote"] = "Beim Start benachrichtigen",
             ["WeekNote"] = "Bei einer neuen Woche benachrichtigen",

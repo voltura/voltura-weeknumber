@@ -135,8 +135,19 @@ public partial class MainWindow : Window
         }
     }
 
-    // This checkbox saves immediately; do not accept edits while its save action is gated.
-    internal void SetActionsBusy(bool busy) => AutomaticUpdateCheck.IsEnabled = !busy;
+    // These toggles save immediately; do not accept edits while their save action is gated.
+    internal void SetActionsBusy(bool busy)
+    {
+        AutomaticUpdateCheck.IsEnabled = !busy;
+        AlwaysOnTopCheck.IsEnabled = !busy;
+
+        if (Tabs.Template.FindName("HeaderPinToggle", Tabs) is ToggleButton pin)
+        {
+            pin.IsEnabled = !busy;
+        }
+    }
+
+    internal void ApplyAlwaysOnTop(bool enabled) => Topmost = enabled;
 
     internal void UpdateState(UpdateState state, bool eligible)
     {
@@ -301,6 +312,12 @@ public partial class MainWindow : Window
         {
             ActionRequested?.Invoke("auto-updates");
         }
+    }
+
+    private void AlwaysOnTopClick(object sender, RoutedEventArgs args)
+    {
+        ApplyAlwaysOnTop(((CalendarViewModel)DataContext).Editor.AlwaysOnTop);
+        ActionRequested?.Invoke("always-on-top");
     }
 
     private void OnExpanded(object sender, RoutedEventArgs args)

@@ -56,6 +56,7 @@ internal static class Cantonese
             ["Light"] = "淺色",
             ["Dark"] = "深色",
             ["Autostart"] = "隨 Windows 啟動",
+            ["AlwaysOnTop"] = "永遠置頂",
             ["Notifications"] = "通知",
             ["StartupNote"] = "開啟程式嗰陣通知我",
             ["WeekNote"] = "新一週開始嗰陣通知我",

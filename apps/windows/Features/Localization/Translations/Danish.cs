@@ -56,6 +56,7 @@ internal static class Danish
             ["Light"] = "Lyst",
             ["Dark"] = "Mørkt",
             ["Autostart"] = "Start med Windows",
+            ["AlwaysOnTop"] = "Altid øverst",
             ["Notifications"] = "Meddelelser",
             ["StartupNote"] = "Giv besked, når programmet starter",
             ["WeekNote"] = "Giv besked, når en ny uge begynder",

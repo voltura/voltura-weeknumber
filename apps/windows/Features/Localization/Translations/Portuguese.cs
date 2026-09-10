@@ -56,6 +56,7 @@ internal static class Portuguese
             ["Light"] = "Claro",
             ["Dark"] = "Escuro",
             ["Autostart"] = "Iniciar com o Windows",
+            ["AlwaysOnTop"] = "Sempre visível",
             ["Notifications"] = "Notificações",
             ["StartupNote"] = "Notificar ao iniciar o aplicativo",
             ["WeekNote"] = "Notificar ao começar uma semana",

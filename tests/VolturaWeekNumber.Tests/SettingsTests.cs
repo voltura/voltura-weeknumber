@@ -22,11 +22,28 @@ public sealed class SettingsTests : IDisposable
             Theme = "dark",
             Background = "#00123456",
             Logging = true,
+            AlwaysOnTop = true,
         };
 
         await store.SaveAsync(settings);
         Assert.Equal(settings, await SettingsStore.ReadAsync(store.FilePath));
         Assert.Empty(Directory.GetFiles(_directory, "*.pending"));
+    }
+
+    [Fact]
+    public async Task SettingsWithoutAlwaysOnTopRemainUnpinned()
+    {
+        Directory.CreateDirectory(_directory);
+
+        var path = Path.Combine(_directory, "legacy.json");
+
+        await File.WriteAllTextAsync(
+            path,
+            """{"Schema":1}""",
+            TestContext.Current.CancellationToken
+        );
+
+        Assert.False((await SettingsStore.ReadAsync(path)).AlwaysOnTop);
     }
 
     [Fact]

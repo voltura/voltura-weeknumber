@@ -56,6 +56,7 @@ internal static class SimplifiedChinese
             ["Light"] = "浅色",
             ["Dark"] = "深色",
             ["Autostart"] = "随 Windows 启动",
+            ["AlwaysOnTop"] = "始终置顶",
             ["Notifications"] = "通知",
             ["StartupNote"] = "应用启动时通知",
             ["WeekNote"] = "新的一周开始时通知",

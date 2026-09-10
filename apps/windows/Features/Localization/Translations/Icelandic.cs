@@ -56,6 +56,7 @@ internal static class Icelandic
             ["Light"] = "Ljóst",
             ["Dark"] = "Dökkt",
             ["Autostart"] = "Ræsa með Windows",
+            ["AlwaysOnTop"] = "Alltaf efst",
             ["Notifications"] = "Tilkynningar",
             ["StartupNote"] = "Tilkynna þegar forritið ræsist",
             ["WeekNote"] = "Tilkynna þegar ný vika hefst",

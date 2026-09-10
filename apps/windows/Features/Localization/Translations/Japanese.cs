@@ -56,6 +56,7 @@ internal static class Japanese
             ["Light"] = "ライト",
             ["Dark"] = "ダーク",
             ["Autostart"] = "Windowsと同時に起動",
+            ["AlwaysOnTop"] = "常に手前に表示",
             ["Notifications"] = "通知",
             ["StartupNote"] = "アプリの起動時に通知",
             ["WeekNote"] = "新しい週の開始時に通知",

@@ -12,6 +12,7 @@ public sealed record AppSettings
     public string Theme { get; init; } = "system";
     public CalendarOptions Calendar { get; init; } = new();
     public bool StartWithWindows { get; init; }
+    public bool AlwaysOnTop { get; init; }
     public bool StartupNotification { get; init; } = true;
     public bool WeekNotification { get; init; } = true;
     public bool SilentNotifications { get; init; } = true;

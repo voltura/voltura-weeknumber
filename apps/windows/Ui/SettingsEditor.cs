@@ -73,6 +73,11 @@ public sealed class SettingsEditor : INotifyPropertyChanged
         get => _value.StartWithWindows;
         set => Change(_value with { StartWithWindows = value });
     }
+    public bool AlwaysOnTop
+    {
+        get => _value.AlwaysOnTop;
+        set => Change(_value with { AlwaysOnTop = value });
+    }
     public bool StartupNotification
     {
         get => _value.StartupNotification;

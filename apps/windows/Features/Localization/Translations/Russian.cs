@@ -56,6 +56,7 @@ internal static class Russian
             ["Light"] = "Светлое",
             ["Dark"] = "Тёмное",
             ["Autostart"] = "Запускать вместе с Windows",
+            ["AlwaysOnTop"] = "Поверх остальных окон",
             ["Notifications"] = "Уведомления",
             ["StartupNote"] = "Уведомлять при запуске приложения",
             ["WeekNote"] = "Уведомлять о начале новой недели",

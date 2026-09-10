@@ -56,6 +56,7 @@ internal static class Spanish
             ["Light"] = "Claro",
             ["Dark"] = "Oscuro",
             ["Autostart"] = "Iniciar con Windows",
+            ["AlwaysOnTop"] = "Siempre en primer plano",
             ["Notifications"] = "Notificaciones",
             ["StartupNote"] = "Notificar al iniciar la aplicación",
             ["WeekNote"] = "Notificar al comenzar una semana",

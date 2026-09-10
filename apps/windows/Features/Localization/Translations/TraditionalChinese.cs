@@ -56,6 +56,7 @@ internal static class TraditionalChinese
             ["Light"] = "淺色",
             ["Dark"] = "深色",
             ["Autostart"] = "隨 Windows 啟動",
+            ["AlwaysOnTop"] = "永遠置頂",
             ["Notifications"] = "通知",
             ["StartupNote"] = "應用程式啟動時通知",
             ["WeekNote"] = "新的一週開始時通知",

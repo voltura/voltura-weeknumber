@@ -18,6 +18,10 @@ public sealed class UiStateTests
         Assert.True(editor.HasChanges);
         editor.StartWithWindows = saved.StartWithWindows;
         Assert.False(editor.HasChanges);
+        editor.AlwaysOnTop = !saved.AlwaysOnTop;
+        Assert.True(editor.HasChanges);
+        editor.AlwaysOnTop = saved.AlwaysOnTop;
+        Assert.False(editor.HasChanges);
         editor.FirstDay = DayOfWeek.Tuesday;
         Assert.True(editor.HasChanges);
         editor.Load(editor.Value);

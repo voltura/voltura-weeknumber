@@ -56,6 +56,7 @@ internal static class Dutch
             ["Light"] = "Licht",
             ["Dark"] = "Donker",
             ["Autostart"] = "Starten met Windows",
+            ["AlwaysOnTop"] = "Altijd op de voorgrond",
             ["Notifications"] = "Meldingen",
             ["StartupNote"] = "Melden bij het starten van de app",
             ["WeekNote"] = "Melden bij het begin van een week",

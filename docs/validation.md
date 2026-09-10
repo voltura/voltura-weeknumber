@@ -8,7 +8,7 @@ Run commands from the repository root on Windows. See [Contributing](../CONTRIBU
 ./scripts/build.ps1
 ```
 
-This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence and language import/export, Windows-language detection (including Chinese scripts and regions), translation completeness, localized runtime and tray states, minimum-width button labels, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
+This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence and language import/export, Windows-language detection (including Chinese scripts and regions), translation completeness, localized runtime and tray states, the always-on-top controls, minimum-width button labels, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
 
 For installer or packaging changes:
 
@@ -77,7 +77,7 @@ The report includes startup time, CPU, memory, handles, icon render count, and D
 
 Choose checks relevant to the changed behavior and record the build, environment, and observed result:
 
-- **Calendar and appearance:** test date entry and invalid input, year boundaries, each calendar mode, all 21 language options, light/dark/high-contrast appearance, keyboard navigation, custom icon transparency, and export/import dialogs.
+- **Calendar and appearance:** test date entry and invalid input, year boundaries, each calendar mode, all 21 language options, light/dark/high-contrast appearance, keyboard navigation, the always-on-top pin against other applications, custom icon transparency, and export/import dialogs.
 - **Tray and notifications:** restart Explorer; reopen the window; activate a second instance; test notification clicks, Exit, startup/new-week notifications, sound settings, and Windows quiet mode. Resume across midnight and change the clock or time zone.
 - **Displays:** move the window and taskbar between different DPI displays, change the primary monitor, disconnect/reconnect a display, and power-cycle relevant TV/receiver hardware. Check scale, icon sharpness, visible placement, and manual window sizing.
 - **Installation:** use a clean Windows Sandbox or VM for both installer wizards, missing-runtime download, UAC cancellation, offline failure, reboot-required outcomes, autostart, upgrade, and uninstall with and without settings removal. Check the portable ZIP separately.
