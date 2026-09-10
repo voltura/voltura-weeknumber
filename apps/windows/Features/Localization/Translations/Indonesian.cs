@@ -7,6 +7,14 @@ internal static class Indonesian
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Tahun sebelumnya",
+            ["NextYear"] = "Tahun berikutnya",
+            ["PreviousMonth"] = "Bulan sebelumnya",
+            ["NextMonth"] = "Bulan berikutnya",
+            ["ChooseMonth"] = "Pilih bulan untuk melihat kalender.",
+            ["ChooseWeek"] = "Pilih minggu untuk melihat tanggalnya.",
+            ["CurrentWeek"] = "Minggu ini",
+            ["CalendarUnavailable"] = "Periode ini tidak tersedia dengan aturan kalender yang dipilih.",
             ["CopyWeekReference"] = "Salin referensi minggu",
             ["CopyFormats"] = "Format salinan",
             ["CopyIso"] = "Salin format ISO",

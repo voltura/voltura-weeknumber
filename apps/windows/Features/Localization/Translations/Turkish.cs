@@ -7,6 +7,14 @@ internal static class Turkish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Önceki yıl",
+            ["NextYear"] = "Sonraki yıl",
+            ["PreviousMonth"] = "Önceki ay",
+            ["NextMonth"] = "Sonraki ay",
+            ["ChooseMonth"] = "Takvimi görmek için bir ay seçin.",
+            ["ChooseWeek"] = "Tarihleri görmek için bir hafta seçin.",
+            ["CurrentWeek"] = "Geçerli hafta",
+            ["CalendarUnavailable"] = "Bu dönem seçilen takvim kurallarıyla kullanılamıyor.",
             ["CopyWeekReference"] = "Hafta bilgisini kopyala",
             ["CopyFormats"] = "Kopyalama biçimleri",
             ["CopyIso"] = "ISO biçiminde kopyala",

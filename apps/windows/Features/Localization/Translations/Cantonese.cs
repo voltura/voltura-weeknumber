@@ -7,6 +7,14 @@ internal static class Cantonese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "上一年",
+            ["NextYear"] = "下一年",
+            ["PreviousMonth"] = "上一個月",
+            ["NextMonth"] = "下一個月",
+            ["ChooseMonth"] = "揀一個月，睇下月曆。",
+            ["ChooseWeek"] = "揀一週，睇下日期。",
+            ["CurrentWeek"] = "今週",
+            ["CalendarUnavailable"] = "所選日曆規則唔支援呢段期間。",
             ["CopyWeekReference"] = "複製週次資料",
             ["CopyFormats"] = "複製格式",
             ["CopyIso"] = "複製 ISO 格式",

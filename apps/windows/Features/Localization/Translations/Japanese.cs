@@ -7,6 +7,14 @@ internal static class Japanese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "前年",
+            ["NextYear"] = "翌年",
+            ["PreviousMonth"] = "前月",
+            ["NextMonth"] = "翌月",
+            ["ChooseMonth"] = "月を選ぶとカレンダーを表示します。",
+            ["ChooseWeek"] = "週を選ぶと日付を表示します。",
+            ["CurrentWeek"] = "今週",
+            ["CalendarUnavailable"] = "選択したカレンダーの規則では、この期間を表示できません。",
             ["CopyWeekReference"] = "週の情報をコピー",
             ["CopyFormats"] = "コピー形式",
             ["CopyIso"] = "ISO形式でコピー",

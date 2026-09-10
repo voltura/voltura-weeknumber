@@ -7,6 +7,14 @@ internal static class Danish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Forrige år",
+            ["NextYear"] = "Næste år",
+            ["PreviousMonth"] = "Forrige måned",
+            ["NextMonth"] = "Næste måned",
+            ["ChooseMonth"] = "Vælg en måned for at se kalenderen.",
+            ["ChooseWeek"] = "Vælg en uge for at se dens datoer.",
+            ["CurrentWeek"] = "Aktuel uge",
+            ["CalendarUnavailable"] = "Perioden er ikke tilgængelig med de valgte kalenderregler.",
             ["CopyWeekReference"] = "Kopiér ugereference",
             ["CopyFormats"] = "Kopieringsformater",
             ["CopyIso"] = "Kopiér ISO",

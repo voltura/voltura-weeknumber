@@ -7,6 +7,14 @@ internal static class Norwegian
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Forrige år",
+            ["NextYear"] = "Neste år",
+            ["PreviousMonth"] = "Forrige måned",
+            ["NextMonth"] = "Neste måned",
+            ["ChooseMonth"] = "Velg en måned for å se kalenderen.",
+            ["ChooseWeek"] = "Velg en uke for å se datoene.",
+            ["CurrentWeek"] = "Inneværende uke",
+            ["CalendarUnavailable"] = "Perioden er ikke tilgjengelig med de valgte kalenderreglene.",
             ["CopyWeekReference"] = "Kopier ukereferanse",
             ["CopyFormats"] = "Kopieringsformater",
             ["CopyIso"] = "Kopier ISO",

@@ -23,6 +23,29 @@ public static class WeekCalculator
 {
     public static WeekResult Calculate(DateOnly date, CalendarOptions options, CultureInfo region)
     {
+        var (calendar, first, rule, iso) = ResolveConvention(options, region);
+
+        var value = date.ToDateTime(TimeOnly.MinValue);
+        var number = iso
+            ? ISOWeek.GetWeekOfYear(value)
+            : calendar.GetWeekOfYear(value, rule, first);
+        var offset = ((int)date.DayOfWeek - (int)first + 7) % 7;
+
+        return new(
+            number,
+            iso
+                ? ISOWeek.GetYear(value)
+                : null,
+            DateOnly.FromDayNumber(Math.Max(0, date.DayNumber - offset))
+        );
+    }
+
+    internal static DayOfWeek FirstWeekday(CalendarOptions options, CultureInfo region) =>
+        ResolveConvention(options, region).First;
+
+    private static (System.Globalization.Calendar Calendar, DayOfWeek First, CalendarWeekRule Rule, bool Iso)
+        ResolveConvention(CalendarOptions options, CultureInfo region)
+    {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(region);
 
@@ -48,19 +71,7 @@ public static class WeekCalculator
             first = DayOfWeek.Monday;
         }
 
-        var value = date.ToDateTime(TimeOnly.MinValue);
-        var number = iso
-            ? ISOWeek.GetWeekOfYear(value)
-            : calendar.GetWeekOfYear(value, rule, first);
-        var offset = ((int)date.DayOfWeek - (int)first + 7) % 7;
-
-        return new(
-            number,
-            iso
-                ? ISOWeek.GetYear(value)
-                : null,
-            DateOnly.FromDayNumber(Math.Max(0, date.DayNumber - offset))
-        );
+        return (calendar, first, rule, iso);
     }
 
     public static IReadOnlyList<WeekRange> FindRanges(

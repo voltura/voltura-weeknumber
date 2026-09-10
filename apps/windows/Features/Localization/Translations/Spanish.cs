@@ -7,6 +7,14 @@ internal static class Spanish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Año anterior",
+            ["NextYear"] = "Año siguiente",
+            ["PreviousMonth"] = "Mes anterior",
+            ["NextMonth"] = "Mes siguiente",
+            ["ChooseMonth"] = "Elige un mes para ver su calendario.",
+            ["ChooseWeek"] = "Elige una semana para ver sus fechas.",
+            ["CurrentWeek"] = "Semana actual",
+            ["CalendarUnavailable"] = "Este período no está disponible con las reglas de calendario seleccionadas.",
             ["CopyWeekReference"] = "Copiar referencia de semana",
             ["CopyFormats"] = "Formatos de copia",
             ["CopyIso"] = "Copiar formato ISO",

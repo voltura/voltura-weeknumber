@@ -3,11 +3,11 @@
   <DockPanel>
     <DockPanel.Style><Style TargetType="DockPanel">
       <Setter Property="Margin" Value="20"/>
-      <Style.Triggers><DataTrigger Binding="{Binding SelectedIndex, ElementName=Tabs}" Value="3"><Setter Property="Margin" Value="20,20,20,12"/></DataTrigger></Style.Triggers>
+      <Style.Triggers><DataTrigger Binding="{Binding IsSelected, ElementName=PreferencesTab}" Value="True"><Setter Property="Margin" Value="20,20,20,12"/></DataTrigger></Style.Triggers>
     </Style></DockPanel.Style>
     <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Foreground="{DynamicResource MutedBrush}" FontSize="12" MinHeight="20" Margin="0,10,0,0" AutomationProperties.LiveSetting="Polite">
       <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Style.Triggers><DataTrigger Binding="{Binding SelectedIndex, ElementName=Tabs}" Value="3"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
+        <Style.Triggers><DataTrigger Binding="{Binding IsSelected, ElementName=PreferencesTab}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
       </Style></TextBlock.Style>
     </TextBlock>
     <TabControl x:Name="Tabs" Background="Transparent" BorderThickness="0">
@@ -101,13 +101,16 @@
           </ui:SpacingStackPanel>
         </ScrollViewer>
       </TabItem>
+      <TabItem x:Name="CalendarTab" Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}">
+        <ui:CalendarBrowserPage x:Name="CalendarPage"/>
+      </TabItem>
       <TabItem Header="{Binding [OrdinalTab], Source={x:Static ui:Strings.Current}}">
         <ui:DateLookupPage DataContext="{Binding DayOfYear}"/>
       </TabItem>
       <TabItem Header="{Binding [JulianTab], Source={x:Static ui:Strings.Current}}">
         <ui:DateLookupPage DataContext="{Binding JulianDay}"/>
       </TabItem>
-      <TabItem Header="{Binding [Preferences], Source={x:Static ui:Strings.Current}}">
+      <TabItem x:Name="PreferencesTab" Header="{Binding [Preferences], Source={x:Static ui:Strings.Current}}">
         <DockPanel Margin="0,14,0,0">
           <ui:SpacingStackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,8,0,0">
             <Button x:Name="SaveChangesButton" Click="ActionClick" Tag="save" IsEnabled="{Binding Editor.HasChanges}" AutomationProperties.Name="{Binding [Save], Source={x:Static ui:Strings.Current}}">

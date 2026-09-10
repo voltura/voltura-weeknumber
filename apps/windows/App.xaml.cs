@@ -138,6 +138,26 @@ public partial class App : System.Windows.Application
                     _runtime.Window.UpdateLayout();
                     await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                     Capture(_runtime.Window, Path.Combine(output, "window-" + theme + ".png"));
+                    _runtime.Window.Open(MainPage.Calendar);
+
+                    var browser = _runtime.Model.CalendarBrowser;
+
+                    browser.ZoomOut(Ui.CalendarZoom.Year);
+                    browser.Today();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(_runtime.Window, Path.Combine(output, "calendar-year-" + theme + ".png"));
+                    browser.ShowMonth(browser.Anchor);
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(_runtime.Window, Path.Combine(output, "calendar-month-" + theme + ".png"));
+
+                    if (browser.HasPeriod)
+                    {
+                        browser.ShowWeek(browser.Weeks.First(week => week.IsCurrent));
+                        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                        Capture(_runtime.Window, Path.Combine(output, "calendar-week-" + theme + ".png"));
+                    }
+
+                    _runtime.Window.Open();
                 }
 
                 await File.WriteAllTextAsync(

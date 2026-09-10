@@ -7,6 +7,14 @@ internal static class Korean
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "이전 연도",
+            ["NextYear"] = "다음 연도",
+            ["PreviousMonth"] = "이전 달",
+            ["NextMonth"] = "다음 달",
+            ["ChooseMonth"] = "월을 선택하면 달력이 표시됩니다.",
+            ["ChooseWeek"] = "주를 선택하면 날짜가 표시됩니다.",
+            ["CurrentWeek"] = "이번 주",
+            ["CalendarUnavailable"] = "선택한 달력 규칙으로는 이 기간을 표시할 수 없습니다.",
             ["CopyWeekReference"] = "주 정보 복사",
             ["CopyFormats"] = "복사 형식",
             ["CopyIso"] = "ISO 형식으로 복사",

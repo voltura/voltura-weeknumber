@@ -26,6 +26,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
         format, Strings.Current.Culture, Strings.Current["WeekNumberFormat"]);
     public event PropertyChangedEventHandler? PropertyChanged;
     public WeekLookupViewModel WeekLookup { get; } = new();
+    internal CalendarBrowserViewModel CalendarBrowser { get; } = new();
     public DateLookupViewModel DayOfYear { get; } = new(false);
     public DateLookupViewModel JulianDay { get; } = new(true);
     public SettingsEditor Editor { get; } = new();
@@ -100,6 +101,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
         Editor.Load(settings);
         Editor.RefreshLabels();
         WeekLookup.Apply(settings.Calendar);
+        CalendarBrowser.Apply(settings.Calendar);
         WeekOffsetErrorText = string.Empty;
     }
 
@@ -160,6 +162,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
 
         DayOfYear.Refresh(today);
         JulianDay.Refresh(today);
+        CalendarBrowser.Refresh(today);
 
         var strings = Strings.Current;
 

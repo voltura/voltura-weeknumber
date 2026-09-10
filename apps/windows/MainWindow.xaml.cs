@@ -15,6 +15,7 @@ namespace VolturaWeekNumber;
 public enum MainPage
 {
     WeekNumber,
+    Calendar,
     DayOfYear,
     JulianDay,
     Preferences,
@@ -35,6 +36,7 @@ public partial class MainWindow : Window
         _clipboard = clipboard;
         InitializeComponent();
         DataContext = model;
+        CalendarPage.DataContext = model.CalendarBrowser;
         SelectedWeekCopy.CopyRequested += format => CopyWeek(model.CopyText(format));
         LookupWeekCopy.CopyRequested += format => CopyWeek(model.WeekLookup.CopyText(format));
         WindowWorkAreaPlacement.ConstrainAndCenterOnFirstLoad(this);
@@ -70,6 +72,7 @@ public partial class MainWindow : Window
         Activate();
         // Showing the window restores focus and can reselect the previously focused tab.
         Tabs.SelectedIndex = (int)tab;
+        ((CalendarViewModel)DataContext).CalendarBrowser.SetActive(CalendarTab.IsSelected);
         FocusDatePageHeader();
     }
 
@@ -77,6 +80,7 @@ public partial class MainWindow : Window
     {
         if (args.OriginalSource == Tabs)
         {
+            ((CalendarViewModel)DataContext).CalendarBrowser.SetActive(CalendarTab.IsSelected && IsVisible);
             FocusDatePageHeader();
 
             if (Tabs.SelectedIndex == (int)MainPage.About)
@@ -173,6 +177,7 @@ public partial class MainWindow : Window
         }
 
         args.Cancel = true;
+        ((CalendarViewModel)DataContext).CalendarBrowser.SetActive(false);
         Hide();
         HiddenToTray?.Invoke();
     }

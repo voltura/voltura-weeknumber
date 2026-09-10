@@ -51,7 +51,7 @@ Run `scripts/verify.ps1` to include signing and release-workflow regression chec
 
 ## UI captures
 
-Use a separate profile so normal settings are unaffected. The capture writes the current English main window in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits.
+Use a separate profile so normal settings are unaffected. The capture writes the main window and Calendar year, month, and week views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
 
 ```powershell
 $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'

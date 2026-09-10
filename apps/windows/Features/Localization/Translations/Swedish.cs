@@ -7,6 +7,14 @@ internal static class Swedish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Föregående år",
+            ["NextYear"] = "Nästa år",
+            ["PreviousMonth"] = "Föregående månad",
+            ["NextMonth"] = "Nästa månad",
+            ["ChooseMonth"] = "Välj en månad för att visa kalendern.",
+            ["ChooseWeek"] = "Välj en vecka för att visa dess datum.",
+            ["CurrentWeek"] = "Aktuell vecka",
+            ["CalendarUnavailable"] = "Perioden är inte tillgänglig med de valda kalenderreglerna.",
             ["CopyWeekReference"] = "Kopiera veckoreferens",
             ["CopyFormats"] = "Kopieringsformat",
             ["CopyIso"] = "Kopiera ISO",

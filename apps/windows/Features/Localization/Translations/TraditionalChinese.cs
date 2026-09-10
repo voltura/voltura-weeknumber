@@ -7,6 +7,14 @@ internal static class TraditionalChinese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "上一年",
+            ["NextYear"] = "下一年",
+            ["PreviousMonth"] = "上個月",
+            ["NextMonth"] = "下個月",
+            ["ChooseMonth"] = "選取月份以查看月曆。",
+            ["ChooseWeek"] = "選取週以查看日期。",
+            ["CurrentWeek"] = "本週",
+            ["CalendarUnavailable"] = "所選日曆規則不支援此期間。",
             ["CopyWeekReference"] = "複製週次資訊",
             ["CopyFormats"] = "複製格式",
             ["CopyIso"] = "複製 ISO 格式",

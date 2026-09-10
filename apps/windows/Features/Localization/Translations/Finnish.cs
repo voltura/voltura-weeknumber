@@ -7,6 +7,14 @@ internal static class Finnish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["PreviousYear"] = "Edellinen vuosi",
+            ["NextYear"] = "Seuraava vuosi",
+            ["PreviousMonth"] = "Edellinen kuukausi",
+            ["NextMonth"] = "Seuraava kuukausi",
+            ["ChooseMonth"] = "Näytä kalenteri valitsemalla kuukausi.",
+            ["ChooseWeek"] = "Näytä päivämäärät valitsemalla viikko.",
+            ["CurrentWeek"] = "Kuluva viikko",
+            ["CalendarUnavailable"] = "Jakso ei ole käytettävissä valituilla kalenterisäännöillä.",
             ["CopyWeekReference"] = "Kopioi viikkoviite",
             ["CopyFormats"] = "Kopiointimuodot",
             ["CopyIso"] = "Kopioi ISO-muodossa",
