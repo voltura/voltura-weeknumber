@@ -5,6 +5,7 @@
     <p class="hero-lede">Voltura WeekNumber keeps the current week number visible in your notification area, right beside the Windows clock.</p>
     <div class="hero-actions">
       <a class="button button-primary" href="https://github.com/voltura/voltura-weeknumber/releases/latest">Download for Windows</a>
+      <a class="button button-secondary" href="https://youtu.be/vaAMrb807Qg">Watch the walkthrough</a>
       <a class="button button-secondary" href="https://github.com/voltura/voltura-weeknumber/releases">Release notes</a>
     </div>
     <p class="hero-meta">Windows <span aria-hidden="true">·</span> Free and open source <span aria-hidden="true">·</span> No account</p>
