@@ -138,6 +138,20 @@ public partial class App : System.Windows.Application
                     _runtime.Window.UpdateLayout();
                     await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                     Capture(_runtime.Window, Path.Combine(output, "window-" + theme + ".png"));
+                    _runtime.Window.Open(MainPage.DateSpan);
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(_runtime.Window, Path.Combine(output, "date-span-" + theme + ".png"));
+
+                    var reviewWidth = _runtime.Window.Width;
+
+                    _runtime.Window.Width = _runtime.Window.MinWidth;
+                    _runtime.Window.UpdateLayout();
+                    await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                    Capture(
+                        _runtime.Window,
+                        Path.Combine(output, "date-span-narrow-" + theme + ".png")
+                    );
+                    _runtime.Window.Width = reviewWidth;
                     _runtime.Window.Open(MainPage.Calendar);
 
                     var browser = _runtime.Model.CalendarBrowser;

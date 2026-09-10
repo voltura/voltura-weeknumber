@@ -1,5 +1,5 @@
 <Window x:Class="VolturaWeekNumber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui"
-  Title="Voltura WeekNumber" Width="720" Height="640" MinWidth="560" MinHeight="280" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
+  Title="Voltura WeekNumber" Width="800" Height="640" MinWidth="560" MinHeight="280" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" UseLayoutRounding="True" SnapsToDevicePixels="True">
   <Window.Resources>
     <Style x:Key="HeaderPinToggle" TargetType="ToggleButton">
       <Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/>
@@ -39,7 +39,7 @@
         <Style TargetType="TabItem">
           <Setter Property="Height" Value="40"/>
           <Setter Property="Margin" Value="0,0,2,0"/>
-          <Setter Property="Padding" Value="12,0"/>
+          <Setter Property="Padding" Value="8,0"/>
           <Setter Property="Background" Value="Transparent"/>
           <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
           <Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="2"/>
@@ -156,6 +156,9 @@
       </TabItem>
       <TabItem x:Name="CalendarTab" Header="{Binding [Calendar], Source={x:Static ui:Strings.Current}}">
         <ui:CalendarBrowserPage x:Name="CalendarPage"/>
+      </TabItem>
+      <TabItem Header="{Binding [DateSpanTab], Source={x:Static ui:Strings.Current}}">
+        <ui:DateSpanPage x:Name="DateSpanPage" DataContext="{Binding DateSpan}"/>
       </TabItem>
       <TabItem Header="{Binding [OrdinalTab], Source={x:Static ui:Strings.Current}}">
         <ui:DateLookupPage DataContext="{Binding DayOfYear}"/>

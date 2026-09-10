@@ -27,6 +27,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     public WeekLookupViewModel WeekLookup { get; } = new();
     internal CalendarBrowserViewModel CalendarBrowser { get; } = new();
+    public DateSpanViewModel DateSpan { get; } = new();
     public DateLookupViewModel DayOfYear { get; } = new(false);
     public DateLookupViewModel JulianDay { get; } = new(true);
     public SettingsEditor Editor { get; } = new();
@@ -162,6 +163,7 @@ public sealed class CalendarViewModel : INotifyPropertyChanged
 
         DayOfYear.Refresh(today);
         JulianDay.Refresh(today);
+        DateSpan.Refresh(today);
         CalendarBrowser.Refresh(today);
 
         var strings = Strings.Current;

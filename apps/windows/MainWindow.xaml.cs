@@ -16,6 +16,7 @@ public enum MainPage
 {
     WeekNumber,
     Calendar,
+    DateSpan,
     DayOfYear,
     JulianDay,
     Preferences,

@@ -18,7 +18,7 @@
       </div>
     </div>
     <figure class="app-window">
-      <img src="docs/images/voltura-weeknumber.png" width="708" height="605" alt="Voltura WeekNumber showing the current week and the Always on top pin">
+      <img src="docs/images/voltura-weeknumber.png" width="788" height="605" alt="Voltura WeekNumber showing the current week, date tools, and the Always on top pin">
       <figcaption>The calendar is there when you need more than a glance.</figcaption>
     </figure>
   </div>
@@ -39,7 +39,7 @@
     <article class="feature-card">
       <span class="feature-number">02</span>
       <h3>Any date, one click away</h3>
-      <p>Browse the year’s week numbers and date ranges in Calendar, then open a month or week for a closer look. Move week by week, jump a number of weeks from today, or find a week’s date range, day of the year, or Julian day number. Copy week references in ISO, short, or localized formats, and pin the window above other apps while you plan.</p>
+      <p>Browse the year’s week numbers and date ranges in Calendar, then open a month or week for a closer look. Compare two dates by calendar days, weekdays, weekend days, and whole weeks. Move week by week, jump a number of weeks from today, or find a week’s date range, day of the year, or Julian day number. Copy week references in ISO, short, or localized formats, and pin the window above other apps while you plan.</p>
     </article>
     <article class="feature-card">
       <span class="feature-number">03</span>

@@ -8,7 +8,7 @@ Run commands from the repository root on Windows. See [Contributing](../CONTRIBU
 ./scripts/build.ps1
 ```
 
-This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date conversions, midnight scheduling, notification deduplication, settings persistence and language import/export, Windows-language detection (including Chinese scripts and regions), translation completeness, localized runtime and tray states, the always-on-top controls, minimum-width button labels, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
+This builds Release with locked dependencies and runs the Microsoft.Testing.Platform xUnit suite. Tests cover calendar boundaries and rules, date-span and date conversions, midnight scheduling, notification deduplication, settings persistence and language import/export, Windows-language detection (including Chinese scripts and regions), translation completeness, localized runtime and tray states, the always-on-top controls, minimum-width button labels, icon frames, UI state, monitor placement, and signed update handling with simulated HTTP responses.
 
 For installer or packaging changes:
 
@@ -51,7 +51,7 @@ Run `scripts/verify.ps1` to include signing and release-workflow regression chec
 
 ## UI captures
 
-Use a separate profile so normal settings are unaffected. The capture writes the main window and Calendar year, month, and week views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
+Use a separate profile so normal settings are unaffected. The capture writes the main window, default- and minimum-width Date span views, and Calendar year, month, and week views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
 
 ```powershell
 $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
