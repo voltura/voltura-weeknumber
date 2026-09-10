@@ -39,12 +39,52 @@
     <article class="feature-card">
       <span class="feature-number">02</span>
       <h3>Any date, one click away</h3>
-      <p>Browse the year’s week numbers and date ranges in Calendar, then open a month or week for a closer look. Compare two dates by calendar days, weekdays, weekend days, and whole weeks. Move week by week, jump a number of weeks from today, or find a week’s date range, day of the year, or Julian day number. Copy week references in ISO, short, or localized formats, and pin the window above other apps while you plan.</p>
+      <p>Choose any date to see its week number, then return to today with one click.</p>
     </article>
     <article class="feature-card">
       <span class="feature-number">03</span>
       <h3>Your calendar rules</h3>
       <p>Follow Windows, use ISO 8601, or choose your own week rules.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section capabilities" aria-labelledby="capabilities-title">
+  <div class="section-heading">
+    <p class="eyebrow">More when you need it</p>
+    <h2 id="capabilities-title">Useful tools. Kept simple.</h2>
+    <p>Open the app for deeper calendar and date work.</p>
+  </div>
+  <div class="capability-grid">
+    <article class="capability-card">
+      <span class="capability-kicker">Browse</span>
+      <h3>Calendar</h3>
+      <p>Browse years, months, and weeks with clear week numbers and date ranges.</p>
+    </article>
+    <article class="capability-card">
+      <span class="capability-kicker">Compare</span>
+      <h3>Date span</h3>
+      <p>Compare two dates by calendar days, weekdays, weekend days, or whole weeks.</p>
+    </article>
+    <article class="capability-card">
+      <span class="capability-kicker">Navigate</span>
+      <h3>Week navigation</h3>
+      <p>Move one week at a time, or jump a chosen number of weeks from today.</p>
+    </article>
+    <article class="capability-card">
+      <span class="capability-kicker">Reference</span>
+      <h3>Find and copy</h3>
+      <p>Find a week’s date range, then copy its ISO, short, or localized reference.</p>
+    </article>
+    <article class="capability-card">
+      <span class="capability-kicker">Convert</span>
+      <h3>Date tools</h3>
+      <p>Find a date’s day-of-year or Julian day number.</p>
+    </article>
+    <article class="capability-card">
+      <span class="capability-kicker">Pin</span>
+      <h3>Always on top</h3>
+      <p>Keep the window above your other apps while you plan.</p>
     </article>
   </div>
 </section>

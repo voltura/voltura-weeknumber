@@ -348,6 +348,40 @@ main {
   color: var(--muted);
 }
 
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.capability-card {
+  min-height: 190px;
+  padding: 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(23, 29, 33, 0.72);
+}
+
+.capability-kicker {
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.capability-card h3 {
+  margin: 2.3rem 0 0.45rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.025em;
+}
+
+.capability-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .essentials {
   display: grid;
   grid-template-columns: 0.75fr 1.25fr;
@@ -590,6 +624,10 @@ main {
     margin-inline: auto;
   }
 
+  .capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .essentials,
   .download {
     grid-template-columns: 1fr;
@@ -671,6 +709,7 @@ main {
   }
 
   .feature-grid,
+  .capability-grid,
   .essentials-grid {
     grid-template-columns: 1fr;
   }
