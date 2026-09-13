@@ -7,6 +7,10 @@ internal static class Finnish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "Vie vuosi {0}…",
+            ["ExportMonthFormat"] = "Vie kuukausi {0}…",
+            ["ExportWeekFormat"] = "Vie {0} alkava viikko…",
+            ["CalendarExportFailed"] = "Kalenteritiedostoa ei voitu tallentaa. Kokeile toista sijaintia.",
             ["WeeksFormat"] = "Viikot {0}",
             ["PinCalendar"] = "Kiinnitä kalenteri",
             ["PreviousDecade"] = "Edellinen vuosikymmen",

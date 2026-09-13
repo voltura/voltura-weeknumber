@@ -83,12 +83,12 @@
           <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate><DataTemplate>
             <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="76"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-              <Border Padding="4,0" Margin="0,4,4,4" BorderThickness="3,0,0,0" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
-                <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent"/><Style.Triggers><DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></DataTrigger></Style.Triggers></Style></Border.Style>
+              <Border ui:CalendarExportActions.Target="Week" Focusable="True" Background="Transparent" Padding="4,0" Margin="0,4,4,4" BorderThickness="3,0,0,0" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
+                <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent"/><Style.Triggers><DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></DataTrigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource TextBrush}"/></Trigger></Style.Triggers></Style></Border.Style>
                 <TextBlock Text="{Binding CompactNumberText}" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
               </Border>
               <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
-                <RadioButton Style="{StaticResource CalendarDay}" GroupName="SelectedCalendarDate" Click="DayClick" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
+                <RadioButton ui:CalendarExportActions.Target="Day" Style="{StaticResource CalendarDay}" GroupName="SelectedCalendarDate" Click="DayClick" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
                   <RadioButton.IsChecked><MultiBinding Converter="{x:Static ui:TrayCalendarWindow.DatesMatch}" Mode="OneWay"><Binding Path="Date"/><Binding Path="SelectedDate" RelativeSource="{RelativeSource AncestorType=ui:TrayCalendarWindow}"/></MultiBinding></RadioButton.IsChecked>
                   <TextBlock Text="{Binding Number}" Style="{StaticResource DayText}"/>
                 </RadioButton>
@@ -100,7 +100,7 @@
       </Grid>
       <ItemsControl x:Name="PickerItems" Grid.Row="1" Margin="0,12,0,8" ItemsSource="{Binding Items}" Visibility="{Binding IsPicker, Converter={StaticResource VisibleIf}}">
         <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" Rows="4"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate><DataTemplate><Button Style="{StaticResource Picker}" IsEnabled="{Binding IsEnabled}" Click="PickerClick" AutomationProperties.Name="{Binding TooltipText}" ToolTip="{Binding TooltipText}">
+        <ItemsControl.ItemTemplate><DataTemplate><Button Style="{StaticResource Picker}" IsEnabled="{Binding IsEnabled}" Click="PickerClick" ui:CalendarExportActions.Target="Picker" AutomationProperties.Name="{Binding TooltipText}" ToolTip="{Binding TooltipText}">
           <StackPanel VerticalAlignment="Center">
             <TextBlock Text="{Binding Label}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" TextAlignment="Center"/>
             <TextBlock Text="{Binding WeekRange}" FontSize="11" TextAlignment="Center" Margin="0,2,0,0" Visibility="{Binding HasWeekRange, Converter={StaticResource VisibleIf}}">
@@ -118,7 +118,12 @@
       <ToggleButton x:Name="CalendarPin" Grid.Row="2" HorizontalAlignment="Left" Style="{StaticResource HeaderPinToggle}" ToolTip="{Binding [PinCalendar], Source={x:Static ui:Strings.Current}}" AutomationProperties.Name="{Binding [PinCalendar], Source={x:Static ui:Strings.Current}}">
         <TextBlock Text="&#xE718;" Style="{StaticResource ButtonGlyph}" FontSize="16" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"><TextBlock.RenderTransform><TranslateTransform Y="-1"/></TextBlock.RenderTransform></TextBlock>
       </ToggleButton>
-      <Button x:Name="TodayButton" Grid.Row="2" Width="Auto" HorizontalAlignment="Right" MinWidth="96" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+      <ui:SpacingStackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+        <Button x:Name="ExportButton" Width="40" Padding="0" Click="ExportClick" Visibility="{Binding CanExport, Converter={StaticResource VisibleIf}}" ToolTip="{Binding ExportLabel}" AutomationProperties.Name="{Binding ExportLabel}"><TextBlock Text="&#xEDE1;" Style="{StaticResource ButtonGlyph}"/></Button>
+        <Button x:Name="TodayButton" Width="Auto" MinWidth="100" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
+          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="&#xE8D1;" Style="{StaticResource ButtonGlyph}"/><TextBlock Text="{Binding [Today], Source={x:Static ui:Strings.Current}}"/></ui:SpacingStackPanel>
+        </Button>
+      </ui:SpacingStackPanel>
     </Grid>
   </Border>
 </Window>

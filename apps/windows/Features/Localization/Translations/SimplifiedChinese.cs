@@ -7,6 +7,10 @@ internal static class SimplifiedChinese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "导出 {0} 年…",
+            ["ExportMonthFormat"] = "导出 {0} 月份…",
+            ["ExportWeekFormat"] = "导出从 {0} 开始的一周…",
+            ["CalendarExportFailed"] = "无法保存日历文件。请尝试其他位置。",
             ["WeeksFormat"] = "第{0}周",
             ["PinCalendar"] = "固定日历",
             ["PreviousDecade"] = "上十年",

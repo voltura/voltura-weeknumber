@@ -7,6 +7,10 @@ internal static class Japanese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "{0} 年をエクスポート…",
+            ["ExportMonthFormat"] = "{0} をエクスポート…",
+            ["ExportWeekFormat"] = "{0} からの週をエクスポート…",
+            ["CalendarExportFailed"] = "カレンダーファイルを保存できませんでした。別の場所をお試しください。",
             ["WeeksFormat"] = "第{0}週",
             ["PinCalendar"] = "カレンダーを固定",
             ["PreviousDecade"] = "前の10年",

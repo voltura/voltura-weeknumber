@@ -21,6 +21,11 @@ internal sealed record CalendarMonthItem(DateOnly Date, string Name, string Acce
 internal sealed class CalendarBrowserViewModel : INotifyPropertyChanged
 {
     private CalendarOptions _options = new();
+    internal CalendarOptions Options => _options;
+    internal CalendarExportRequest ExportRequest => CalendarExportActions.Normalize(new((CalendarExportScope)Zoom, Anchor), _options);
+    public string ExportLabel => HasPeriod
+        ? CalendarExportActions.Label(ExportRequest)
+        : Strings.Current["CalendarUnavailable"];
     private DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
     private bool _followingToday = true;
     private bool _active;

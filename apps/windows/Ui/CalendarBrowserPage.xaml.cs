@@ -47,6 +47,8 @@ public partial class CalendarBrowserPage : System.Windows.Controls.UserControl
     }
     private void PreviousClick(object sender, RoutedEventArgs args) => Model.Move(-1);
     private void NextClick(object sender, RoutedEventArgs args) => Model.Move(1);
+    private void ExportClick(object sender, RoutedEventArgs args) =>
+        CalendarExportActions.Export(Window.GetWindow(this), Model.ExportRequest, Model.Options);
     private void TodayClick(object sender, RoutedEventArgs args)
     {
         Model.Today();
@@ -55,6 +57,7 @@ public partial class CalendarBrowserPage : System.Windows.Controls.UserControl
             if (Model.IsYear && Model.HasPeriod)
             {
                 YearMonths.UpdateLayout();
+
                 var month = Model.Months.FirstOrDefault(item => item.Date.Month == Model.Anchor.Month);
 
                 if (month is not null

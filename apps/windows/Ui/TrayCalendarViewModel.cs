@@ -28,6 +28,11 @@ internal sealed class TrayCalendarViewModel : INotifyPropertyChanged
     public IReadOnlyList<CalendarPickerItem> Items { get; private set; } = [];
     internal DateOnly TodayDate => _today;
     public bool IsMonth => View == TrayCalendarView.Month;
+    public bool CanExport => View != TrayCalendarView.Decade;
+    internal CalendarExportRequest ExportRequest => new(IsMonth
+        ? CalendarExportScope.Month
+        : CalendarExportScope.Year, Anchor);
+    public string ExportLabel => CalendarExportActions.Label(ExportRequest);
     public bool IsPicker => !IsMonth;
     public bool CanZoomOut => View != TrayCalendarView.Decade;
     public string Heading => View switch

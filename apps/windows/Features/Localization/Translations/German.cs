@@ -7,6 +7,10 @@ internal static class German
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "Jahr {0} exportieren…",
+            ["ExportMonthFormat"] = "Monat {0} exportieren…",
+            ["ExportWeekFormat"] = "Woche ab {0} exportieren…",
+            ["CalendarExportFailed"] = "Die Kalenderdatei konnte nicht gespeichert werden. Versuchen Sie einen anderen Speicherort.",
             ["WeeksFormat"] = "Wochen {0}",
             ["PinCalendar"] = "Kalender anheften",
             ["PreviousDecade"] = "Vorheriges Jahrzehnt",

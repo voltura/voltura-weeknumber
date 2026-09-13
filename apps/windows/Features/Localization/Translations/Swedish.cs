@@ -7,6 +7,10 @@ internal static class Swedish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "Exportera år {0}…",
+            ["ExportMonthFormat"] = "Exportera månad {0}…",
+            ["ExportWeekFormat"] = "Exportera veckan som börjar {0}…",
+            ["CalendarExportFailed"] = "Kalenderfilen kunde inte sparas. Försök med en annan plats.",
             ["WeeksFormat"] = "Veckor {0}",
             ["PinCalendar"] = "Fäst kalendern",
             ["PreviousDecade"] = "Föregående årtionde",

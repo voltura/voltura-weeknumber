@@ -7,6 +7,10 @@ internal static class Indonesian
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "Ekspor tahun {0}…",
+            ["ExportMonthFormat"] = "Ekspor bulan {0}…",
+            ["ExportWeekFormat"] = "Ekspor minggu mulai {0}…",
+            ["CalendarExportFailed"] = "File kalender tidak dapat disimpan. Coba lokasi lain.",
             ["WeeksFormat"] = "Minggu {0}",
             ["PinCalendar"] = "Sematkan kalender",
             ["PreviousDecade"] = "Dekade sebelumnya",

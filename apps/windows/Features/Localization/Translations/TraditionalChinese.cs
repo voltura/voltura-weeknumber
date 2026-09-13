@@ -7,6 +7,10 @@ internal static class TraditionalChinese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "匯出 {0} 年…",
+            ["ExportMonthFormat"] = "匯出 {0} 月份…",
+            ["ExportWeekFormat"] = "匯出從 {0} 開始的一週…",
+            ["CalendarExportFailed"] = "無法儲存行事曆檔案。請嘗試其他位置。",
             ["WeeksFormat"] = "第{0}週",
             ["PinCalendar"] = "固定行事曆",
             ["PreviousDecade"] = "上十年",

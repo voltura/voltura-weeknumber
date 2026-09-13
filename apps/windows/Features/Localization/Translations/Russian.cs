@@ -7,6 +7,10 @@ internal static class Russian
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "Экспорт года {0}…",
+            ["ExportMonthFormat"] = "Экспорт месяца {0}…",
+            ["ExportWeekFormat"] = "Экспорт недели с {0}…",
+            ["CalendarExportFailed"] = "Не удалось сохранить файл календаря. Выберите другое расположение.",
             ["WeeksFormat"] = "Недели {0}",
             ["PinCalendar"] = "Закрепить календарь",
             ["PreviousDecade"] = "Предыдущее десятилетие",

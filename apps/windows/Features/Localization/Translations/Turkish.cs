@@ -7,6 +7,10 @@ internal static class Turkish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "{0} yılını dışa aktar…",
+            ["ExportMonthFormat"] = "{0} ayını dışa aktar…",
+            ["ExportWeekFormat"] = "{0} tarihinde başlayan haftayı dışa aktar…",
+            ["CalendarExportFailed"] = "Takvim dosyası kaydedilemedi. Başka bir konum deneyin.",
             ["WeeksFormat"] = "Haftalar {0}",
             ["PinCalendar"] = "Takvimi sabitle",
             ["PreviousDecade"] = "Önceki on yıl",

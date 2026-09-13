@@ -51,6 +51,8 @@ Run `scripts/verify.ps1` to include signing and release-workflow regression chec
 
 ## UI captures
 
+Calendar export tests cover scope resolution, boundary weeks, regional/custom rules, iCalendar encoding, safe file replacement, and owned tray interactions. Set `VOLTURA_CALENDAR_REVIEW` to an artifact directory when running the tests to also write week/month/year/Unicode `.ics` samples and calendar layout captures. Before claiming compatibility with a calendar client, open a sample in a separate test calendar and verify the dates, all-day markers, free/busy behavior, and reminder state. Repeated-import handling belongs to the receiving client.
+
 Use a separate profile so normal settings are unaffected. The capture writes the main window, default- and minimum-width Date span views, and Calendar year, month, and week views plus tray month, year, and decade views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
 
 ```powershell

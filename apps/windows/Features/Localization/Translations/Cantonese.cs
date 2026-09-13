@@ -7,6 +7,10 @@ internal static class Cantonese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "匯出 {0} 年…",
+            ["ExportMonthFormat"] = "匯出 {0} 月份…",
+            ["ExportWeekFormat"] = "匯出由 {0} 開始嘅一週…",
+            ["CalendarExportFailed"] = "儲存唔到日曆檔案。請試下其他位置。",
             ["WeeksFormat"] = "第{0}週",
             ["PinCalendar"] = "固定月曆",
             ["PreviousDecade"] = "上十年",

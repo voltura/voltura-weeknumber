@@ -53,6 +53,7 @@ public sealed class TrayCalendarUiTests(WpfTestFixture fixture)
             window.Model.Refresh(new(CalendarMode.Iso), new(2026, 9, 13));
             window.Open(new(1000, 900, 20, 20));
             Idle(window);
+
             var initial = new Point(window.Left, window.Top);
 
             window.CalendarPin.IsChecked = pinned;

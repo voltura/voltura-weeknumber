@@ -43,6 +43,24 @@ public static class WeekCalculator
     internal static DayOfWeek FirstWeekday(CalendarOptions options, CultureInfo region) =>
         ResolveConvention(options, region).First;
 
+    internal static string ConventionIdentity(CalendarOptions options, CultureInfo region)
+    {
+        var (calendar, first, rule, iso) = ResolveConvention(options, region);
+
+        return iso
+            ? "ISO8601"
+            : FormattableString.Invariant($"{calendar.GetType().Name}|{(int)first}|{(int)rule}");
+    }
+
+    internal static CalendarWeekRule WeekRule(CalendarOptions options, CultureInfo region)
+    {
+        var convention = ResolveConvention(options, region);
+
+        return convention.Iso
+            ? CalendarWeekRule.FirstFourDayWeek
+            : convention.Rule;
+    }
+
     private static (System.Globalization.Calendar Calendar, DayOfWeek First, CalendarWeekRule Rule, bool Iso)
         ResolveConvention(CalendarOptions options, CultureInfo region)
     {

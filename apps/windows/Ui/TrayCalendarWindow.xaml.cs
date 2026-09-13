@@ -14,6 +14,33 @@ namespace VolturaWeekNumber.Ui;
 public partial class TrayCalendarWindow : Window
 {
     private bool _exit;
+    private int _exportInteractions;
+    internal IDisposable BeginExportInteraction()
+    {
+        _exportInteractions++;
+
+        return new ExportInteraction(this);
+    }
+
+    private sealed class ExportInteraction(TrayCalendarWindow owner) : IDisposable
+    {
+        private bool _disposed;
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            owner._exportInteractions--;
+
+            if (!owner.IsActive)
+            {
+                owner.DismissOnDeactivate();
+            }
+        }
+    }
     public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register(
         nameof(SelectedDate), typeof(DateOnly?), typeof(TrayCalendarWindow));
     public DateOnly? SelectedDate
@@ -53,7 +80,7 @@ public partial class TrayCalendarWindow : Window
 
     internal void DismissOnDeactivate()
     {
-        if (IsVisible && !IsPinned)
+        if (IsVisible && !IsPinned && _exportInteractions == 0)
         {
             Dismissed?.Invoke();
             Hide();
@@ -122,6 +149,8 @@ public partial class TrayCalendarWindow : Window
     }
     private void PreviousClick(object sender, RoutedEventArgs args) => Model.Move(-1);
     private void NextClick(object sender, RoutedEventArgs args) => Model.Move(1);
+    private void ExportClick(object sender, RoutedEventArgs args) =>
+        CalendarExportActions.Export(this, Model.ExportRequest, Model.Month.Options);
     private void TodayClick(object sender, RoutedEventArgs args)
     {
         Model.Today();

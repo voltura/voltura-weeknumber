@@ -7,6 +7,10 @@ internal static class Korean
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["ExportYearFormat"] = "{0}년 내보내기…",
+            ["ExportMonthFormat"] = "{0} 내보내기…",
+            ["ExportWeekFormat"] = "{0}에 시작하는 주 내보내기…",
+            ["CalendarExportFailed"] = "달력 파일을 저장하지 못했습니다. 다른 위치를 선택해 보세요.",
             ["WeeksFormat"] = "{0}주",
             ["PinCalendar"] = "달력 고정",
             ["PreviousDecade"] = "이전 10년",

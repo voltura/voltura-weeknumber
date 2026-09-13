@@ -60,6 +60,7 @@
     <p>Click the heading to browse months, then decades. Each month shows its week range, and all week numbers follow your existing calendar preferences.</p>
     <p>Select a date without losing sight of today. Pin the calendar to keep it above other windows while you plan, independently of the main window. Drag the calendar’s top area to position it beside your work. Reopening restores its default position.</p>
     <p>Click the icon again or press Escape to hide it. Clicking elsewhere also closes it when it isn’t pinned.</p>
+    <p>Take your week numbers into another calendar. Export the displayed month or year with the button beside Today, or right-click a date or week to choose a period. <a href="#calendar-export">Learn about calendar export.</a></p>
   </div>
   <figure class="app-window">
     <img src="docs/images/voltura-weeknumber-tray-calendar-dark.png" width="440" height="456" alt="Compact calendar in dark mode with week numbers beside each row, an outlined selected date, a filled highlight for today, and a calendar pin" loading="lazy">
@@ -75,8 +76,8 @@
   <div class="capability-grid">
     <article class="capability-card">
       <span class="capability-kicker">Browse</span>
-      <h3>Calendar</h3>
-      <p>Browse years, months, and weeks with clear week numbers and date ranges. Pin the window on top while you plan.</p>
+      <h3>Calendar and export</h3>
+      <p>Browse years, months, and weeks with clear week numbers and date ranges. Pin the window on top while you plan, or save week-number markers as an iCalendar (.ics) file to import into another calendar.</p>
     </article>
     <article class="capability-card">
       <span class="capability-kicker">Compare</span>
@@ -158,6 +159,14 @@
 </section>
 
 <section class="section details" aria-label="More information">
+  <details id="calendar-export">
+    <summary>Export week numbers to your calendar</summary>
+    <div class="detail-body">
+      <p>In the main Calendar view, use the export button beside Today to save the displayed year, month, or week as an iCalendar (.ics) file. The compact tray calendar exports the displayed month or year. Right-click a month, date, or week row for more export choices; keyboard users can press Shift+F10 or the Menu key on a focused item.</p>
+      <p>Each week becomes a single all-day marker on its first day, following your ISO, Windows regional, or custom week rules. The description includes the week’s date range and rules. Month and year exports include only weeks that start within that period. Markers leave your time free and contain no reminders.</p>
+      <p>Choose where to save the file, then open or import it in a calendar app that supports iCalendar. Export works offline and needs no account. It saves a file without connecting or synchronizing calendars; repeated imports are handled by your calendar app.</p>
+    </div>
+  </details>
   <details>
     <summary>Languages and personalization</summary>
     <div class="detail-body">
