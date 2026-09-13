@@ -7,6 +7,10 @@ internal static class Dutch
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "Weken {0}",
+            ["PinCalendar"] = "Kalender vastzetten",
+            ["PreviousDecade"] = "Vorig decennium",
+            ["NextDecade"] = "Volgend decennium",
             ["PreviousYear"] = "Vorig jaar",
             ["NextYear"] = "Volgend jaar",
             ["PreviousMonth"] = "Vorige maand",

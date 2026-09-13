@@ -7,6 +7,10 @@ internal static class Turkish
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "Haftalar {0}",
+            ["PinCalendar"] = "Takvimi sabitle",
+            ["PreviousDecade"] = "Önceki on yıl",
+            ["NextDecade"] = "Sonraki on yıl",
             ["PreviousYear"] = "Önceki yıl",
             ["NextYear"] = "Sonraki yıl",
             ["PreviousMonth"] = "Önceki ay",

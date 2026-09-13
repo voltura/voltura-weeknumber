@@ -235,7 +235,7 @@ public sealed class AlwaysOnTopTests(WpfTestFixture fixture)
     }
 
     [Fact]
-    public void SelectedTabsMatchTheActivePinAndTheGlyphIsLifted()
+    public void SelectedTabsShareTheActivePinColorsAndTheGlyphIsLifted()
     {
         fixture.Run(() =>
         {
@@ -258,6 +258,8 @@ public sealed class AlwaysOnTopTests(WpfTestFixture fixture)
                 var glyph = Assert.IsType<TextBlock>(pin.Content);
 
                 Assert.Equal(-1, Assert.IsType<TranslateTransform>(glyph.RenderTransform).Y);
+                Assert.Same(pin.Foreground, glyph.Foreground);
+                Assert.Equal(new Thickness(1), pinChrome.BorderThickness);
 
                 foreach (var tab in tabs.Items.OfType<TabItem>())
                 {
@@ -270,8 +272,6 @@ public sealed class AlwaysOnTopTests(WpfTestFixture fixture)
                     );
 
                     Assert.Equal(pinChrome.Background, tabChrome.Background);
-                    Assert.Equal(pinChrome.BorderBrush, tabChrome.BorderBrush);
-                    Assert.Equal(pinChrome.BorderThickness, tabChrome.BorderThickness);
                     Assert.Equal(pinChrome.CornerRadius, tabChrome.CornerRadius);
                     Assert.Equal(pin.Foreground, tab.Foreground);
                 }

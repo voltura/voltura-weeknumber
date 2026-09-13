@@ -1,9 +1,34 @@
 <Application x:Class="VolturaWeekNumber.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" ShutdownMode="OnExplicitShutdown" ThemeMode="System">
   <Application.Resources>
+    <Style x:Key="HeaderPinToggle" TargetType="ToggleButton">
+      <Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+      <Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Template"><Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger>
+            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource WindowBrush}"/></Trigger>
+            <Trigger Property="IsChecked" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource SurfaceBrush}"/></Trigger>
+            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value></Setter>
+    </Style>
     <SolidColorBrush x:Key="WindowBrush" Color="#F4F6FA"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="White"/>
+    <SolidColorBrush x:Key="CalendarRowBrush" Color="#FAFBFD"/>
+    <SolidColorBrush x:Key="CalendarRowBorderBrush" Color="#E1E6EF"/>
     <SolidColorBrush x:Key="TextBrush" Color="#17253B"/>
     <SolidColorBrush x:Key="MutedBrush" Color="#52627A"/>
+    <SolidColorBrush x:Key="OutsideMonthBrush" Color="#697586"/>
     <SolidColorBrush x:Key="AccentBrush" Color="#245CB4"/>
     <SolidColorBrush x:Key="AccentTextBrush" Color="White"/>
     <SolidColorBrush x:Key="BorderBrush" Color="#D9E0EB"/>

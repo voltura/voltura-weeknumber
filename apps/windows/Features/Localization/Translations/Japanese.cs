@@ -7,6 +7,10 @@ internal static class Japanese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "第{0}週",
+            ["PinCalendar"] = "カレンダーを固定",
+            ["PreviousDecade"] = "前の10年",
+            ["NextDecade"] = "次の10年",
             ["PreviousYear"] = "前年",
             ["NextYear"] = "翌年",
             ["PreviousMonth"] = "前月",

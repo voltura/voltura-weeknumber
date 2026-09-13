@@ -50,6 +50,22 @@
   </div>
 </section>
 
+<section class="section calendar-preview" aria-labelledby="tray-calendar-title">
+  <div class="calendar-copy">
+    <div class="section-heading">
+      <p class="eyebrow">A calendar beside the clock</p>
+      <h2 id="tray-calendar-title">Your calendar, one click away.</h2>
+      <p>Left-click the week-number icon to open a compact month calendar, with a clear week number beside every row.</p>
+    </div>
+    <p>Click the heading to browse months, then decades. Each month shows its week range, and all week numbers follow your existing calendar preferences.</p>
+    <p>Select a date without losing sight of today. Pin the calendar to keep it above other windows while you plan, independently of the main window. Drag the calendar’s top area to position it beside your work. Reopening restores its default position.</p>
+    <p>Click the icon again or press Escape to hide it. Clicking elsewhere also closes it when it isn’t pinned.</p>
+  </div>
+  <figure class="app-window">
+    <img src="docs/images/voltura-weeknumber-tray-calendar-dark.png" width="440" height="456" alt="Compact calendar in dark mode with week numbers beside each row, an outlined selected date, a filled highlight for today, and a calendar pin" loading="lazy">
+    <figcaption>Week numbers first. Today and your selected date stay easy to distinguish.</figcaption>
+  </figure>
+</section>
 <section class="section capabilities" aria-labelledby="capabilities-title">
   <div class="section-heading">
     <p class="eyebrow">More when you need it</p>
@@ -137,7 +153,7 @@
   <ol class="steps">
     <li><span>1</span><div><strong>Install and open</strong><p>Use an installer, or extract and open the portable version.</p></div></li>
     <li><span>2</span><div><strong>Find the calendar icon</strong><p>It appears beside the Windows clock or in the notification-area overflow.</p></div></li>
-    <li><span>3</span><div><strong>Glance—or open</strong><p>Read the week from the icon. Double-click it whenever you want the full calendar.</p></div></li>
+    <li><span>3</span><div><strong>Glance—or open</strong><p>Read the week from the icon. Left-click to open a compact calendar with week numbers; click again to hide it. Right-click for the main window and preferences.</p></div></li>
   </ol>
 </section>
 

@@ -7,6 +7,10 @@ internal static class Russian
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "Недели {0}",
+            ["PinCalendar"] = "Закрепить календарь",
+            ["PreviousDecade"] = "Предыдущее десятилетие",
+            ["NextDecade"] = "Следующее десятилетие",
             ["PreviousYear"] = "Предыдущий год",
             ["NextYear"] = "Следующий год",
             ["PreviousMonth"] = "Предыдущий месяц",

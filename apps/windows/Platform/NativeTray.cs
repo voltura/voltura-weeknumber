@@ -99,6 +99,13 @@ internal sealed partial class NativeTray : IDisposable
         {
             item.BackColor = renderer.Surface;
             item.ForeColor = renderer.Text;
+
+            if (item is Forms.ToolStripMenuItem)
+            {
+                var padding = item.Padding;
+
+                item.Padding = new Forms.Padding(padding.Left, padding.Top + 4, padding.Right, padding.Bottom + 4);
+            }
         }
 
         _menuAppearance = appearance;
@@ -292,9 +299,20 @@ internal sealed partial class NativeTray : IDisposable
         {
             var code = (int)(lParam.ToInt64() & 0xffff);
 
-            if (code is 0x203 or 0x401)
+            // Moving over the icon after a cancelled press starts a fresh interaction.
+            // Keyboard activation must not consume a pending mouse dismissal either.
+
+            if ((code == 0x200 && GetAsyncKeyState(1) >= 0) || code == 0x401)
             {
-                OpenRequested?.Invoke();
+                CalendarPointerIdle?.Invoke();
+            }
+
+            if (code is 0x400 or 0x401)
+            {
+                var position = wParam.ToInt64();
+
+                CalendarToggleRequested?.Invoke(CalendarAnchor(new System.Drawing.Point(
+                    (short)(position & 0xffff), (short)((position >> 16) & 0xffff))));
             }
             else if (code == 0x405)
             {

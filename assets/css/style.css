@@ -308,6 +308,25 @@ main {
   font-size: 1.08rem;
 }
 
+.calendar-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+
+.calendar-preview .section-heading {
+  margin-bottom: 1.5rem;
+}
+
+.calendar-copy > p {
+  color: var(--muted);
+}
+
+.calendar-preview .app-window {
+  width: min(440px, 100%);
+  justify-self: center;
+}
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -610,6 +629,10 @@ main {
 }
 
 @media (max-width: 900px) {
+  .calendar-preview {
+    grid-template-columns: 1fr;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;

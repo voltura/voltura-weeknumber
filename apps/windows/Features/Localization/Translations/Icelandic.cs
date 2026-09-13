@@ -7,6 +7,10 @@ internal static class Icelandic
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "Vikur {0}",
+            ["PinCalendar"] = "Festa dagatal",
+            ["PreviousDecade"] = "Fyrri áratugur",
+            ["NextDecade"] = "Næsti áratugur",
             ["PreviousYear"] = "Fyrra ár",
             ["NextYear"] = "Næsta ár",
             ["PreviousMonth"] = "Fyrri mánuður",

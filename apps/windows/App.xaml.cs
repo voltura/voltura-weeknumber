@@ -47,7 +47,9 @@ public partial class App : System.Windows.Application
                 ? AppPaths.ReadPathArgument(e.Args, "--render-review")
                 : null;
 
-            _instance = new SingleInstance(paths.Data);
+            _instance = new SingleInstance(paths.Isolated
+                ? paths.Data
+                : null);
 
             if (!_instance.IsFirst)
             {
@@ -171,6 +173,35 @@ public partial class App : System.Windows.Application
                         browser.ShowWeek(browser.Weeks.First(week => week.IsCurrent));
                         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
                         Capture(_runtime.Window, Path.Combine(output, "calendar-week-" + theme + ".png"));
+                    }
+
+                    var flyout = new Ui.TrayCalendarWindow();
+
+                    try
+                    {
+                        flyout.Model.Refresh(_runtime.Model.Editor.Value.Calendar, DateOnly.FromDateTime(DateTime.Today));
+                        flyout.Open(new System.Drawing.Rectangle(System.Windows.Forms.Cursor.Position, new System.Drawing.Size(1, 1)));
+
+                        foreach (var view in new[] { "month", "year", "decade" })
+                        {
+                            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                            Capture(flyout, Path.Combine(output, $"tray-calendar-{view}-{theme}.png"));
+
+                            if (view == "month")
+                            {
+                                flyout.SelectedDate = DateOnly.FromDateTime(DateTime.Today).AddDays(-3);
+                                flyout.CalendarPin.IsChecked = true;
+                                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+                                Capture(flyout, Path.Combine(output, $"tray-calendar-selected-{theme}.png"));
+                                flyout.CalendarPin.IsChecked = false;
+                            }
+
+                            flyout.Model.ZoomOut();
+                        }
+                    }
+                    finally
+                    {
+                        flyout.Exit();
                     }
 
                     _runtime.Window.Open(MainPage.Preferences);

@@ -74,6 +74,22 @@ internal static class ThemeManager
                     : 0xFFFFFFu)
         );
         SetBrush(
+            "CalendarRowBrush",
+            highContrast
+                ? SystemColors.WindowColor
+                : Rgb(dark
+                    ? 0x171E29u
+                    : 0xFAFBFDu)
+        );
+        SetBrush(
+            "CalendarRowBorderBrush",
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0x2B3545u
+                    : 0xE1E6EFu)
+        );
+        SetBrush(
             "TextBrush",
             highContrast
                 ? SystemColors.WindowTextColor
@@ -88,6 +104,14 @@ internal static class ThemeManager
                 : Rgb(dark
                     ? 0xB4C2D3u
                     : 0x52627Au)
+        );
+        SetBrush(
+            "OutsideMonthBrush",
+            highContrast
+                ? SystemColors.WindowTextColor
+                : Rgb(dark
+                    ? 0x7E8999u
+                    : 0x697586u)
         );
         SetBrush(
             "AccentBrush",

@@ -7,6 +7,10 @@ internal static class TraditionalChinese
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "第{0}週",
+            ["PinCalendar"] = "固定行事曆",
+            ["PreviousDecade"] = "上十年",
+            ["NextDecade"] = "下十年",
             ["PreviousYear"] = "上一年",
             ["NextYear"] = "下一年",
             ["PreviousMonth"] = "上個月",

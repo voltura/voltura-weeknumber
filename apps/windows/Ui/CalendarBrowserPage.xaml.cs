@@ -47,7 +47,28 @@ public partial class CalendarBrowserPage : System.Windows.Controls.UserControl
     }
     private void PreviousClick(object sender, RoutedEventArgs args) => Model.Move(-1);
     private void NextClick(object sender, RoutedEventArgs args) => Model.Move(1);
-    private void TodayClick(object sender, RoutedEventArgs args) => Model.Today();
+    private void TodayClick(object sender, RoutedEventArgs args)
+    {
+        Model.Today();
+        _ = Dispatcher.InvokeAsync(() =>
+        {
+            if (Model.IsYear && Model.HasPeriod)
+            {
+                YearMonths.UpdateLayout();
+                var month = Model.Months.FirstOrDefault(item => item.Date.Month == Model.Anchor.Month);
+
+                if (month is not null
+                    && YearMonths.ItemContainerGenerator.ContainerFromItem(month) is FrameworkElement card)
+                {
+                    card.BringIntoView();
+                }
+            }
+            else
+            {
+                CalendarScroll.ScrollToTop();
+            }
+        }, DispatcherPriority.Loaded);
+    }
 
     private void FocusNavigation()
     {

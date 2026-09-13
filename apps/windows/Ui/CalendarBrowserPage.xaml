@@ -5,6 +5,22 @@
       <Setter Property="Width" Value="Auto"/><Setter Property="Height" Value="Auto"/>
       <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Top"/>
     </Style>
+    <Style x:Key="MonthWeekButton" TargetType="Button" BasedOn="{StaticResource CalendarButton}">
+      <Setter Property="Background" Value="{DynamicResource CalendarRowBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource CalendarRowBorderBrush}"/>
+    </Style>
+    <Style x:Key="MonthDayMark" TargetType="Border">
+      <Setter Property="Width" Value="34"/><Setter Property="Height" Value="34"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="CornerRadius" Value="17"/>
+      <Style.Triggers><DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Background" Value="{DynamicResource AccentBrush}"/></DataTrigger></Style.Triggers>
+    </Style>
+    <Style x:Key="MonthDayNumber" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsOutsideMonth}" Value="True"><Setter Property="Foreground" Value="{DynamicResource OutsideMonthBrush}"/></DataTrigger>
+        <DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
     <Style x:Key="WeekMark" TargetType="Border">
       <Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="2,0,0,0"/>
       <Setter Property="Padding" Value="5,3,2,3"/>
@@ -28,7 +44,11 @@
   </UserControl.Resources>
   <ScrollViewer x:Name="CalendarScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <ui:SpacingStackPanel Spacing="12" Margin="0,20,12,4">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
       <WrapPanel x:Name="Breadcrumbs" Visibility="{Binding IsYear, Converter={x:Static ui:CalendarBrowserPage.HiddenWhenTrue}}">
+        <WrapPanel.Style><Style TargetType="WrapPanel"><Setter Property="Margin" Value="0,0,8,0"/><Style.Triggers><DataTrigger Binding="{Binding IsWeek}" Value="True"><Setter Property="Grid.ColumnSpan" Value="2"/><Setter Property="Margin" Value="0,0,0,12"/></DataTrigger></Style.Triggers></Style></WrapPanel.Style>
         <Button x:Name="YearBreadcrumb" Style="{StaticResource CalendarButton}" Height="40" Padding="12,8" Click="YearClick" AutomationProperties.Name="{Binding YearText}">
           <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="&#xE74A;" Style="{StaticResource ButtonGlyph}"/><TextBlock Text="{Binding YearText}"/></ui:SpacingStackPanel>
         </Button>
@@ -36,6 +56,7 @@
         <Button x:Name="MonthBreadcrumb" Style="{StaticResource CalendarButton}" Height="40" Padding="12,8" Click="MonthClick" Content="{Binding MonthText}" AutomationProperties.Name="{Binding MonthText}" Visibility="{Binding IsWeek, Converter={StaticResource VisibleIf}}"/>
       </WrapPanel>
       <Grid>
+        <Grid.Style><Style TargetType="Grid"><Setter Property="Grid.Column" Value="1"/><Style.Triggers><DataTrigger Binding="{Binding IsWeek}" Value="True"><Setter Property="Grid.Row" Value="1"/><Setter Property="Grid.Column" Value="0"/><Setter Property="Grid.ColumnSpan" Value="2"/></DataTrigger></Style.Triggers></Style></Grid.Style>
         <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <Button x:Name="PreviousPeriod" Width="40" Padding="0" Click="PreviousClick" IsEnabled="{Binding CanPrevious}" ToolTip="{Binding PreviousLabel}" AutomationProperties.Name="{Binding PreviousLabel}"><TextBlock Text="&#xE76B;" Style="{StaticResource ButtonGlyph}"/></Button>
         <TextBlock x:Name="PeriodTitle" Grid.Column="1" Text="{Binding Title}" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0" AutomationProperties.LiveSetting="Polite"/>
@@ -43,6 +64,7 @@
         <Button x:Name="TodayButton" Grid.Column="4" Width="Auto" MinWidth="100" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
           <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="&#xE8D1;" Style="{StaticResource ButtonGlyph}"/><TextBlock Text="{Binding [Today], Source={x:Static ui:Strings.Current}}"/></ui:SpacingStackPanel>
         </Button>
+      </Grid>
       </Grid>
       <TextBlock Text="{Binding ConventionText}" Style="{StaticResource Caption}"/>
       <TextBlock Text="{Binding ErrorText}" Visibility="{Binding HasPeriod, Converter={x:Static ui:CalendarBrowserPage.HiddenWhenTrue}}" AutomationProperties.LiveSetting="Polite"/>
@@ -75,11 +97,11 @@
           </Grid>
           <ItemsControl x:Name="MonthWeeks" ItemsSource="{Binding Weeks}">
             <ItemsControl.ItemTemplate><DataTemplate>
-              <Button Style="{StaticResource CalendarButton}" Margin="0,3" Padding="10,6" Click="OpenWeekClick" AutomationProperties.Name="{Binding AccessibleName}" ToolTip="{Binding RangeText}">
+              <Button Style="{StaticResource MonthWeekButton}" Margin="0,3" Padding="10,6" Click="OpenWeekClick" AutomationProperties.Name="{Binding AccessibleName}" ToolTip="{Binding RangeText}">
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="84"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                  <Border Style="{StaticResource WeekMark}" VerticalAlignment="Center"><TextBlock Text="{Binding NumberText}" Style="{StaticResource WeekLabel}" FontSize="12"/></Border>
-                  <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
-                    <Border Style="{StaticResource DayMark}" AutomationProperties.Name="{Binding AccessibleName}"><TextBlock Text="{Binding Number}" Style="{StaticResource DayNumber}"/></Border>
+                  <Border Style="{StaticResource WeekMark}" VerticalAlignment="Center"><TextBlock Text="{Binding NumberText}" Style="{StaticResource WeekLabel}" FontWeight="Bold" FontSize="12"/></Border>
+                  <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}" IsHitTestVisible="False" Focusable="False"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
+                    <Border Style="{StaticResource MonthDayMark}" AutomationProperties.Name="{Binding AccessibleName}"><TextBlock Text="{Binding Number}" Style="{StaticResource MonthDayNumber}"/></Border>
                   </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
                 </Grid>
               </Button>

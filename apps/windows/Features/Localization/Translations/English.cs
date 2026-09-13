@@ -7,6 +7,10 @@ internal static class English
     internal static FrozenDictionary<string, string> Entries { get; } =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["WeeksFormat"] = "Weeks {0}",
+            ["PinCalendar"] = "Pin calendar",
+            ["PreviousDecade"] = "Previous decade",
+            ["NextDecade"] = "Next decade",
             ["PreviousYear"] = "Previous year",
             ["NextYear"] = "Next year",
             ["PreviousMonth"] = "Previous month",

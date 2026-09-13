@@ -10,7 +10,10 @@ internal sealed record CalendarDayItem(DateOnly? Date, string Number, string Wee
     string AccessibleName, bool IsToday, bool IsOutsideMonth);
 
 internal sealed record CalendarWeekItem(CalendarWeek Week, string NumberText, string RangeText,
-    string AccessibleName, bool IsCurrent, IReadOnlyList<CalendarDayItem> Days);
+    string AccessibleName, bool IsCurrent, IReadOnlyList<CalendarDayItem> Days)
+{
+    public string CompactNumberText => string.Join(" / ", Week.Numbers.Select(number => number.ToString("D2", CultureInfo.InvariantCulture)));
+}
 
 internal sealed record CalendarMonthItem(DateOnly Date, string Name, string AccessibleName,
     IReadOnlyList<CalendarWeekItem> Weeks);

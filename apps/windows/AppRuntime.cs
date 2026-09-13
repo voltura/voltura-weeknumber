@@ -24,6 +24,8 @@ internal sealed class AppRuntime : IAsyncDisposable
     private readonly DispatcherTimer _midnight;
     private readonly NativeTray _tray;
     private readonly SemaphoreSlim _actions = new(1, 1);
+    private TrayCalendarWindow? _calendarFlyout;
+    private bool _calendarDismissedByTrayClick;
     private bool _hiddenExplained;
     private volatile bool _shuttingDown;
     private bool _settingsDamaged;
@@ -60,6 +62,8 @@ internal sealed class AppRuntime : IAsyncDisposable
         _midnight = new DispatcherTimer(DispatcherPriority.Background, Window.Dispatcher);
         _midnight.Tick += OnMidnight;
         _tray.OpenRequested += Open;
+        _tray.CalendarToggleRequested += ToggleCalendar;
+        _tray.CalendarPointerIdle += ResetCalendarDismissal;
         _tray.PreferencesRequested += Preferences;
         _tray.ExitRequested += RequestExit;
         _tray.DisplayChanged += QueueRefresh;
@@ -125,6 +129,43 @@ internal sealed class AppRuntime : IAsyncDisposable
         {
             Window.Open();
         }
+    }
+
+    private void ToggleCalendar(System.Drawing.Rectangle anchor)
+    {
+        if (_shuttingDown)
+        {
+            return;
+        }
+
+        if (_calendarDismissedByTrayClick)
+        {
+            _calendarDismissedByTrayClick = false;
+
+            return;
+        }
+
+        if (_calendarFlyout is { IsVisible: true })
+        {
+            _calendarFlyout.Hide();
+
+            return;
+        }
+
+        _calendarFlyout ??= CreateCalendarFlyout();
+        _calendarFlyout.Model.Refresh(_settings.Current.Calendar, DateOnly.FromDateTime(DateTime.Today));
+        _calendarFlyout.Open(anchor);
+    }
+
+    private void ResetCalendarDismissal() => _calendarDismissedByTrayClick = false;
+
+    private TrayCalendarWindow CreateCalendarFlyout()
+    {
+        var flyout = new TrayCalendarWindow();
+
+        flyout.Dismissed += () => _calendarDismissedByTrayClick = _tray.IsCalendarTrayClick;
+
+        return flyout;
     }
 
     private void Preferences() => Window.Open(MainPage.Preferences);
@@ -225,6 +266,11 @@ internal sealed class AppRuntime : IAsyncDisposable
                 Refresh(true);
                 WindowWorkAreaPlacement.EnsureVisibleOnCurrentMonitor(Window);
 
+                if (_calendarFlyout is { IsVisible: true })
+                {
+                    TrayCalendarPlacement.Place(_calendarFlyout, _tray.CalendarAnchor());
+                }
+
                 if (_traceDpi)
                 {
                     _log.Record(
@@ -307,6 +353,12 @@ internal sealed class AppRuntime : IAsyncDisposable
         }
 
         Model.Refresh(date.ToDateTime(TimeOnly.MinValue));
+
+        if (_calendarFlyout is { IsVisible: true })
+        {
+            _calendarFlyout.Model.Refresh(settings.Calendar, date);
+        }
+
         _midnight.Interval = WeekCalculator.UntilNextMidnight(now, TimeZoneInfo.Local);
         _midnight.Start();
     }
@@ -813,6 +865,9 @@ internal sealed class AppRuntime : IAsyncDisposable
         await _updates.DisposeAsync();
         await _actions.WaitAsync();
         _actions.Release();
+        _tray.CalendarToggleRequested -= ToggleCalendar;
+        _tray.CalendarPointerIdle -= ResetCalendarDismissal;
+        _calendarFlyout?.Exit();
         _tray.Dispose();
         Window.Exit();
         _settings.Dispose();

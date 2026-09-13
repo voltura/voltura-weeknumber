@@ -1,0 +1,124 @@
+<Window x:Class="VolturaWeekNumber.Ui.TrayCalendarWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:VolturaWeekNumber.Ui" Title="Voltura WeekNumber" Width="440" Height="456" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" Background="{DynamicResource WindowBrush}" PreviewKeyDown="OnKeyDown" PreviewMouseLeftButtonDown="HeaderMouseLeftButtonDown">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleIf"/>
+    <Style x:Key="Navigation" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/><Setter Property="Padding" Value="6"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style x:Key="CalendarHeading" TargetType="Button" BasedOn="{StaticResource Navigation}">
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Border x:Name="Chrome" Background="Transparent" BorderBrush="Transparent" BorderThickness="2" CornerRadius="8">
+          <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="CalendarDay" TargetType="RadioButton">
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Width" Value="36"/><Setter Property="Height" Value="36"/><Setter Property="Margin" Value="2"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Background" Value="Transparent"/><Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RadioButton">
+        <Grid Background="Transparent">
+          <Border Background="{TemplateBinding Background}" CornerRadius="18" IsHitTestVisible="False"/>
+          <Border x:Name="Selection" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.5" CornerRadius="18" Visibility="Collapsed" IsHitTestVisible="False"/>
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Selection" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsChecked" Value="True"><Setter TargetName="Selection" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Selection" Property="Visibility" Value="Visible"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Date}" Value="{x:Null}"><Setter Property="IsEnabled" Value="False"/><Setter Property="Visibility" Value="Hidden"/></DataTrigger>
+        <DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Background" Value="{DynamicResource AccentBrush}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="DayText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="FontSize" Value="16"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsOutsideMonth}" Value="True"><Setter Property="Foreground" Value="{DynamicResource OutsideMonthBrush}"/></DataTrigger>
+        <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/></DataTrigger>
+        <DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="Picker" TargetType="Button" BasedOn="{StaticResource Navigation}">
+      <Setter Property="Width" Value="64"/><Setter Property="Height" Value="64"/><Setter Property="Margin" Value="4"/><Setter Property="FontSize" Value="17"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="32">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource TextBrush}"/><Setter TargetName="Chrome" Property="BorderThickness" Value="2"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsMuted}" Value="True"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></DataTrigger>
+        <DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="Background" Value="{DynamicResource AccentBrush}"/><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="16">
+    <Grid>
+      <Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="*"/><RowDefinition Height="48"/></Grid.RowDefinitions>
+      <Grid x:Name="CalendarHeader" Background="Transparent">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="44"/><ColumnDefinition Width="44"/></Grid.ColumnDefinitions>
+        <Button x:Name="HeadingButton" Style="{StaticResource CalendarHeading}" Width="Auto" HorizontalAlignment="Left" Margin="0,0,12,0" HorizontalContentAlignment="Left" FontSize="19" FontWeight="SemiBold" Content="{Binding Heading}" Click="HeadingClick" Visibility="{Binding CanZoomOut, Converter={StaticResource VisibleIf}}" AutomationProperties.Name="{Binding Heading}"/>
+        <TextBlock Text="{Binding Heading}" FontSize="19" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="6,0" VerticalAlignment="Center" Visibility="{Binding CanZoomOut, Converter={x:Static ui:CalendarBrowserPage.HiddenWhenTrue}}"/>
+        <Button x:Name="PreviousButton" Grid.Column="1" Style="{StaticResource CalendarHeading}" Click="PreviousClick" IsEnabled="{Binding CanPrevious}" ToolTip="{Binding PreviousLabel}" AutomationProperties.Name="{Binding PreviousLabel}"><Path Width="10" Height="8" Stretch="Fill" Fill="{DynamicResource MutedBrush}" Data="M 1.6,10 Q 0,10 0.9,8.4 L 5.2,1.2 Q 6.5,-0.8 7.8,1.2 L 12.1,8.4 Q 13,10 11.4,10 Z"/></Button>
+        <Button x:Name="NextButton" Grid.Column="2" Style="{StaticResource CalendarHeading}" Click="NextClick" IsEnabled="{Binding CanNext}" ToolTip="{Binding NextLabel}" AutomationProperties.Name="{Binding NextLabel}"><Path Width="10" Height="8" Stretch="Fill" Fill="{DynamicResource MutedBrush}" Data="M 1.6,0 Q 0,0 0.9,1.6 L 5.2,8.8 Q 6.5,10.8 7.8,8.8 L 12.1,1.6 Q 13,0 11.4,0 Z"/></Button>
+      </Grid>
+      <Grid Grid.Row="1" Margin="0,12,0,8" Visibility="{Binding IsMonth, Converter={StaticResource VisibleIf}}">
+        <Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="76"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+          <TextBlock Text="{Binding [Week], Source={x:Static ui:Strings.Current}}" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="6,0"/>
+          <ItemsControl Grid.Column="1" ItemsSource="{Binding Month.Weekdays}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+        </Grid>
+        <ItemsControl x:Name="MonthWeeks" Grid.Row="1" ItemsSource="{Binding Month.Weeks}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate>
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="76"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <Border Padding="4,0" Margin="0,4,4,4" BorderThickness="3,0,0,0" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
+                <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent"/><Style.Triggers><DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></DataTrigger></Style.Triggers></Style></Border.Style>
+                <TextBlock Text="{Binding CompactNumberText}" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
+              </Border>
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
+                <RadioButton Style="{StaticResource CalendarDay}" GroupName="SelectedCalendarDate" Click="DayClick" ToolTip="{Binding AccessibleName}" AutomationProperties.Name="{Binding AccessibleName}">
+                  <RadioButton.IsChecked><MultiBinding Converter="{x:Static ui:TrayCalendarWindow.DatesMatch}" Mode="OneWay"><Binding Path="Date"/><Binding Path="SelectedDate" RelativeSource="{RelativeSource AncestorType=ui:TrayCalendarWindow}"/></MultiBinding></RadioButton.IsChecked>
+                  <TextBlock Text="{Binding Number}" Style="{StaticResource DayText}"/>
+                </RadioButton>
+              </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+            </Grid>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Grid.Row="1" Text="{Binding Month.ErrorText}" Visibility="{Binding Month.HasPeriod, Converter={x:Static ui:CalendarBrowserPage.HiddenWhenTrue}}" IsHitTestVisible="False" VerticalAlignment="Center" TextAlignment="Center" AutomationProperties.LiveSetting="Polite"/>
+      </Grid>
+      <ItemsControl x:Name="PickerItems" Grid.Row="1" Margin="0,12,0,8" ItemsSource="{Binding Items}" Visibility="{Binding IsPicker, Converter={StaticResource VisibleIf}}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" Rows="4"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate><DataTemplate><Button Style="{StaticResource Picker}" IsEnabled="{Binding IsEnabled}" Click="PickerClick" AutomationProperties.Name="{Binding TooltipText}" ToolTip="{Binding TooltipText}">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{Binding Label}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" TextAlignment="Center"/>
+            <TextBlock Text="{Binding WeekRange}" FontSize="11" TextAlignment="Center" Margin="0,2,0,0" Visibility="{Binding HasWeekRange, Converter={StaticResource VisibleIf}}">
+              <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsMuted}" Value="True"><Setter Property="Foreground" Value="{DynamicResource OutsideMonthBrush}"/></DataTrigger>
+                  <DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/></DataTrigger>
+                </Style.Triggers>
+              </Style></TextBlock.Style>
+            </TextBlock>
+          </StackPanel>
+        </Button></DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <ToggleButton x:Name="CalendarPin" Grid.Row="2" HorizontalAlignment="Left" Style="{StaticResource HeaderPinToggle}" ToolTip="{Binding [PinCalendar], Source={x:Static ui:Strings.Current}}" AutomationProperties.Name="{Binding [PinCalendar], Source={x:Static ui:Strings.Current}}">
+        <TextBlock Text="&#xE718;" Style="{StaticResource ButtonGlyph}" FontSize="16" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"><TextBlock.RenderTransform><TranslateTransform Y="-1"/></TextBlock.RenderTransform></TextBlock>
+      </ToggleButton>
+      <Button x:Name="TodayButton" Grid.Row="2" Width="Auto" HorizontalAlignment="Right" MinWidth="96" Content="{Binding [Today], Source={x:Static ui:Strings.Current}}" Click="TodayClick"/>
+    </Grid>
+  </Border>
+</Window>

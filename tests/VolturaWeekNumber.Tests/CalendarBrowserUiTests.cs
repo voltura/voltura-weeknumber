@@ -18,6 +18,42 @@ namespace VolturaWeekNumber.Tests;
 public sealed class CalendarBrowserUiTests(WpfTestFixture fixture)
 {
     [Fact]
+    public void TodayInYearViewScrollsTheCurrentMonthIntoView() => fixture.Run(() =>
+    {
+        var model = CreateModel();
+        var window = new MainWindow(model);
+
+        try
+        {
+            window.Open(MainPage.Calendar);
+            Idle(window);
+            model.CalendarBrowser.Move(-1);
+
+            var page = (CalendarBrowserPage)window.FindName("CalendarPage");
+            var scroll = (ScrollViewer)page.FindName("CalendarScroll");
+
+            scroll.ScrollToTop();
+            Click((Button)page.FindName("TodayButton"));
+            Idle(window);
+            Assert.True(model.CalendarBrowser.IsYear);
+            Assert.Equal(2026, model.CalendarBrowser.Anchor.Year);
+            Assert.True(scroll.VerticalOffset > 0);
+
+            var months = (ItemsControl)page.FindName("YearMonths");
+            var september = model.CalendarBrowser.Months.Single(month => month.Date.Month == 9);
+            var card = (FrameworkElement)months.ItemContainerGenerator.ContainerFromItem(september);
+            var top = card.TranslatePoint(new Point(), scroll).Y;
+
+            Assert.InRange(top, -1, scroll.ViewportHeight);
+            Assert.True(top + card.ActualHeight <= scroll.ViewportHeight + 1);
+        }
+        finally
+        {
+            window.Exit();
+        }
+    });
+
+    [Fact]
     public void DrillDownBreadcrumbsAndTabReentryPreserveTheBrowsedPeriod() => fixture.Run(() =>
     {
         var model = CreateModel();

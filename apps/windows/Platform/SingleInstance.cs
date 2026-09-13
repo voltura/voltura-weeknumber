@@ -5,22 +5,25 @@ namespace VolturaWeekNumber.Platform;
 
 internal sealed class SingleInstance : IDisposable
 {
+    private const string MutexName = @"Local\VolturaWeekNumber";
+    private const string ActivationEventName = @"Local\VolturaWeekNumber-Activate";
     private readonly Mutex _mutex;
     private readonly EventWaitHandle _activation;
     private RegisteredWaitHandle? _wait;
     public bool IsFirst { get; }
-    public SingleInstance(string dataDirectory)
+    public SingleInstance(string? isolatedDirectory = null)
     {
-        var identity = Convert.ToHexString(
-            SHA256.HashData(Encoding.UTF8.GetBytes(dataDirectory.ToUpperInvariant()))
-        )[..24];
+        var suffix = isolatedDirectory is null
+            ? string.Empty
+            : "-Isolated-" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+                Path.TrimEndingDirectorySeparator(Path.GetFullPath(isolatedDirectory)).ToUpperInvariant())));
 
-        _mutex = new Mutex(true, @"Local\VolturaWeekNumber-" + identity, out var created);
+        _mutex = new Mutex(true, MutexName + suffix, out var created);
         IsFirst = created;
         _activation = new EventWaitHandle(
             false,
             EventResetMode.AutoReset,
-            @"Local\VolturaWeekNumber-Activate-" + identity
+            ActivationEventName + suffix
         );
 
         if (!created)

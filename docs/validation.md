@@ -51,7 +51,7 @@ Run `scripts/verify.ps1` to include signing and release-workflow regression chec
 
 ## UI captures
 
-Use a separate profile so normal settings are unaffected. The capture writes the main window, default- and minimum-width Date span views, and Calendar year, month, and week views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
+Use a separate profile so normal settings are unaffected. The capture writes the main window, default- and minimum-width Date span views, and Calendar year, month, and week views plus tray month, year, and decade views in light and dark themes, an icon review sheet, the application ICO, and DPI metadata, then exits. Captures use the isolated profile's language and calendar rules.
 
 ```powershell
 $reviewRoot = Join-Path (Get-Location) 'artifacts/ui-review'
@@ -85,3 +85,11 @@ Choose checks relevant to the changed behavior and record the build, environment
 - **Updates:** test a real installed-version upgrade with authorized signed release metadata, both package variants, failure/retry behavior, and settings retention. After upgrading, restart and open About before checking online: the already-installed package must not produce an error or an install action. Then check online and confirm the latest-version message. Cancel setup and confirm it can be reopened. Confirm that portable copies use manual updates.
 
 Generated output belongs under ignored `artifacts/`; retain only intentional documentation images in Git. A passing automated suite does not establish hardware or operating-system acceptance.
+
+### Tray calendar
+
+Left-click the tray icon to toggle the flyout; outside click dismisses it unless pinned; Escape always dismisses it. Every opening starts at the current month. Click the heading to browse months, then decades. Up/down moves one month, one year, or one decade according to the current view. Today always returns to the current month. Muted months and years remain selectable and open their actual period.
+
+Verify second-click dismissal without reopening, rapid clicks, keyboard tray activation, and the overflow tray. Check selectable next-year months and years before/after the decade, all calendar rules, midnight/resume refresh, and placement beside taskbars on mixed-DPI monitors. Confirm the main calendar keeps its independent browsing state. Render-review writes `tray-calendar-{month,year,decade}-{light,dark}.png`; captures and automated tests do not replace real Explorer input and display checks.
+
+Clicking a day selects it with an outline while today keeps its filled highlight. The calendar pin is independent of the main window pin and remains set for the app session, including when the flyout is hidden and reopened. Verify pinned outside-click behavior, explicit dismissal, unpinning, and selection across navigation. Selected/pinned captures are saved as `tray-calendar-selected-{light,dark}.png`.
