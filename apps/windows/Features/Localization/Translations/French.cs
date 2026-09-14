@@ -34,6 +34,7 @@ internal static class French
             ["CalendarExportFailed"] = "Impossible d’enregistrer le fichier calendrier. Essayez un autre emplacement.",
             ["WeeksFormat"] = "Semaines {0}",
             ["PinCalendar"] = "Épingler le calendrier",
+            ["OpenMainWindow"] = "Ouvrir la fenêtre principale",
             ["PreviousDecade"] = "Décennie précédente",
             ["NextDecade"] = "Décennie suivante",
             ["PreviousYear"] = "Année précédente",

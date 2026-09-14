@@ -50,6 +50,7 @@ public partial class TrayCalendarWindow : Window
 
     internal TrayCalendarViewModel Model { get; } = new();
     internal event Action? Dismissed;
+    internal event Action? OpenMainRequested;
 
     public TrayCalendarWindow()
     {
@@ -173,6 +174,7 @@ public partial class TrayCalendarWindow : Window
     }
     private void PreviousClick(object sender, RoutedEventArgs args) => Model.Move(-1);
     private void NextClick(object sender, RoutedEventArgs args) => Model.Move(1);
+    private void OpenMainClick(object sender, RoutedEventArgs args) => OpenMainRequested?.Invoke();
     private void ExportClick(object sender, RoutedEventArgs args) =>
         CalendarExportActions.Export(this, Model.ExportRequest, Model.Month.Options);
     private void TodayClick(object sender, RoutedEventArgs args)

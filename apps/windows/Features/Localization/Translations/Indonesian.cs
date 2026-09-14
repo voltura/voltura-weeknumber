@@ -34,6 +34,7 @@ internal static class Indonesian
             ["CalendarExportFailed"] = "File kalender tidak dapat disimpan. Coba lokasi lain.",
             ["WeeksFormat"] = "Minggu {0}",
             ["PinCalendar"] = "Sematkan kalender",
+            ["OpenMainWindow"] = "Buka jendela utama",
             ["PreviousDecade"] = "Dekade sebelumnya",
             ["NextDecade"] = "Dekade berikutnya",
             ["PreviousYear"] = "Tahun sebelumnya",

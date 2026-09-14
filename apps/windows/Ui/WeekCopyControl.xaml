@@ -9,10 +9,10 @@
     <Button x:Name="FormatsButton" Width="40" Margin="4,0,0,0" Padding="8" Click="FormatsClick" AutomationProperties.Name="{Binding [CopyFormats], Source={x:Static ui:Strings.Current}}" ToolTip="{Binding [CopyFormats], Source={x:Static ui:Strings.Current}}">
       <TextBlock Text="&#xE70D;" Style="{StaticResource ButtonGlyph}"/>
       <Button.ContextMenu>
-        <ContextMenu Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}">
-          <MenuItem Header="{Binding [CopyIso], Source={x:Static ui:Strings.Current}}" Tag="Iso" Click="FormatClick"/>
-          <MenuItem Header="{Binding [CopyShort], Source={x:Static ui:Strings.Current}}" Tag="Short" Click="FormatClick"/>
-          <MenuItem Header="{Binding [CopyLocalized], Source={x:Static ui:Strings.Current}}" Tag="Localized" Click="FormatClick"/>
+        <ContextMenu Style="{StaticResource ThemedContextMenu}">
+          <MenuItem Style="{StaticResource ThemedMenuItem}" Header="{Binding [CopyIso], Source={x:Static ui:Strings.Current}}" Tag="Iso" Click="FormatClick"/>
+          <MenuItem Style="{StaticResource ThemedMenuItem}" Header="{Binding [CopyShort], Source={x:Static ui:Strings.Current}}" Tag="Short" Click="FormatClick"/>
+          <MenuItem Style="{StaticResource ThemedMenuItem}" Header="{Binding [CopyLocalized], Source={x:Static ui:Strings.Current}}" Tag="Localized" Click="FormatClick"/>
         </ContextMenu>
       </Button.ContextMenu>
     </Button>

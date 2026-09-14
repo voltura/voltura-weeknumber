@@ -34,6 +34,7 @@ internal static class Turkish
             ["CalendarExportFailed"] = "Takvim dosyası kaydedilemedi. Başka bir konum deneyin.",
             ["WeeksFormat"] = "Haftalar {0}",
             ["PinCalendar"] = "Takvimi sabitle",
+            ["OpenMainWindow"] = "Ana pencereyi aç",
             ["PreviousDecade"] = "Önceki on yıl",
             ["NextDecade"] = "Sonraki on yıl",
             ["PreviousYear"] = "Önceki yıl",

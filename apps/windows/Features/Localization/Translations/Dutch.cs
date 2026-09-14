@@ -34,6 +34,7 @@ internal static class Dutch
             ["CalendarExportFailed"] = "Het kalenderbestand kon niet worden opgeslagen. Probeer een andere locatie.",
             ["WeeksFormat"] = "Weken {0}",
             ["PinCalendar"] = "Kalender vastzetten",
+            ["OpenMainWindow"] = "Hoofdvenster openen",
             ["PreviousDecade"] = "Vorig decennium",
             ["NextDecade"] = "Volgend decennium",
             ["PreviousYear"] = "Vorig jaar",

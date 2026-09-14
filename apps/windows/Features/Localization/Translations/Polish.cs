@@ -34,6 +34,7 @@ internal static class Polish
             ["CalendarExportFailed"] = "Nie można zapisać pliku kalendarza. Spróbuj wybrać inną lokalizację.",
             ["WeeksFormat"] = "Tygodnie {0}",
             ["PinCalendar"] = "Przypnij kalendarz",
+            ["OpenMainWindow"] = "Otwórz główne okno",
             ["PreviousDecade"] = "Poprzednia dekada",
             ["NextDecade"] = "Następna dekada",
             ["PreviousYear"] = "Poprzedni rok",

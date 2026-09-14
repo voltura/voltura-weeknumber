@@ -34,6 +34,7 @@ internal static class Norwegian
             ["CalendarExportFailed"] = "Kunne ikke lagre kalenderfilen. Prøv en annen plassering.",
             ["WeeksFormat"] = "Uker {0}",
             ["PinCalendar"] = "Fest kalenderen",
+            ["OpenMainWindow"] = "Åpne hovedvinduet",
             ["PreviousDecade"] = "Forrige tiår",
             ["NextDecade"] = "Neste tiår",
             ["PreviousYear"] = "Forrige år",

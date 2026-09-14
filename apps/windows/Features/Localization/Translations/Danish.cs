@@ -34,6 +34,7 @@ internal static class Danish
             ["CalendarExportFailed"] = "Kalenderfilen kunne ikke gemmes. Prøv en anden placering.",
             ["WeeksFormat"] = "Uger {0}",
             ["PinCalendar"] = "Fastgør kalender",
+            ["OpenMainWindow"] = "Åbn hovedvinduet",
             ["PreviousDecade"] = "Forrige årti",
             ["NextDecade"] = "Næste årti",
             ["PreviousYear"] = "Forrige år",

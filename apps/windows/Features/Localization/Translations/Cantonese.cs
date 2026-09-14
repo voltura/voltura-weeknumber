@@ -34,6 +34,7 @@ internal static class Cantonese
             ["CalendarExportFailed"] = "儲存唔到日曆檔案。請試下其他位置。",
             ["WeeksFormat"] = "第{0}週",
             ["PinCalendar"] = "固定月曆",
+            ["OpenMainWindow"] = "開啟主視窗",
             ["PreviousDecade"] = "上十年",
             ["NextDecade"] = "下十年",
             ["PreviousYear"] = "上一年",

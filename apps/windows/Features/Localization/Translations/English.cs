@@ -34,6 +34,7 @@ internal static class English
             ["CalendarExportFailed"] = "Could not save the calendar file. Try another location.",
             ["WeeksFormat"] = "Weeks {0}",
             ["PinCalendar"] = "Pin calendar",
+            ["OpenMainWindow"] = "Open main window",
             ["PreviousDecade"] = "Previous decade",
             ["NextDecade"] = "Next decade",
             ["PreviousYear"] = "Previous year",

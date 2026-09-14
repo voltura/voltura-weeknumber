@@ -34,6 +34,7 @@ internal static class Icelandic
             ["CalendarExportFailed"] = "Ekki tókst að vista dagatalsskrána. Prófaðu annan stað.",
             ["WeeksFormat"] = "Vikur {0}",
             ["PinCalendar"] = "Festa dagatal",
+            ["OpenMainWindow"] = "Opna aðalgluggann",
             ["PreviousDecade"] = "Fyrri áratugur",
             ["NextDecade"] = "Næsti áratugur",
             ["PreviousYear"] = "Fyrra ár",

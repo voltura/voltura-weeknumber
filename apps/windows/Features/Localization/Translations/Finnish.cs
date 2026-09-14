@@ -34,6 +34,7 @@ internal static class Finnish
             ["CalendarExportFailed"] = "Kalenteritiedostoa ei voitu tallentaa. Kokeile toista sijaintia.",
             ["WeeksFormat"] = "Viikot {0}",
             ["PinCalendar"] = "Kiinnitä kalenteri",
+            ["OpenMainWindow"] = "Avaa pääikkuna",
             ["PreviousDecade"] = "Edellinen vuosikymmen",
             ["NextDecade"] = "Seuraava vuosikymmen",
             ["PreviousYear"] = "Edellinen vuosi",

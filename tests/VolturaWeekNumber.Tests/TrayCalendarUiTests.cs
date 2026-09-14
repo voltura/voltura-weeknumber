@@ -28,12 +28,37 @@ public sealed class TrayCalendarUiTests(WpfTestFixture fixture)
             Assert.True(window.CanDragFrom(new Point(window.ActualWidth - 5, 35)));
             Assert.False(window.CanDragFrom(new Point(100, 120)));
 
-            foreach (var button in new[] { window.HeadingButton, window.PreviousButton, window.NextButton })
+            foreach (var button in new[] { window.HeadingButton, window.PreviousButton, window.NextButton, (Button)window.FindName("OpenMainButton")! })
             {
                 var center = button.TranslatePoint(new Point(button.ActualWidth / 2, button.ActualHeight / 2), window);
 
                 Assert.False(window.CanDragFrom(center));
             }
+        }
+        finally
+        {
+            window.Exit();
+        }
+    });
+
+    [Fact]
+    public void OpenMainButtonRaisesRequestAndHasAccessibleLabel() => fixture.Run(() =>
+    {
+        var window = new TrayCalendarWindow();
+        var opened = 0;
+
+        try
+        {
+            window.OpenMainRequested += () => opened++;
+            window.Open(new(1000, 900, 20, 20));
+            Idle(window);
+
+            var button = (Button)window.FindName("OpenMainButton")!;
+            Assert.Equal(Strings.Current["OpenMainWindow"], AutomationProperties.GetName(button));
+
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+            Assert.Equal(1, opened);
         }
         finally
         {

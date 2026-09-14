@@ -34,6 +34,7 @@ internal static class SimplifiedChinese
             ["CalendarExportFailed"] = "无法保存日历文件。请尝试其他位置。",
             ["WeeksFormat"] = "第{0}周",
             ["PinCalendar"] = "固定日历",
+            ["OpenMainWindow"] = "打开主窗口",
             ["PreviousDecade"] = "上十年",
             ["NextDecade"] = "下十年",
             ["PreviousYear"] = "上一年",

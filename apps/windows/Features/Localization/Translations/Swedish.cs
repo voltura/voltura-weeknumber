@@ -34,6 +34,7 @@ internal static class Swedish
             ["CalendarExportFailed"] = "Kalenderfilen kunde inte sparas. Försök med en annan plats.",
             ["WeeksFormat"] = "Veckor {0}",
             ["PinCalendar"] = "Fäst kalendern",
+            ["OpenMainWindow"] = "Öppna huvudfönstret",
             ["PreviousDecade"] = "Föregående årtionde",
             ["NextDecade"] = "Nästa årtionde",
             ["PreviousYear"] = "Föregående år",

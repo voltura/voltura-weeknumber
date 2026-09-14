@@ -34,6 +34,7 @@ internal static class Russian
             ["CalendarExportFailed"] = "Не удалось сохранить файл календаря. Выберите другое расположение.",
             ["WeeksFormat"] = "Недели {0}",
             ["PinCalendar"] = "Закрепить календарь",
+            ["OpenMainWindow"] = "Открыть главное окно",
             ["PreviousDecade"] = "Предыдущее десятилетие",
             ["NextDecade"] = "Следующее десятилетие",
             ["PreviousYear"] = "Предыдущий год",

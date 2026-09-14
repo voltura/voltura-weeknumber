@@ -34,6 +34,7 @@ internal static class German
             ["CalendarExportFailed"] = "Die Kalenderdatei konnte nicht gespeichert werden. Versuchen Sie einen anderen Speicherort.",
             ["WeeksFormat"] = "Wochen {0}",
             ["PinCalendar"] = "Kalender anheften",
+            ["OpenMainWindow"] = "Hauptfenster öffnen",
             ["PreviousDecade"] = "Vorheriges Jahrzehnt",
             ["NextDecade"] = "Nächstes Jahrzehnt",
             ["PreviousYear"] = "Vorheriges Jahr",

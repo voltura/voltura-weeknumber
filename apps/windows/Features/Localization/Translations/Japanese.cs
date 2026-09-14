@@ -34,6 +34,7 @@ internal static class Japanese
             ["CalendarExportFailed"] = "カレンダーファイルを保存できませんでした。別の場所をお試しください。",
             ["WeeksFormat"] = "第{0}週",
             ["PinCalendar"] = "カレンダーを固定",
+            ["OpenMainWindow"] = "メインウィンドウを開く",
             ["PreviousDecade"] = "前の10年",
             ["NextDecade"] = "次の10年",
             ["PreviousYear"] = "前年",

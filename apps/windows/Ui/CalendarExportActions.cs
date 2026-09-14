@@ -102,6 +102,7 @@ public static class CalendarExportActions
         }
 
         var menu = element.ContextMenu!;
+        menu.Style = (Style)Application.Current.FindResource("ThemedContextMenu");
 
         menu.Items.Clear();
 
@@ -116,7 +117,11 @@ public static class CalendarExportActions
                 captured = request with { Anchor = DateOnly.FromDayNumber(Math.Max(0, request.Anchor.DayNumber - offset)) };
             }
 
-            var item = new MenuItem { Header = Label(captured) };
+            var item = new MenuItem
+            {
+                Header = Label(captured),
+                Style = (Style)Application.Current.FindResource("ThemedMenuItem"),
+            };
 
             item.Click += (_, _) => Export(owner, captured, model.Options);
             menu.Items.Add(item);

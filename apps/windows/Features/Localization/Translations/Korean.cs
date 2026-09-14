@@ -34,6 +34,7 @@ internal static class Korean
             ["CalendarExportFailed"] = "달력 파일을 저장하지 못했습니다. 다른 위치를 선택해 보세요.",
             ["WeeksFormat"] = "{0}주",
             ["PinCalendar"] = "달력 고정",
+            ["OpenMainWindow"] = "기본 창 열기",
             ["PreviousDecade"] = "이전 10년",
             ["NextDecade"] = "다음 10년",
             ["PreviousYear"] = "이전 연도",

@@ -169,6 +169,7 @@ internal sealed class AppRuntime : IAsyncDisposable
         flyout.SetImportStore(_calendars);
 
         flyout.Dismissed += () => _calendarDismissedByTrayClick = _tray.IsCalendarTrayClick;
+        flyout.OpenMainRequested += Open;
 
         return flyout;
     }
@@ -873,6 +874,10 @@ internal sealed class AppRuntime : IAsyncDisposable
         _tray.CalendarToggleRequested -= ToggleCalendar;
         _tray.CalendarPointerIdle -= ResetCalendarDismissal;
         await _calendars.DisposeAsync();
+        if (_calendarFlyout is not null)
+        {
+            _calendarFlyout.OpenMainRequested -= Open;
+        }
         _calendarFlyout?.Exit();
 
         if (_calendarFlyout is not null)

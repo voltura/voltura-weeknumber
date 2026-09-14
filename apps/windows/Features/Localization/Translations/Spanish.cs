@@ -34,6 +34,7 @@ internal static class Spanish
             ["CalendarExportFailed"] = "No se pudo guardar el archivo de calendario. Prueba otra ubicación.",
             ["WeeksFormat"] = "Semanas {0}",
             ["PinCalendar"] = "Fijar calendario",
+            ["OpenMainWindow"] = "Abrir ventana principal",
             ["PreviousDecade"] = "Década anterior",
             ["NextDecade"] = "Década siguiente",
             ["PreviousYear"] = "Año anterior",
