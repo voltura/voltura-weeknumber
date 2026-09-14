@@ -37,7 +37,7 @@ public sealed record IconAppearance(Color Foreground, Color Background)
 public static class CalendarIconRenderer
 {
     public static IReadOnlyList<int> Sizes { get; } =
-        Array.AsReadOnly(new[] { 16, 20, 24, 28, 32, 36, 40, 48, 64, 96, 128, 256 });
+        Array.AsReadOnly([16, 20, 24, 28, 32, 36, 40, 48, 64, 96, 128, 256]);
     public static BitmapSource Render(int? week, int size, IconAppearance appearance)
     {
         // Leap years in lunisolar calendars can contain up to 385 days.

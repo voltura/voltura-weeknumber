@@ -145,7 +145,7 @@ internal sealed partial class NativeTray : IDisposable
         {
             RenderCount++;
 
-            var bytes = CalendarIconRenderer.EncodeIco(week, appearance, new[] { size });
+            var bytes = CalendarIconRenderer.EncodeIco(week, appearance, [size]);
             // .ico directory entry points to an independently encoded PNG image.
             var pngOffset = BitConverter.ToInt32(bytes, 18);
             var png = bytes.AsSpan(pngOffset).ToArray();
