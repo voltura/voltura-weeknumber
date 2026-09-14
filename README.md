@@ -64,8 +64,8 @@
     <p>Your holidays and appointments belong beside your week numbers. Calendar imports put them in the tray calendar, with subtle dots marking event dates and details just a click away. <a href="#calendar-import">More about calendar imports.</a></p>
   </div>
   <figure class="app-window">
-    <img src="docs/images/voltura-weeknumber-tray-calendar-dark.png" width="440" height="456" alt="Compact calendar in dark mode with week numbers beside each row, an outlined selected date, a filled highlight for today, and a calendar pin" loading="lazy">
-    <figcaption>Week numbers first. Today and your selected date stay easy to distinguish.</figcaption>
+    <img src="docs/images/voltura-weeknumber-calendar-event-dark.png" width="1854" height="1045" alt="Compact calendar in dark mode showing December 2026 with week numbers, event dots, Christmas Day selected, and its event details open beside the month" loading="lazy">
+    <figcaption>Event dots keep the month quiet. Select a date to see the details beside it.</figcaption>
   </figure>
 </section>
 <section class="section capabilities" aria-labelledby="capabilities-title">
