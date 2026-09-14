@@ -183,20 +183,6 @@ public sealed class TrayCalendarUiTests(WpfTestFixture fixture)
                 window.Model.ZoomOut();
                 Idle(window);
 
-                var output = Environment.GetEnvironmentVariable("VOLTURA_TRAY_REVIEW");
-
-                if (language.Id == "en" && !highContrast && !string.IsNullOrEmpty(output))
-                {
-                    Directory.CreateDirectory(output);
-
-                    var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(
-                        (int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-
-                    bitmap.Render(window);
-                    File.WriteAllBytes(Path.Combine(output, $"tray-year-weeks-{theme}.png"),
-                        VolturaWeekNumber.Features.Icon.CalendarIconRenderer.Png(bitmap));
-                }
-
                 var buttons = PickerButtons(window);
 
                 Assert.Equal(16, buttons.Length);

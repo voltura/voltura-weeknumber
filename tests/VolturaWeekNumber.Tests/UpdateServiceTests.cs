@@ -4,9 +4,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using VolturaWeekNumber.Features.Icon;
 using VolturaWeekNumber.Features.Updates;
 using VolturaWeekNumber.Platform;
 using VolturaWeekNumber.Ui;
@@ -631,29 +628,6 @@ public sealed class UpdateServiceTests(WpfTestFixture fixture) : IDisposable
                         ? Visibility.Visible
                         : Visibility.Collapsed,
                     install.Visibility
-                );
-
-                var output = Environment.GetEnvironmentVariable("VOLTURA_UPDATE_REVIEW_DIR");
-
-                if (output is null)
-                {
-                    return;
-                }
-
-                Directory.CreateDirectory(output);
-
-                var bitmap = new RenderTargetBitmap(
-                    (int)window.ActualWidth,
-                    (int)window.ActualHeight,
-                    96,
-                    96,
-                    PixelFormats.Pbgra32
-                );
-
-                bitmap.Render(window);
-                File.WriteAllBytes(
-                    Path.Combine(output, $"about-{language}-{service.State.Status}.png"),
-                    CalendarIconRenderer.Png(bitmap)
                 );
             });
 

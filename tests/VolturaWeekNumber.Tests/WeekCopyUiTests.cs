@@ -2,11 +2,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using VolturaWeekNumber.Features.Calendar;
-using VolturaWeekNumber.Features.Icon;
 using VolturaWeekNumber.Features.Settings;
 using VolturaWeekNumber.Platform;
 using VolturaWeekNumber.Ui;
@@ -190,49 +187,6 @@ public sealed class WeekCopyUiTests(WpfTestFixture fixture)
                         var right = arrow.TranslatePoint(new Point(arrow.ActualWidth, 0), control).X;
 
                         Assert.True(right <= control.ActualWidth + 1, $"{language.Id}: {name} overflows");
-                    }
-
-                    var output = Environment.GetEnvironmentVariable("VOLTURA_WEEKCOPY_REVIEW");
-
-                    if (output is not null && language.Id is "en" or "sv" or "fr" or "ja")
-                    {
-                        Directory.CreateDirectory(output);
-                        // Let Fluent expansion/theme animations finish before taking review images.
-
-                        var frame = new DispatcherFrame();
-                        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(350) };
-
-                        timer.Tick += (_, _) =>
-                        {
-                            timer.Stop();
-                            frame.Continue = false;
-                        };
-
-                        timer.Start();
-                        Dispatcher.PushFrame(frame);
-
-                        var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-
-                        bitmap.Render(window);
-                        File.WriteAllBytes(Path.Combine(output, $"copy-{language.Id}-{theme}.png"), CalendarIconRenderer.Png(bitmap));
-
-                        var arrow = (Button)((WeekCopyControl)window.FindName("SelectedWeekCopy")).FindName("FormatsButton");
-
-                        arrow.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                        Idle(window);
-
-                        var menu = arrow.ContextMenu;
-                        var menuBitmap = new RenderTargetBitmap((int)Math.Ceiling(menu.ActualWidth), (int)Math.Ceiling(menu.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-                        var menuVisual = new DrawingVisual();
-
-                        using (var drawing = menuVisual.RenderOpen())
-                        {
-                            drawing.DrawRectangle(new VisualBrush(menu), null, new Rect(0, 0, menu.ActualWidth, menu.ActualHeight));
-                        }
-
-                        menuBitmap.Render(menuVisual);
-                        File.WriteAllBytes(Path.Combine(output, $"menu-{language.Id}-{theme}.png"), CalendarIconRenderer.Png(menuBitmap));
-                        menu.IsOpen = false;
                     }
                 }
             }
