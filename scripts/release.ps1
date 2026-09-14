@@ -14,6 +14,7 @@ $script:releasePhase = 'Starting release checks'
 function Write-ReleaseHeader([string]$Message)
 {
     $script:releasePhase = $Message
+
     Write-Host ''
     Write-Host ('=' * 72) -ForegroundColor DarkCyan
     Write-Host ('  ' + $Message) -ForegroundColor Cyan
@@ -27,7 +28,15 @@ function Write-ReleaseStatus([string]$Message, [ConsoleColor]$Color = [ConsoleCo
 
 function Write-ReleaseSuccess([string]$Message)
 {
-    $displayMessage = if ($Message.Length -gt 59) { $Message.Substring(0, 56) + '...' } else { $Message.PadRight(59) }
+    $displayMessage = if ($Message.Length -gt 59)
+    {
+        $Message.Substring(0, 56) + '...'
+    }
+    else
+    {
+        $Message.PadRight(59)
+    }
+
     Write-Host ''
     Write-Host ('+' + ('-' * 70) + '+') -ForegroundColor Green
     Write-Host ('|  SUCCESS: ' + $displayMessage + '|') -ForegroundColor Green
@@ -36,9 +45,25 @@ function Write-ReleaseSuccess([string]$Message)
 
 trap
 {
-    $phase = if ($script:releasePhase.Length -gt 44) { $script:releasePhase.Substring(0, 41) + '...' } else { $script:releasePhase.PadRight(44) }
+    $phase = if ($script:releasePhase.Length -gt 44)
+    {
+        $script:releasePhase.Substring(0, 41) + '...'
+    }
+    else
+    {
+        $script:releasePhase.PadRight(44)
+    }
     $errorMessage = [string]$_.Exception.Message
-    if ($errorMessage.Length -gt 67) { $errorMessage = $errorMessage.Substring(0, 64) + '...' } else { $errorMessage = $errorMessage.PadRight(67) }
+
+    if ($errorMessage.Length -gt 67)
+    {
+        $errorMessage = $errorMessage.Substring(0, 64) + '...'
+    }
+    else
+    {
+        $errorMessage = $errorMessage.PadRight(67)
+    }
+
     Write-Host ''
     Write-Host ('!' + ('-' * 70) + '!') -ForegroundColor Red
     Write-Host ('|  RELEASE FAILED during: ' + $phase + '|') -ForegroundColor Red
@@ -113,7 +138,9 @@ if (-not (Test-Path -LiteralPath $KeyPath -PathType Leaf))
 
 $KeyPath = (Resolve-Path -LiteralPath $KeyPath).Path
 # Failed lookups must never be mistaken for an unreleased version.
+
 Write-ReleaseStatus 'Checking signing key and existing GitHub releases...' DarkGray
+
 $releaseTags = @(gh api "repos/$repository/releases" --paginate --jq '.[].tag_name')
 
 if ($LASTEXITCODE)

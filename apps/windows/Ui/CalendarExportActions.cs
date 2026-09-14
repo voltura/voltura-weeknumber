@@ -102,6 +102,7 @@ public static class CalendarExportActions
         }
 
         var menu = element.ContextMenu!;
+
         menu.Style = (Style)Application.Current.FindResource("ThemedContextMenu");
 
         menu.Items.Clear();

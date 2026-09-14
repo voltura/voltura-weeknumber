@@ -26,10 +26,10 @@ public sealed record IconAppearance(Color Foreground, Color Background)
             return new(Parse(settings.Foreground), Parse(settings.Background));
         }
 
-    return darkTaskbar
-        ? new(Parse("#FFFFFFFF"), Parse("#FF1C1C1C"))
-        : new(Parse("#FF303030"), Parse("#FFF9FBFF"));
-}
+        return darkTaskbar
+            ? new(Parse("#FFFFFFFF"), Parse("#FF1C1C1C"))
+            : new(Parse("#FF303030"), Parse("#FFF9FBFF"));
+    }
 
     private static Color Parse(string value) => (Color)ColorConverter.ConvertFromString(value);
 }

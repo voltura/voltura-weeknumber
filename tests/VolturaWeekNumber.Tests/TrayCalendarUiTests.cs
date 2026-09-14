@@ -54,6 +54,7 @@ public sealed class TrayCalendarUiTests(WpfTestFixture fixture)
             Idle(window);
 
             var button = (Button)window.FindName("OpenMainButton")!;
+
             Assert.Equal(Strings.Current["OpenMainWindow"], AutomationProperties.GetName(button));
 
             button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
