@@ -62,7 +62,7 @@ public static class CalendarIconRenderer
             // Keep the small tray icon visually weighted like the neighboring Windows icons.
             var stroke = Math.Max(2.0, Math.Round(size / 26d, 1));
             var inset = stroke / 2;
-            var top = Math.Max(2, Math.Round(size * .12));
+            var top = Math.Max(2, Math.Round(size * .07));
             var fg = new SolidColorBrush(appearance.Foreground);
             var bg = new SolidColorBrush(appearance.Background);
             var pen = new Pen(fg, stroke);
