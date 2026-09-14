@@ -26,10 +26,10 @@ public sealed record IconAppearance(Color Foreground, Color Background)
             return new(Parse(settings.Foreground), Parse(settings.Background));
         }
 
-        return darkTaskbar
-            ? new(Parse("#FFF2F5FA"), Parse("#FF202936"))
-            : new(Parse("#FF233047"), Parse("#FFF9FBFF"));
-    }
+    return darkTaskbar
+        ? new(Parse("#FFFFFFFF"), Parse("#FF1C1C1C"))
+        : new(Parse("#FF303030"), Parse("#FFF9FBFF"));
+}
 
     private static Color Parse(string value) => (Color)ColorConverter.ConvertFromString(value);
 }
@@ -59,7 +59,8 @@ public static class CalendarIconRenderer
 
         using (var dc = visual.RenderOpen())
         {
-            var stroke = Math.Max(1, Math.Round(size / 32d));
+            // Keep the small tray icon visually weighted like the neighboring Windows icons.
+            var stroke = Math.Max(2.0, Math.Round(size / 26d, 1));
             var inset = stroke / 2;
             var top = Math.Max(2, Math.Round(size * .12));
             var fg = new SolidColorBrush(appearance.Foreground);
@@ -98,8 +99,8 @@ public static class CalendarIconRenderer
             }
 
             var fontSize = size * (size <= 24
-                ? .69
-                : .65);
+                ? .72
+                : .68);
             var text = new FormattedText(
                 week?.ToString("D2", CultureInfo.InvariantCulture) ?? "—",
                 CultureInfo.InvariantCulture,
