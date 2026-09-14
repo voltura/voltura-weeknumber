@@ -161,7 +161,7 @@ public sealed class CalendarExportUiTests(WpfTestFixture fixture)
             Assert.True(tray.IsPinned);
             pin.IsChecked = false;
 
-            using (tray.BeginExportInteraction())
+            using (tray.BeginCalendarInteraction())
             {
                 tray.DismissOnDeactivate();
                 Assert.True(tray.IsVisible);

@@ -14,15 +14,15 @@ namespace VolturaWeekNumber.Ui;
 public partial class TrayCalendarWindow : Window
 {
     private bool _exit;
-    private int _exportInteractions;
-    internal IDisposable BeginExportInteraction()
+    private int _ownedInteractions;
+    internal IDisposable BeginCalendarInteraction()
     {
-        _exportInteractions++;
+        _ownedInteractions++;
 
-        return new ExportInteraction(this);
+        return new CalendarInteraction(this);
     }
 
-    private sealed class ExportInteraction(TrayCalendarWindow owner) : IDisposable
+    private sealed class CalendarInteraction(TrayCalendarWindow owner) : IDisposable
     {
         private bool _disposed;
         public void Dispose()
@@ -33,12 +33,9 @@ public partial class TrayCalendarWindow : Window
             }
 
             _disposed = true;
-            owner._exportInteractions--;
+            owner._ownedInteractions--;
 
-            if (!owner.IsActive)
-            {
-                owner.DismissOnDeactivate();
-            }
+            owner.QueueGroupDismissal();
         }
     }
     public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register(
@@ -57,13 +54,40 @@ public partial class TrayCalendarWindow : Window
     public TrayCalendarWindow()
     {
         InitializeComponent();
+        WindowCorners.Apply(this, WindowBorder);
         DataContext = Model;
-        Deactivated += (_, _) => DismissOnDeactivate();
+        Deactivated += (_, _) => QueueGroupDismissal();
+        LocationChanged += (_, _) => _eventsWindow?.Hide();
+        IsVisibleChanged += (_, _) =>
+        {
+            if (!IsVisible)
+            {
+                _eventsWindow?.Hide();
+
+                foreach (var manager in OwnedWindows.OfType<ImportedCalendarsWindow>())
+                {
+                    manager.Hide();
+                }
+
+                _eventQuery?.Cancel();
+            }
+            else
+            {
+                RefreshEvents();
+            }
+        };
+
+        Model.PropertyChanged += (_, _) =>
+        {
+            _eventsWindow?.Hide();
+            RefreshEvents();
+        };
     }
 
     internal void Exit()
     {
         _exit = true;
+        ReleaseEvents();
         Close();
     }
 
@@ -80,7 +104,7 @@ public partial class TrayCalendarWindow : Window
 
     internal void DismissOnDeactivate()
     {
-        if (IsVisible && !IsPinned && _exportInteractions == 0)
+        if (IsVisible && !IsPinned && _ownedInteractions == 0)
         {
             Dismissed?.Invoke();
             Hide();
@@ -163,7 +187,7 @@ public partial class TrayCalendarWindow : Window
         HeadingButton.Focus();
     }
     private void DayClick(object sender, RoutedEventArgs args) =>
-        SelectedDate = ((CalendarDayItem)((RadioButton)sender).DataContext).Date;
+        SelectEventDate(((CalendarDayItem)((RadioButton)sender).DataContext).Date);
 
     private sealed class DateMatchConverter : IMultiValueConverter
     {

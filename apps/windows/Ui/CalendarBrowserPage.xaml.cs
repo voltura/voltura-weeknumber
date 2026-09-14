@@ -49,6 +49,8 @@ public partial class CalendarBrowserPage : System.Windows.Controls.UserControl
     private void NextClick(object sender, RoutedEventArgs args) => Model.Move(1);
     private void ExportClick(object sender, RoutedEventArgs args) =>
         CalendarExportActions.Export(Window.GetWindow(this), Model.ExportRequest, Model.Options);
+    private async void ImportClick(object sender, RoutedEventArgs args) =>
+        await CalendarImportActions.ImportAsync(Window.GetWindow(this));
     private void TodayClick(object sender, RoutedEventArgs args)
     {
         Model.Today();

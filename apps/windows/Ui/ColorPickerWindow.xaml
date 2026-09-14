@@ -4,7 +4,7 @@
     <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,16,-8,-8">
       <Button IsCancel="True" Margin="0,0,8,8" AutomationProperties.Name="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}">
         <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="&#xE711;" Style="{StaticResource ButtonGlyph}"/>
+          <TextBlock Text="&#xE711;" Style="{StaticResource XGlyph}"/>
           <TextBlock Text="{Binding [Dismiss], Source={x:Static ui:Strings.Current}}"/>
         </ui:SpacingStackPanel>
       </Button>

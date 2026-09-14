@@ -8,6 +8,36 @@ namespace VolturaWeekNumber.Platform;
 
 internal static partial class TrayCalendarPlacement
 {
+    internal static Drawing.Rectangle CalculateEventBounds(Drawing.Rectangle work, Drawing.Rectangle calendar,
+        int width, int height, int gap)
+    {
+        width = Math.Min(width, work.Width);
+        height = Math.Min(height, work.Height);
+
+        var x = calendar.Right + gap;
+
+        if (x + width > work.Right)
+        {
+            x = calendar.Left - gap - width;
+        }
+
+        return new(Math.Clamp(x, work.Left, work.Right - width), Math.Clamp(calendar.Top, work.Top, work.Bottom - height), width, height);
+    }
+
+    internal static void PlaceEvents(Window window, Window calendar)
+    {
+        var top = calendar.PointToScreen(new Point());
+        var bottom = calendar.PointToScreen(new Point(calendar.ActualWidth, calendar.ActualHeight));
+        var anchor = Drawing.Rectangle.FromLTRB((int)top.X, (int)top.Y, (int)bottom.X, (int)bottom.Y);
+        var screen = Forms.Screen.FromRectangle(anchor);
+        var scale = System.Windows.Media.VisualTreeHelper.GetDpi(calendar).DpiScaleX;
+        var bounds = CalculateEventBounds(screen.WorkingArea, anchor, (int)Math.Round(360 * scale),
+            (int)Math.Round(456 * scale), (int)Math.Round(8 * scale));
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+
+        _ = SetWindowPos(handle, new nint(-1), bounds.X, bounds.Y, bounds.Width, bounds.Height, 0x10);
+    }
+
     internal static Drawing.Rectangle CalculateBounds(Drawing.Rectangle work, Drawing.Rectangle anchor,
         int width, int height, int gap)
     {

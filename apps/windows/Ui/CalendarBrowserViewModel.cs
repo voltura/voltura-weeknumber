@@ -7,7 +7,22 @@ namespace VolturaWeekNumber.Ui;
 internal enum CalendarZoom { Year, Month, Week }
 
 internal sealed record CalendarDayItem(DateOnly? Date, string Number, string Weekday, string DateText,
-    string AccessibleName, bool IsToday, bool IsOutsideMonth);
+    string AccessibleName, bool IsToday, bool IsOutsideMonth) : INotifyPropertyChanged
+{
+    private int _eventCount;
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public bool HasEvents => _eventCount > 0;
+    public string EventAccessibleName => _eventCount == 0
+        ? AccessibleName
+        : AccessibleName + " · "
+        + string.Format(Strings.Current.Culture, Strings.Current["CalendarEventCount"], _eventCount);
+    internal void SetEventCount(int count)
+    {
+        _eventCount = count;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasEvents)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EventAccessibleName)));
+    }
+}
 
 internal sealed record CalendarWeekItem(CalendarWeek Week, string NumberText, string RangeText,
     string AccessibleName, bool IsCurrent, IReadOnlyList<CalendarDayItem> Days)

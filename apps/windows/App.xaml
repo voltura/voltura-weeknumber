@@ -47,6 +47,10 @@
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="RenderTransform"><Setter.Value><TranslateTransform Y="2"/></Setter.Value></Setter>
     </Style>
+    <Style x:Key="XGlyph" TargetType="TextBlock" BasedOn="{StaticResource ButtonGlyph}">
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="RenderTransform" Value="Identity"/>
+    </Style>
     <!-- Shared flat button primitive adapted from Voltura Air's native-title-bar WPF UI. -->
     <Style TargetType="Button">
       <Setter Property="Width" Value="240"/><Setter Property="Height" Value="40"/>

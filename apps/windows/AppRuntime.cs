@@ -18,6 +18,7 @@ internal sealed class AppRuntime : IAsyncDisposable
     private readonly AppPaths _paths;
     private readonly bool _traceDpi;
     private readonly SettingsStore _settings;
+    private readonly ImportedCalendarStore _calendars;
     private readonly ApplicationLog _log;
     private readonly UpdateService _updates;
     private readonly WeekTracker _tracker = new();
@@ -43,9 +44,11 @@ internal sealed class AppRuntime : IAsyncDisposable
         _paths = paths;
         _traceDpi = paths.Isolated && traceDpi;
         _settings = new SettingsStore(paths.Data);
+        _calendars = new ImportedCalendarStore(paths.Data);
         _log = new ApplicationLog(paths.Data);
         _updates = new UpdateService(paths, log: _log);
         Window = new MainWindow(Model);
+        Window.SetValue(CalendarImportActions.StoreProperty, _calendars);
 
         if (_traceDpi)
         {
@@ -162,6 +165,8 @@ internal sealed class AppRuntime : IAsyncDisposable
     private TrayCalendarWindow CreateCalendarFlyout()
     {
         var flyout = new TrayCalendarWindow();
+
+        flyout.SetImportStore(_calendars);
 
         flyout.Dismissed += () => _calendarDismissedByTrayClick = _tray.IsCalendarTrayClick;
 
@@ -867,7 +872,14 @@ internal sealed class AppRuntime : IAsyncDisposable
         _actions.Release();
         _tray.CalendarToggleRequested -= ToggleCalendar;
         _tray.CalendarPointerIdle -= ResetCalendarDismissal;
+        await _calendars.DisposeAsync();
         _calendarFlyout?.Exit();
+
+        if (_calendarFlyout is not null)
+        {
+            await _calendarFlyout.DrainEventQueriesAsync();
+        }
+
         _tray.Dispose();
         Window.Exit();
         _settings.Dispose();

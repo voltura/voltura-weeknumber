@@ -15,7 +15,12 @@ The standard installer uses a separately installed Microsoft .NET Desktop Runtim
 
 ## Application dependencies and build tools
 
-The application project has no additional NuGet package dependencies. Test dependencies are listed in `tests/VolturaWeekNumber.Tests/VolturaWeekNumber.Tests.csproj` and its lock file; they are not shipped with the application. NSIS builds the installers and is not an application runtime dependency.
+The application ships Ical.Net 5.2.3 (MIT) for iCalendar parsing and recurrence, and its NodaTime 3.2.2 dependency (Apache-2.0) for time-zone handling. Their full licenses and required notices are included in `ThirdPartyNotices/` in the distribution and in [docs/licenses](docs/licenses) in the source repository:
+
+- `Ical.Net-LICENSE.md` — copyright Douglas Day, Rian Stockbower, and the ical-org Project.
+- `NodaTime-LICENSE.txt` and `NodaTime-NOTICE.txt` — includes attribution for code derived from Joda Time.
+
+Test dependencies are listed in `tests/VolturaWeekNumber.Tests/VolturaWeekNumber.Tests.csproj` and its lock file; they are not shipped with the application. NSIS builds the installers and is not an application runtime dependency.
 
 Voltura-owned source attribution is recorded in [NOTICE.md](NOTICE.md). Third-party authors and vendors do not endorse Voltura WeekNumber or Voltura AB. Their software remains subject to its own license and warranty terms.
 

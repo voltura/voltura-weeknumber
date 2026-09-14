@@ -58,12 +58,13 @@
       </WrapPanel>
       <Grid>
         <Grid.Style><Style TargetType="Grid"><Setter Property="Grid.Column" Value="1"/><Style.Triggers><DataTrigger Binding="{Binding IsWeek}" Value="True"><Setter Property="Grid.Row" Value="1"/><Setter Property="Grid.Column" Value="0"/><Setter Property="Grid.ColumnSpan" Value="2"/></DataTrigger></Style.Triggers></Style></Grid.Style>
-        <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="40"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <Button x:Name="PreviousPeriod" Width="40" Padding="0" Click="PreviousClick" IsEnabled="{Binding CanPrevious}" ToolTip="{Binding PreviousLabel}" AutomationProperties.Name="{Binding PreviousLabel}"><TextBlock Text="&#xE76B;" Style="{StaticResource ButtonGlyph}"/></Button>
         <TextBlock x:Name="PeriodTitle" Grid.Column="1" Text="{Binding Title}" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0" AutomationProperties.LiveSetting="Polite"/>
         <Button x:Name="NextPeriod" Grid.Column="2" Width="40" Padding="0" Click="NextClick" IsEnabled="{Binding CanNext}" ToolTip="{Binding NextLabel}" AutomationProperties.Name="{Binding NextLabel}"><TextBlock Text="&#xE76C;" Style="{StaticResource ButtonGlyph}"/></Button>
         <Button x:Name="ExportButton" Grid.Column="4" Width="40" Padding="0" Click="ExportClick" IsEnabled="{Binding HasPeriod}" ToolTip="{Binding ExportLabel}" AutomationProperties.Name="{Binding ExportLabel}"><TextBlock Text="&#xEDE1;" Style="{StaticResource ButtonGlyph}"/></Button>
-        <Button x:Name="TodayButton" Grid.Column="6" Width="Auto" MinWidth="100" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
+        <Button x:Name="ImportButton" Grid.Column="6" Width="40" Padding="0" Click="ImportClick" ToolTip="{Binding [ImportCalendar], Source={x:Static ui:Strings.Current}}" AutomationProperties.Name="{Binding [ImportCalendar], Source={x:Static ui:Strings.Current}}"><TextBlock Text="&#xE8B5;" Style="{StaticResource ButtonGlyph}"/></Button>
+        <Button x:Name="TodayButton" Grid.Column="8" Width="Auto" MinWidth="100" Click="TodayClick" AutomationProperties.Name="{Binding [Today], Source={x:Static ui:Strings.Current}}">
           <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="&#xE8D1;" Style="{StaticResource ButtonGlyph}"/><TextBlock Text="{Binding [Today], Source={x:Static ui:Strings.Current}}"/></ui:SpacingStackPanel>
         </Button>
       </Grid>

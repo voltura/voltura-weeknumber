@@ -7,6 +7,7 @@ Voltura WeekNumber is a desktop calendar utility from Voltura AB. It requires no
 - **Installed app:** `%LOCALAPPDATA%\Voltura\WeekNumber` holds settings, optional application logs, setup diagnostics, and downloaded update data.
 - **Portable app:** the `Data` folder beside `VolturaWeekNumber.exe` holds settings and optional application logs.
 - **Settings:** `settings.json` stores language, appearance, calendar rules, notification choices, autostart preference, logging, and automatic-update preference.
+- **Imported calendars:** `Calendars` inside the app's data folder stores local copies of imported `.ics` content and source metadata. These can contain private event titles, locations, and descriptions. Imports are never uploaded, synchronized, or included in settings exports. Remove them through **Calendars…** in the tray calendar; the original files remain where you saved them.
 - **Optional logging:** disabled by default. `application.log` and its rotated `.1` file contain operational events and error types, with rotation at approximately 1 MiB. Explicit display diagnostics also record display geometry and DPI information.
 - **Setup diagnostics:** `setup.log` records installer output and is replaced on each installation attempt. Diagnostic output may contain local paths.
 - **Exports:** settings backups and exported icons are written to locations you choose.
@@ -16,6 +17,8 @@ Starting with Windows creates an application-specific entry in the current user'
 The app also attempts to make its tray icon visible and, once per Windows user, save a position near the clock using the current user's Windows tray settings. A `TrayOrderPlacementAttempted` marker under `HKCU\Software\Voltura\WeekNumber` remains after uninstall so reinstalling does not repeat the placement attempt. It contains no personal information.
 
 ## Network requests
+
+Importing a calendar from a web address downloads it from that address and any redirects. The calendar provider receives the requested address, including its query parameters, and normal network information such as your IP address. This happens only when you import or replace a calendar; there is no automatic refresh. The app stores the downloaded calendar and its filename without separately saving the entered web address.
 
 Automatic updates are enabled by default for installed copies and can be disabled on the About page. Update checks use the GitHub API; update metadata, signatures, and installers are downloaded from GitHub release infrastructure over HTTPS. Requests include an application user-agent, and the server receives normal network information such as your IP address and the requested resource. Settings and calendar lookups are not attached to these requests. You choose when to install the downloaded update.
 

@@ -61,6 +61,7 @@
     <p>Select a date without losing sight of today. Pin the calendar to keep it above other windows while you plan, independently of the main window. Drag the calendar’s top area to position it beside your work. Reopening restores its default position.</p>
     <p>Click the icon again or press Escape to hide it. Clicking elsewhere also closes it when it isn’t pinned.</p>
     <p>Take your week numbers into another calendar. Export the displayed month or year with the button beside Today, or right-click a date or week to choose a period. <a href="#calendar-export">Learn about calendar export.</a></p>
+    <p>Your holidays and appointments belong beside your week numbers. Calendar imports put them in the tray calendar, with subtle dots marking event dates and details just a click away. <a href="#calendar-import">More about calendar imports.</a></p>
   </div>
   <figure class="app-window">
     <img src="docs/images/voltura-weeknumber-tray-calendar-dark.png" width="440" height="456" alt="Compact calendar in dark mode with week numbers beside each row, an outlined selected date, a filled highlight for today, and a calendar pin" loading="lazy">
@@ -76,8 +77,8 @@
   <div class="capability-grid">
     <article class="capability-card">
       <span class="capability-kicker">Browse</span>
-      <h3>Calendar and export</h3>
-      <p>Browse years, months, and weeks with clear week numbers and date ranges. Pin the window on top while you plan, or save week-number markers as an iCalendar (.ics) file to import into another calendar.</p>
+      <h3>Calendar, import, and export</h3>
+      <p>Clear week numbers and date ranges, your imported events in the tray calendar, and week-number exports for other calendar apps.</p>
     </article>
     <article class="capability-card">
       <span class="capability-kicker">Compare</span>
@@ -159,6 +160,14 @@
 </section>
 
 <section class="section details" aria-label="More information">
+  <details id="calendar-import">
+    <summary>Import calendars and view events</summary>
+    <div class="detail-body">
+      <p>Holidays, appointments, and recurring events from iCalendar (.ics) files or web links fit right into the compact tray calendar. Subtle dots make busy dates easy to spot, with event times, locations, and descriptions displayed beside the month.</p>
+      <p>Multiple calendars stay together in one view, while each event keeps its calendar name. Imports are easy to replace when plans change or remove when no longer needed. All-day events, events spanning several days, and recurring schedules are supported.</p>
+      <p>Imported calendars stay on your computer and remain available between app sessions. Web imports download a snapshot; after import, calendars work offline without an account or automatic synchronization, editing, or reminders.</p>
+    </div>
+  </details>
   <details id="calendar-export">
     <summary>Export week numbers to your calendar</summary>
     <div class="detail-body">

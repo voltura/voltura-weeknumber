@@ -29,5 +29,9 @@
     <None Include="../../LICENSE" Link="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../NOTICE.md" Link="NOTICE.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../docs/licenses/*" Link="ThirdPartyNotices/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Ical.Net" Version="5.2.3" />
   </ItemGroup>
 </Project>

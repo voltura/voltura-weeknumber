@@ -39,7 +39,7 @@
           <ui:SpacingStackPanel Orientation="Horizontal" Spacing="9"><Grid x:Name="ConflictIcon" Width="20" Height="20" VerticalAlignment="Center"><Ellipse Fill="{DynamicResource WarningTextBrush}"/><TextBlock Text="!" Foreground="{DynamicResource WarningBrush}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Margin="0,-1,0,0"/></Grid><TextBlock Text="{Binding [ShortcutConflict], Source={x:Static ui:Strings.Current}}" Foreground="{DynamicResource WarningTextBrush}" FontWeight="SemiBold" VerticalAlignment="Center"/></ui:SpacingStackPanel>
         </Border>
         <Border x:Name="InvalidBanner" Visibility="Collapsed" Background="{DynamicResource ErrorBrush}" CornerRadius="6" Padding="12,10" AutomationProperties.LiveSetting="Assertive" AutomationProperties.Name="{Binding [ShortcutInvalid], Source={x:Static ui:Strings.Current}}">
-          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="9"><TextBlock Text="&#xE711;" Style="{StaticResource ButtonGlyph}" Foreground="{DynamicResource ErrorTextBrush}"/><TextBlock Text="{Binding [ShortcutInvalid], Source={x:Static ui:Strings.Current}}" Foreground="{DynamicResource ErrorTextBrush}" FontWeight="SemiBold"/></ui:SpacingStackPanel>
+          <ui:SpacingStackPanel Orientation="Horizontal" Spacing="9"><TextBlock Text="&#xE711;" Style="{StaticResource XGlyph}" Foreground="{DynamicResource ErrorTextBrush}"/><TextBlock Text="{Binding [ShortcutInvalid], Source={x:Static ui:Strings.Current}}" Foreground="{DynamicResource ErrorTextBrush}" FontWeight="SemiBold"/></ui:SpacingStackPanel>
         </Border>
       </ui:SpacingStackPanel>
     </ScrollViewer>

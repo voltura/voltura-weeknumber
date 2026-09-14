@@ -27,6 +27,14 @@
           "xunit.v3.mtp-v2": "[4.0.0]"
         }
       },
+      "Ical.Net": {
+        "type": "Transitive",
+        "resolved": "5.2.3",
+        "contentHash": "zROvmrRPKqND0e0Bt/wSY+d8iYtL4+sP9mORyjT/ySBiIDfik4iovTjS+L9PFg+zoXfkJ5eBTHK2lX9c7lganw==",
+        "dependencies": {
+          "NodaTime": "3.2.2"
+        }
+      },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
         "resolved": "2.23.0",
@@ -89,6 +97,11 @@
         "type": "Transitive",
         "resolved": "5.0.0",
         "contentHash": "dDoKi0PnDz31yAyETfRntsLArTlVAVzUzCIvvEDsDsucrl33Dl8pIJG06ePTJTI3tGpeyHS9Cq7Foc/s4EeKcg=="
+      },
+      "NodaTime": {
+        "type": "Transitive",
+        "resolved": "3.2.2",
+        "contentHash": "dmju5W0UYC3QP/UJM0juKAZkH0HSDMp0gH91A0+mT9M0kgyM2Jm67hUZPl/WRQLq8Lijjqmdk8kyAViWFWM7dA=="
       },
       "System.Security.AccessControl": {
         "type": "Transitive",
@@ -164,7 +177,10 @@
         }
       },
       "volturaweeknumber": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Ical.Net": "[5.2.3, )"
+        }
       }
     }
   }

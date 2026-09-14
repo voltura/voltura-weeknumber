@@ -127,7 +127,7 @@ public static class CalendarExportActions
             ? System.Windows.Controls.Primitives.PlacementMode.Bottom
             : System.Windows.Controls.Primitives.PlacementMode.MousePoint;
 
-        var interaction = tray?.BeginExportInteraction();
+        var interaction = tray?.BeginCalendarInteraction();
         RoutedEventHandler? closed = null;
 
         closed = (_, _) =>
@@ -157,7 +157,7 @@ public static class CalendarExportActions
     internal static void Export(Window owner, CalendarExportRequest request, CalendarOptions options,
         ICalendarExportDialog? dialog = null)
     {
-        using var interaction = (owner as TrayCalendarWindow)?.BeginExportInteraction();
+        using var interaction = (owner as TrayCalendarWindow)?.BeginCalendarInteraction();
         var strings = Strings.Current;
 
         dialog ??= new CalendarExportDialog();
