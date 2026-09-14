@@ -179,6 +179,7 @@ internal static class CalendarImport
 
                     var from = Local(occurrence.Period.StartTime, zone);
                     // Ical.Net applies the master duration to RDATE periods; retain their explicit end.
+
                     if (!periodLookups.TryGetValue(entry, out var periods))
                     {
                         foreach (var period in entry.RecurrenceDates.GetAllPeriods())
@@ -198,6 +199,7 @@ internal static class CalendarImport
                     Period? explicitPeriod = null;
 
                     periods?.TryGetValue(occurrence.Period.StartTime, out explicitPeriod);
+
                     var to = Local(explicitPeriod?.EffectiveEndTime ?? occurrence.Period.EffectiveEndTime ?? occurrence.Period.StartTime, zone);
 
                     if (from >= end || (to > from
