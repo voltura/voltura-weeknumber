@@ -44,6 +44,8 @@ VIAddVersionKey /LANG=1033 "InternalName" "VolturaWeekNumberSetup"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "Copyright (c) 2026 ${PUBLISHER}"
 VIAddVersionKey /LANG=1033 "Comments" "Developer: ${DEVELOPER}; Website: ${PRODUCT_URL}; Address: ${POSTAL_ADDRESS}"
 !define MUI_ICON "..\apps\windows\Assets\App.ico"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "Assets\wizard.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP_STRETCH "AspectFitHeight"
 !define MUI_ABORTWARNING
 ; Unicode setup must offer every language, regardless of the Windows code page.
 !define MUI_LANGDLL_ALLLANGUAGES

@@ -43,6 +43,8 @@ try
         throw 'NSIS is required.'
     }
 
+    & "$PSScriptRoot\build-installer-art.ps1"
+
     if (-not $SkipTests)
     {
         & "$PSScriptRoot\build.ps1"
