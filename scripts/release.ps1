@@ -9,6 +9,43 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $repository = 'voltura/voltura-weeknumber'
+$script:releasePhase = 'Starting release checks'
+
+function Write-ReleaseHeader([string]$Message)
+{
+    $script:releasePhase = $Message
+    Write-Host ''
+    Write-Host ('=' * 72) -ForegroundColor DarkCyan
+    Write-Host ('  ' + $Message) -ForegroundColor Cyan
+    Write-Host ('=' * 72) -ForegroundColor DarkCyan
+}
+
+function Write-ReleaseStatus([string]$Message, [ConsoleColor]$Color = [ConsoleColor]::Gray)
+{
+    Write-Host ('  ' + $Message) -ForegroundColor $Color
+}
+
+function Write-ReleaseSuccess([string]$Message)
+{
+    $displayMessage = if ($Message.Length -gt 59) { $Message.Substring(0, 56) + '...' } else { $Message.PadRight(59) }
+    Write-Host ''
+    Write-Host ('+' + ('-' * 70) + '+') -ForegroundColor Green
+    Write-Host ('|  SUCCESS: ' + $displayMessage + '|') -ForegroundColor Green
+    Write-Host ('+' + ('-' * 70) + '+') -ForegroundColor Green
+}
+
+trap
+{
+    $phase = if ($script:releasePhase.Length -gt 44) { $script:releasePhase.Substring(0, 41) + '...' } else { $script:releasePhase.PadRight(44) }
+    $errorMessage = [string]$_.Exception.Message
+    if ($errorMessage.Length -gt 67) { $errorMessage = $errorMessage.Substring(0, 64) + '...' } else { $errorMessage = $errorMessage.PadRight(67) }
+    Write-Host ''
+    Write-Host ('!' + ('-' * 70) + '!') -ForegroundColor Red
+    Write-Host ('|  RELEASE FAILED during: ' + $phase + '|') -ForegroundColor Red
+    Write-Host ('|  ' + $errorMessage + '|') -ForegroundColor Red
+    Write-Host ('!' + ('-' * 70) + '!') -ForegroundColor Red
+    throw $_.Exception
+}
 
 function ConvertTo-ReleaseVersion([string]$Value)
 {
@@ -61,6 +98,9 @@ function Assert-ReleaseTag([string]$Revision)
     }
 }
 
+Write-ReleaseHeader 'Preparing release'
+Write-ReleaseStatus "Repository: $repository"
+
 if ([string]::IsNullOrWhiteSpace($KeyPath))
 {
     throw 'Supply -KeyPath or set WEEKNUMBER_KEYPATH, then open a new terminal.'
@@ -73,6 +113,7 @@ if (-not (Test-Path -LiteralPath $KeyPath -PathType Leaf))
 
 $KeyPath = (Resolve-Path -LiteralPath $KeyPath).Path
 # Failed lookups must never be mistaken for an unreleased version.
+Write-ReleaseStatus 'Checking signing key and existing GitHub releases...' DarkGray
 $releaseTags = @(gh api "repos/$repository/releases" --paginate --jq '.[].tag_name')
 
 if ($LASTEXITCODE)
@@ -113,6 +154,8 @@ if ((ConvertTo-ReleaseVersion $Version) -le $latest)
     throw "Version $Version must be newer than the latest release $latest."
 }
 
+Write-ReleaseStatus "Releasing version $Version (latest published: $latest)" White
+
 $branch = git -C $root branch --show-current
 
 if ($LASTEXITCODE -or [string]::IsNullOrWhiteSpace($branch))
@@ -152,7 +195,7 @@ if (-not (Test-ReleaseNotes $notes))
         [IO.File]::WriteAllText($notes, "# Voltura WeekNumber $Version`n`n")
     }
 
-    Write-Host 'Write and save the release notes, then close the separate Notepad++ window to continue.'
+    Write-ReleaseStatus 'Write and save the release notes, then close the separate Notepad++ window to continue.' Yellow
     Start-Process -FilePath $editor -ArgumentList @('-multiInst', '-nosession', ('"' + $notes + '"')) -Wait
 
     if (-not (Test-ReleaseNotes $notes))
@@ -179,6 +222,9 @@ foreach ($path in @($versionPath, $notes))
     }
 }
 
+Write-ReleaseHeader 'Building, testing, packaging, and signing'
+Write-ReleaseStatus 'The detailed tool output below is retained for diagnostics.' DarkGray
+
 # Validate the key, build/test once, and sign before committing or pushing.
 
 & "$PSScriptRoot\sign-update.ps1" -KeyPath $KeyPath -BuildPackages -SkipTests:$NoTests
@@ -193,10 +239,14 @@ $assets = @(
 
 if ($PrepareOnly)
 {
-    Write-Output 'Signed release prepared locally. Files retained; nothing staged, committed, pushed, or published.'
+    Write-ReleaseSuccess "Version $Version prepared locally"
+    Write-ReleaseStatus 'Files retained; nothing staged, committed, pushed, or published.' Yellow
 
     return
 }
+
+Write-ReleaseHeader 'Committing and publishing'
+Write-ReleaseStatus "Committing release $Version on branch $branch..." White
 
 git -C $root add -A
 
@@ -256,3 +306,7 @@ if ($LASTEXITCODE)
 {
     throw 'Release publication failed. Inspect the GitHub release before retrying; the commit remains pushed.'
 }
+
+Write-ReleaseSuccess "Voltura WeekNumber $Version released successfully"
+Write-ReleaseStatus "GitHub: https://github.com/$repository/releases/tag/v$Version" Green
+Write-ReleaseStatus 'Commit pushed and all release assets published.' Green
