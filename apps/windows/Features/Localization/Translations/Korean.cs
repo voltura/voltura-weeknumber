@@ -147,7 +147,7 @@ internal static class Korean
             ["CheckUpdates"] = "업데이트 확인",
             ["Downloads"] = "다운로드 페이지 열기",
             ["Install"] = "설치 후 다시 시작",
-            ["Project"] = "프로젝트 페이지 열기",
+            ["Project"] = "제품 페이지 열기",
             ["License"] = "라이선스 보기",
             ["Donate"] = "개발 후원",
             ["Coffee"] = "커피 한 잔 후원",

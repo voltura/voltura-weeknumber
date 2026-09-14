@@ -147,7 +147,7 @@ internal static class Japanese
             ["CheckUpdates"] = "更新を確認",
             ["Downloads"] = "ダウンロードページを開く",
             ["Install"] = "インストールして再起動",
-            ["Project"] = "プロジェクトページを開く",
+            ["Project"] = "製品ページを開く",
             ["License"] = "ライセンスを表示",
             ["Donate"] = "開発を支援",
             ["Coffee"] = "コーヒーをおごる",

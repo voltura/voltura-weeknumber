@@ -147,7 +147,7 @@ internal static class French
             ["CheckUpdates"] = "Rechercher des mises à jour",
             ["Downloads"] = "Ouvrir les téléchargements",
             ["Install"] = "Installer et redémarrer",
-            ["Project"] = "Ouvrir la page du projet",
+            ["Project"] = "Ouvrir la page du produit",
             ["License"] = "Voir la licence",
             ["Donate"] = "Soutenir le développement",
             ["Coffee"] = "M’offrir un café",

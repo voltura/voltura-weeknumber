@@ -147,7 +147,7 @@ internal static class Polish
             ["CheckUpdates"] = "Sprawdź aktualizacje",
             ["Downloads"] = "Otwórz stronę pobierania",
             ["Install"] = "Zainstaluj i uruchom ponownie",
-            ["Project"] = "Otwórz stronę projektu",
+            ["Project"] = "Otwórz stronę produktu",
             ["License"] = "Wyświetl licencję",
             ["Donate"] = "Wesprzyj rozwój",
             ["Coffee"] = "Postaw mi kawę",

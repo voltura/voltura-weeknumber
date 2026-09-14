@@ -147,7 +147,7 @@ internal static class SimplifiedChinese
             ["CheckUpdates"] = "检查更新",
             ["Downloads"] = "打开下载页面",
             ["Install"] = "安装并重启",
-            ["Project"] = "打开项目页面",
+            ["Project"] = "打开产品页面",
             ["License"] = "查看许可证",
             ["Donate"] = "支持开发",
             ["Coffee"] = "请我喝杯咖啡",

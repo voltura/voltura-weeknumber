@@ -147,7 +147,7 @@ internal static class Indonesian
             ["CheckUpdates"] = "Periksa pembaruan",
             ["Downloads"] = "Buka unduhan",
             ["Install"] = "Instal dan mulai ulang",
-            ["Project"] = "Buka halaman proyek",
+            ["Project"] = "Buka halaman produk",
             ["License"] = "Lihat lisensi",
             ["Donate"] = "Dukung pengembangan",
             ["Coffee"] = "Traktir saya kopi",

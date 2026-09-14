@@ -10,6 +10,7 @@ namespace VolturaWeekNumber.Features.Updates;
 internal sealed class UpdateService : IAsyncDisposable
 {
     public const string ProjectUrl = "https://github.com/voltura/voltura-weeknumber";
+    public const string ProductUrl = "https://voltura.github.io/voltura-weeknumber/";
     private static readonly string[] MetadataFiles =
     [
         "manifest.json",

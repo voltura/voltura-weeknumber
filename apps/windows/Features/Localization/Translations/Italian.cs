@@ -147,7 +147,7 @@ internal static class Italian
             ["CheckUpdates"] = "Cerca aggiornamenti",
             ["Downloads"] = "Apri download",
             ["Install"] = "Installa e riavvia",
-            ["Project"] = "Apri pagina del progetto",
+            ["Project"] = "Apri la pagina del prodotto",
             ["License"] = "Visualizza licenza",
             ["Donate"] = "Sostieni lo sviluppo",
             ["Coffee"] = "Offrimi un caffè",

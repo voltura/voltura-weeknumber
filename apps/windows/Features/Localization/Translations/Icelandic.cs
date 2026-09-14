@@ -147,7 +147,7 @@ internal static class Icelandic
             ["CheckUpdates"] = "Leita að uppfærslum",
             ["Downloads"] = "Opna niðurhal",
             ["Install"] = "Setja upp og endurræsa",
-            ["Project"] = "Opna síðu verkefnis",
+            ["Project"] = "Opna vörusíðu",
             ["License"] = "Skoða leyfi",
             ["Donate"] = "Styðja þróun",
             ["Coffee"] = "Bjóða mér í kaffi",

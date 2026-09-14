@@ -147,7 +147,7 @@ internal static class Finnish
             ["CheckUpdates"] = "Tarkista päivitykset",
             ["Downloads"] = "Avaa lataukset",
             ["Install"] = "Asenna ja käynnistä uudelleen",
-            ["Project"] = "Avaa projektisivu",
+            ["Project"] = "Avaa tuotesivu",
             ["License"] = "Näytä lisenssi",
             ["Donate"] = "Tue kehitystä",
             ["Coffee"] = "Tarjoa kahvi",

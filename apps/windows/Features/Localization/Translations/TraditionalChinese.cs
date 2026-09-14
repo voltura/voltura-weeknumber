@@ -147,7 +147,7 @@ internal static class TraditionalChinese
             ["CheckUpdates"] = "檢查更新",
             ["Downloads"] = "開啟下載頁面",
             ["Install"] = "安裝並重新啟動",
-            ["Project"] = "開啟專案頁面",
+            ["Project"] = "開啟產品頁面",
             ["License"] = "檢視授權條款",
             ["Donate"] = "支持開發",
             ["Coffee"] = "請我喝杯咖啡",

@@ -147,7 +147,7 @@ internal static class German
             ["CheckUpdates"] = "Nach Updates suchen",
             ["Downloads"] = "Downloads öffnen",
             ["Install"] = "Installieren und neu starten",
-            ["Project"] = "Projektseite öffnen",
+            ["Project"] = "Produktseite öffnen",
             ["License"] = "Lizenz anzeigen",
             ["Donate"] = "Entwicklung unterstützen",
             ["Coffee"] = "Einen Kaffee spendieren",

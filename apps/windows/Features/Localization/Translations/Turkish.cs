@@ -147,7 +147,7 @@ internal static class Turkish
             ["CheckUpdates"] = "Güncellemeleri denetle",
             ["Downloads"] = "İndirmeleri aç",
             ["Install"] = "Yükle ve yeniden başlat",
-            ["Project"] = "Proje sayfasını aç",
+            ["Project"] = "Ürün sayfasını aç",
             ["License"] = "Lisansı görüntüle",
             ["Donate"] = "Geliştirmeyi destekle",
             ["Coffee"] = "Bana bir kahve ısmarla",

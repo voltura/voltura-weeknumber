@@ -147,7 +147,7 @@ internal static class Danish
             ["CheckUpdates"] = "Søg efter opdateringer",
             ["Downloads"] = "Åbn downloads",
             ["Install"] = "Installér og genstart",
-            ["Project"] = "Åbn projektsiden",
+            ["Project"] = "Åbn produktsiden",
             ["License"] = "Vis licens",
             ["Donate"] = "Støt udviklingen",
             ["Coffee"] = "Giv mig en kop kaffe",

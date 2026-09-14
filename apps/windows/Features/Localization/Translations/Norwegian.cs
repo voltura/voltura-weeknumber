@@ -147,7 +147,7 @@ internal static class Norwegian
             ["CheckUpdates"] = "Se etter oppdateringer",
             ["Downloads"] = "Åpne nedlastinger",
             ["Install"] = "Installer og start på nytt",
-            ["Project"] = "Åpne prosjektsiden",
+            ["Project"] = "Åpne produktsiden",
             ["License"] = "Vis lisens",
             ["Donate"] = "Støtt utviklingen",
             ["Coffee"] = "Spander en kaffe",

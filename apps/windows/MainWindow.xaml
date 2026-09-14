@@ -350,7 +350,7 @@
                   <Setter Property="Margin" Value="0,0,8,8"/>
                 </Style>
               </WrapPanel.Resources>
-              <Button Click="ActionClick" Tag="project" AutomationProperties.Name="{Binding [Project], Source={x:Static ui:Strings.Current}}">
+              <Button Click="ActionClick" Tag="product" AutomationProperties.Name="{Binding [Project], Source={x:Static ui:Strings.Current}}">
                 <ui:SpacingStackPanel Orientation="Horizontal" Spacing="8">
                   <TextBlock Text="&#xE774;" Style="{StaticResource ButtonGlyph}"/>
                   <TextBlock Text="{Binding [Project], Source={x:Static ui:Strings.Current}}"/>

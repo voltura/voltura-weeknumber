@@ -147,7 +147,7 @@ internal static class Dutch
             ["CheckUpdates"] = "Controleren op updates",
             ["Downloads"] = "Downloads openen",
             ["Install"] = "Installeren en herstarten",
-            ["Project"] = "Projectpagina openen",
+            ["Project"] = "Productpagina openen",
             ["License"] = "Licentie bekijken",
             ["Donate"] = "Ontwikkeling steunen",
             ["Coffee"] = "Trakteer me op koffie",

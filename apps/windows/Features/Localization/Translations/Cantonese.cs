@@ -147,7 +147,7 @@ internal static class Cantonese
             ["CheckUpdates"] = "檢查更新",
             ["Downloads"] = "開啟下載頁",
             ["Install"] = "安裝並重新啟動",
-            ["Project"] = "開啟專案網頁",
+            ["Project"] = "開啟產品網頁",
             ["License"] = "睇授權條款",
             ["Donate"] = "支持開發",
             ["Coffee"] = "請我飲杯咖啡",

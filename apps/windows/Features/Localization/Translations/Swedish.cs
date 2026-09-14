@@ -147,7 +147,7 @@ internal static class Swedish
             ["CheckUpdates"] = "Sök efter uppdateringar",
             ["Downloads"] = "Öppna nedladdningar",
             ["Install"] = "Installera och starta om",
-            ["Project"] = "Öppna projektsidan",
+            ["Project"] = "Öppna produktsidan",
             ["License"] = "Visa licens",
             ["Donate"] = "Stöd utvecklingen",
             ["Coffee"] = "Bjud på en kaffe",

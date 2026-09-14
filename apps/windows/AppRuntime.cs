@@ -826,8 +826,8 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "install-update":
                 await _updates.InstallAsync();
                 break;
-            case "project":
-                Launch(UpdateService.ProjectUrl);
+            case "product":
+                Launch(UpdateService.ProductUrl);
                 break;
             case "license":
                 Launch(Path.Combine(AppContext.BaseDirectory, "LICENSE.txt"));
