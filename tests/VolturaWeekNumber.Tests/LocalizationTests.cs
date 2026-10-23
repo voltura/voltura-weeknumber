@@ -15,8 +15,8 @@ public sealed class LocalizationTests
     [Fact]
     public void CatalogHasCompleteTranslationsAndValidPlaceholders()
     {
-        Assert.Equal(21, LanguageCatalog.All.Count);
-        Assert.Equal(21, LanguageCatalog.All.Select(language => language.Id).Distinct().Count());
+        Assert.Equal(22, LanguageCatalog.All.Count);
+        Assert.Equal(22, LanguageCatalog.All.Select(language => language.Id).Distinct().Count());
 
         var english = LanguageCatalog.All[0].Entries;
 
@@ -102,6 +102,7 @@ public sealed class LocalizationTests
     [InlineData("no-NO", "nb")]
     [InlineData("nn-NO", "en")]
     [InlineData("pl-PL", "pl")]
+    [InlineData("cs-CZ", "cs")]
     [InlineData("it-CH", "it")]
     [InlineData("es-MX", "es")]
     [InlineData("ja-JP", "ja")]
@@ -144,7 +145,7 @@ public sealed class LocalizationTests
         var editor = new SettingsEditor();
         var choices = editor.Languages.ToArray();
 
-        Assert.Equal(22, choices.Length);
+        Assert.Equal(23, choices.Length);
         Assert.Equal("system", choices[0].Value);
         Assert.Equal(LanguageCatalog.All.Select(item => item.Id), choices.Skip(1).Select(item => item.Value));
         editor.Load(new AppSettings());

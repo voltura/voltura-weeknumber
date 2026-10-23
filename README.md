@@ -116,7 +116,7 @@
   <div class="essentials-grid">
     <div class="essential"><strong>Works offline</strong><span>Calendar lookups need no connection.</span></div>
     <div class="essential"><strong>Looks at home</strong><span>Light, dark, or system appearance with customizable icon colors.</span></div>
-    <div class="essential"><strong>Speaks your language</strong><span>Choose from 21 languages or follow Windows.</span></div>
+    <div class="essential"><strong>Speaks your language</strong><span>Choose from 22 languages or follow Windows.</span></div>
     <div class="essential"><strong>Stays out of the way</strong><span>Closing the window leaves the week number available in the tray.</span></div>
   </div>
 </section>
