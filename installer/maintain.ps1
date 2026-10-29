@@ -279,7 +279,13 @@ function Complete-Removal([string]$removalPath)
 
         $run = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
         $expectedCommand = '"' + (Join-Path $target 'VolturaWeekNumber.exe') + '" --autostart'
-        $entry = Get-ItemPropertyValue -Path $run -Name 'Voltura WeekNumber' -ErrorAction SilentlyContinue
+        # Windows PowerShell 5.1 throws a terminating error from Get-ItemPropertyValue
+        # for a missing value even with -ErrorAction SilentlyContinue.
+        $runValues = Get-ItemProperty -Path $run -ErrorAction SilentlyContinue
+        $entry = if ($runValues -and $runValues.PSObject.Properties['Voltura WeekNumber'])
+        {
+            $runValues.'Voltura WeekNumber'
+        }
 
         if ($entry -eq $expectedCommand)
         {
