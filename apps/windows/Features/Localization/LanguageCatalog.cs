@@ -23,6 +23,7 @@ internal static class LanguageCatalog
         new("is", "Íslenska", "is-IS", Icelandic.Entries),
         new("nb", "Norsk bokmål", "nb-NO", Norwegian.Entries),
         new("pl", "Polski", "pl-PL", Polish.Entries),
+        new("cs", "Čeština", "cs-CZ", Czech.Entries),
         new("it", "Italiano", "it-IT", Italian.Entries),
         new("es", "Español", "es-ES", Spanish.Entries),
         new("yue", "粵語", "zh-HK", Cantonese.Entries),

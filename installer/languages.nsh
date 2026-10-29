@@ -19,6 +19,7 @@
 !insertmacro VolturaLanguage "is" "Icelandic" "Íslenska"
 !insertmacro VolturaLanguage "nb" "Norwegian" "Norsk bokmål"
 !insertmacro VolturaLanguage "pl" "Polish" "Polski"
+!insertmacro VolturaLanguage "cs" "Czech" "Čeština"
 !insertmacro VolturaLanguage "it" "Italian" "Italiano"
 !insertmacro VolturaLanguage "es" "Spanish" "Español"
 !insertmacro VolturaLanguage "yue" "Cantonese" "粵語"
@@ -86,6 +87,11 @@
   "Nie udało się zainstalować środowiska .NET 10 Desktop Runtime. Spróbuj ponownie lub użyj instalatora offline." \
   "Czy usunąć również ustawienia, dzienniki i pobrane aktualizacje?" \
   "Wymagany jest system Windows x64."
+!insertmacro VolturaSetupStrings Czech \
+  "Instalaci se nepodařilo dokončit. Předchozí instalace byla podle možností obnovena. Prohlédněte si podrobnosti instalace a zkuste to znovu." \
+  ".NET 10 Desktop Runtime se nepodařilo nainstalovat. Zkuste to znovu nebo použijte offline instalační program." \
+  "Odebrat také nastavení, protokoly a stažené aktualizace?" \
+  "Je vyžadován systém Windows x64."
 !insertmacro VolturaSetupStrings Italian \
   "Impossibile completare l’installazione. L’installazione precedente è stata ripristinata ove possibile. Consulta i dettagli dell’installazione e riprova." \
   "Impossibile installare .NET 10 Desktop Runtime. Riprova o usa il programma di installazione offline." \
