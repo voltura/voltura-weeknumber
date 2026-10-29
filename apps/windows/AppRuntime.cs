@@ -825,7 +825,7 @@ internal sealed class AppRuntime : IAsyncDisposable
             // Setup stops the verified installed process only after payload verification.
             // Cancelling setup before that point leaves this application running.
             case "install-update":
-                await _updates.InstallAsync();
+                await InstallUpdateAsync();
                 break;
             case "product":
                 Launch(UpdateService.ProductUrl);
@@ -839,6 +839,42 @@ internal sealed class AppRuntime : IAsyncDisposable
             case "coffee":
                 Launch("https://ko-fi.com/G2G74W5F8");
                 break;
+        }
+    }
+
+    private async Task InstallUpdateAsync()
+    {
+        if (!_updates.State.Ready)
+        {
+            return;
+        }
+
+        var wasVisible = Window.IsVisible;
+        var wasTopmost = Window.Topmost;
+
+        // Setup has its own language picker and wizard. A pinned app must not cover them.
+
+        _calendarFlyout?.Hide();
+        Window.ApplyAlwaysOnTop(false);
+        Window.Hide();
+
+        try
+        {
+            await _updates.InstallAsync();
+        }
+        finally
+        {
+            // Successful setup stops this process. Cancellation or launch failure leaves it usable.
+            if (!_shuttingDown)
+            {
+                Window.ApplyAlwaysOnTop(wasTopmost);
+
+                if (wasVisible)
+                {
+                    Window.Show();
+                    Window.Activate();
+                }
+            }
         }
     }
 

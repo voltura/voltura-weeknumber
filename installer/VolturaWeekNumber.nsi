@@ -51,6 +51,7 @@ VIAddVersionKey /LANG=1033 "Comments" "Developer: ${DEVELOPER}; Website: ${PRODU
 !define MUI_LANGDLL_ALLLANGUAGES
 !define MUI_FINISHPAGE_RUN "$INSTDIR\VolturaWeekNumber.exe"
 !define MUI_FINISHPAGE_REBOOTLATER_DEFAULT
+!define MUI_CUSTOMFUNCTION_GUIINIT VolturaUpdateGUIInit
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_INSTFILES
@@ -61,18 +62,28 @@ VIAddVersionKey /LANG=1033 "Comments" "Developer: ${DEVELOPER}; Website: ${PRODU
 Var AutoUpdate
 Var PowerShell
 Function .onInit
-  !insertmacro MUI_LANGDLL_DISPLAY
+  ${GetParameters} $0
+  ClearErrors
+  ${GetOptions} $0 "/AUTOUPDATE" $1
+  ${IfNot} ${Errors}
+    StrCpy $AutoUpdate "1"
+  ${EndIf}
+  ; Update setup uses the Windows language without an easily hidden preliminary dialog.
+  ${If} $AutoUpdate != "1"
+    !insertmacro MUI_LANGDLL_DISPLAY
+  ${EndIf}
   ${IfNot} ${RunningX64}
     Abort "$(RequiresX64)"
   ${EndIf}
   StrCpy $PowerShell "$WINDIR\Sysnative\WindowsPowerShell\v1.0\powershell.exe"
   ; Use Windows modules even when setup inherits a PowerShell 7 environment.
   System::Call 'kernel32::SetEnvironmentVariableW(w "PSModulePath", w "$WINDIR\System32\WindowsPowerShell\v1.0\Modules") i.r0'
-  ${GetParameters} $0
-  ClearErrors
-  ${GetOptions} $0 "/AUTOUPDATE" $1
-  ${IfNot} ${Errors}
-    StrCpy $AutoUpdate "1"
+FunctionEnd
+Function VolturaUpdateGUIInit
+  ${If} $AutoUpdate == "1"
+    ; Older installed versions may still have an always-on-top main window open.
+    System::Call 'user32::SetWindowPos(p $HWNDPARENT, p -1, i 0, i 0, i 0, i 0, i 3)'
+    BringToFront
   ${EndIf}
 FunctionEnd
 Section "Install"

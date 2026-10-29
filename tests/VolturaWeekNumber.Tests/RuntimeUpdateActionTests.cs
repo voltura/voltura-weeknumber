@@ -244,6 +244,115 @@ public sealed class RuntimeUpdateActionTests(WpfTestFixture fixture)
         }
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task UpdateInstallerHidesPinnedWindowsAndRestoresAfterCancelOrLaunchFailure(bool pinned, bool launchFails)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "VolturaWeekNumber-tests", Guid.NewGuid().ToString("N"));
+        using var key = System.Security.Cryptography.RSA.Create(2048);
+        using var handler = new UpdateServiceTests.ReleaseHandler(key);
+        var opened = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var closed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        AppRuntime? runtime = null;
+        Task operation = Task.CompletedTask;
+        var token = TestContext.Current.CancellationToken;
+
+        handler.SetRelease(key, "99.0.0");
+
+        try
+        {
+            Task start = Task.CompletedTask;
+
+            fixture.Run(() =>
+            {
+                runtime = new AppRuntime(new(root, false, true));
+                start = runtime.StartAsync(true);
+            });
+            await start;
+
+            Task save = Task.CompletedTask;
+
+            fixture.Run(() => save = runtime!.ApplyReviewSettingsAsync(new AppSettings { AlwaysOnTop = pinned }));
+            await save;
+            fixture.Run(() =>
+            {
+                runtime!.Window.Open(MainPage.About);
+
+                var updates = Field<UpdateService>(runtime, "_updates");
+
+                Field<HttpClient>(updates, "_http").Dispose();
+
+                void Set(string name, object value) => typeof(UpdateService)
+                    .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(updates, value);
+                Set("_http", new HttpClient(handler));
+                Set("_publicKey", key.ExportSubjectPublicKeyInfoPem());
+                Set("<Eligible>k__BackingField", true);
+                Set("_full", false);
+                Set("_install", (Func<string, CancellationToken, Task>)(async (_, cancellation) =>
+                {
+                    opened.TrySetResult();
+                    await closed.Task.WaitAsync(cancellation);
+
+                    if (launchFails)
+                    {
+                        throw new System.ComponentModel.Win32Exception("Controlled installer launch failure.");
+                    }
+                }));
+                typeof(AppRuntime).GetMethod("ToggleCalendar", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .Invoke(runtime, [new System.Drawing.Rectangle(700, 800, 20, 20)]);
+            });
+            await Field<UpdateService>(runtime!, "_updates").CheckAsync();
+            FlushUi();
+            fixture.Run(() =>
+            {
+                Assert.True(runtime!.Window.IsVisible);
+                Assert.Equal(pinned, runtime.Window.Topmost);
+                Assert.True(Field<VolturaWeekNumber.Ui.TrayCalendarWindow>(runtime, "_calendarFlyout").IsVisible);
+                operation = (Task)typeof(AppRuntime).GetMethod("ExecuteAsync", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .Invoke(runtime, ["install-update"])!;
+            });
+            await opened.Task.WaitAsync(TimeSpan.FromSeconds(10), token);
+            fixture.Run(() =>
+            {
+                Assert.False(runtime!.Window.IsVisible);
+                Assert.False(runtime.Window.Topmost);
+                Assert.False(Field<VolturaWeekNumber.Ui.TrayCalendarWindow>(runtime, "_calendarFlyout").IsVisible);
+                Assert.Equal(pinned, runtime.Model.Editor.AlwaysOnTop);
+            });
+            closed.TrySetResult();
+            await operation.WaitAsync(TimeSpan.FromSeconds(10), token);
+            FlushUi();
+            fixture.Run(() =>
+            {
+                Assert.True(runtime!.Window.IsVisible);
+                Assert.Equal(pinned, runtime.Window.Topmost);
+                Assert.Equal(launchFails
+                    ? UpdateStatus.UpdateInstallFailed
+                    : UpdateStatus.Ready,
+                    Field<UpdateService>(runtime, "_updates").State.Status);
+            });
+            Assert.Equal(pinned, (await SettingsStore.ReadAsync(Path.Combine(root, "settings.json"))).AlwaysOnTop);
+        }
+        finally
+        {
+            closed.TrySetResult();
+            await operation;
+
+            Task cleanup = Task.CompletedTask;
+
+            fixture.Run(() => cleanup = runtime?.DisposeAsync().AsTask() ?? Task.CompletedTask);
+            await cleanup;
+
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, true);
+            }
+        }
+    }
+
     private void FlushUi() => fixture.Run(() =>
         System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(
             () => { }, System.Windows.Threading.DispatcherPriority.Background));
