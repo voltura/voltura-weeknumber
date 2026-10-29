@@ -179,7 +179,7 @@
   <details>
     <summary>Languages and personalization</summary>
     <div class="detail-body">
-      <p>English, Swedish, German, French, Danish, Finnish, Icelandic, Norwegian Bokmål, Polish, Italian, Spanish, Cantonese, Japanese, Brazilian Portuguese, Simplified Chinese, Traditional Chinese, Dutch, Korean, Russian, Turkish, and Indonesian are included.</p>
+      <p>English, Swedish, German, French, Danish, Finnish, Icelandic, Norwegian Bokmål, Polish, Czech, Italian, Spanish, Cantonese, Japanese, Brazilian Portuguese, Simplified Chinese, Traditional Chinese, Dutch, Korean, Russian, Turkish, and Indonesian are included.</p>
       <p>Choose a language independently of your calendar rules. You can also customize the tray icon, export it as an ICO file, choose light, dark, or system appearance, and import or export your preferences.</p>
       <p>In Preferences, assign separate keyboard shortcuts for Week number and Calendar. Preview your key combination as you press it, edit or clear a saved shortcut, and get feedback if a shortcut is invalid or already in use.</p>
     </div>

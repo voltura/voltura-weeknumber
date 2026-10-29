@@ -279,7 +279,7 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
             try
             {
                 var application = Descendants(window).OfType<Expander>()
-                    .Single(expander => Equals(expander.Header, "Application"));
+                    .Single(expander => Equals(expander.Header, Strings.Current["General"]));
 
                 application.IsExpanded = true;
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
@@ -292,7 +292,7 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
 
                 Assert.Equal(2, buttons.Length);
                 Assert.Equal(
-                    ["+", "Assign shortcut"],
+                    ["+", Strings.Current["AssignShortcut"]],
                     Descendants(buttons[0]).OfType<TextBlock>()
                         .Where(text => text.IsVisible)
                         .Select(text => text.Text)
@@ -323,7 +323,7 @@ public sealed class PreferencesUiTests(WpfTestFixture fixture)
 
                 Assert.Contains("W", visible);
                 Assert.Contains("\uE70F", visible);
-                Assert.DoesNotContain("Assign shortcut", visible);
+                Assert.DoesNotContain(Strings.Current["AssignShortcut"], visible);
 
                 window.Width = window.MinWidth;
                 window.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);

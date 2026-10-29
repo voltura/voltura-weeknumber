@@ -104,7 +104,7 @@ public sealed class CalendarExportUiTests(WpfTestFixture fixture)
             Assert.True(menu.IsOpen);
             Assert.Equal(System.Windows.Controls.Primitives.PlacementMode.Bottom, menu.Placement);
             Assert.Equal(3, menu.Items.Count);
-            Assert.Contains("August", ((MenuItem)menu.Items[1]).Header.ToString(), StringComparison.Ordinal);
+            Assert.Contains(Strings.Current.Culture.DateTimeFormat.GetMonthName(8), ((MenuItem)menu.Items[1]).Header.ToString(), StringComparison.Ordinal);
             tray.DismissOnDeactivate();
             Assert.True(tray.IsVisible);
             Assert.False(tray.IsPinned);

@@ -61,7 +61,7 @@ public sealed partial class CalendarManagerInteractionTests(WpfTestFixture fixtu
 
                 var manager = Assert.Single(tray.OwnedWindows.OfType<ImportedCalendarsWindow>());
 
-                Assert.Equal("Calendars", manager.Title);
+                Assert.Equal(Strings.Current["ImportedCalendars"].TrimEnd('…', '.'), manager.Title);
                 Assert.True(manager.Topmost);
                 Assert.True(IsWindowEnabled(new WindowInteropHelper(tray).Handle));
                 Assert.True(IsWindowEnabled(new WindowInteropHelper(manager).Handle));
