@@ -31,7 +31,7 @@ function git
         {
             if (-not $state.Detached)
             {
-                'master'
+                'main'
             }
         }
         'rev-parse'
@@ -69,7 +69,7 @@ function git
         }
         push
         {
-            Assert ($args[3] -eq 'origin' -and $args[4] -eq 'HEAD:refs/heads/master') 'Wrong push target.'
+            Assert ($args[3] -eq 'origin' -and $args[4] -eq 'HEAD:refs/heads/main') 'Wrong push target.'
         }
         default
         {

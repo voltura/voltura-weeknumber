@@ -188,18 +188,18 @@
     <summary>Updates and privacy</summary>
     <div class="detail-body">
       <p>Installed copies can check for signed updates and download them automatically; you choose when to install a ready update. Portable copies are updated by downloading a new release.</p>
-      <p>Your settings stay on your computer. The app does not upload date lookups, settings, or diagnostic logs. Update checks contact GitHub, and the standard installer may download the runtime from Microsoft. Read the <a href="https://github.com/voltura/voltura-weeknumber/blob/master/PRIVACY.md">privacy policy</a>.</p>
+      <p>Your settings stay on your computer. The app does not upload date lookups, settings, or diagnostic logs. Update checks contact GitHub, and the standard installer may download the runtime from Microsoft. Read the <a href="https://github.com/voltura/voltura-weeknumber/blob/main/PRIVACY.md">privacy policy</a>.</p>
     </div>
   </details>
   <details>
     <summary>Help and project information</summary>
     <div class="detail-body link-list">
       <a href="https://github.com/voltura/voltura-weeknumber/issues/new?template=bug_report.yml">Report a bug</a>
-      <a href="https://github.com/voltura/voltura-weeknumber/blob/master/CONTRIBUTING.md">Contributing and building from source</a>
-      <a href="https://github.com/voltura/voltura-weeknumber/blob/master/docs/architecture.md">Architecture</a>
-      <a href="https://github.com/voltura/voltura-weeknumber/blob/master/docs/validation.md">Validation guide</a>
-      <a href="https://github.com/voltura/voltura-weeknumber/blob/master/SECURITY.md">Security policy</a>
-      <a href="https://github.com/voltura/voltura-weeknumber/blob/master/LICENSE">MIT License and third-party notices</a>
+      <a href="https://github.com/voltura/voltura-weeknumber/blob/main/CONTRIBUTING.md">Contributing and building from source</a>
+      <a href="https://github.com/voltura/voltura-weeknumber/blob/main/docs/architecture.md">Architecture</a>
+      <a href="https://github.com/voltura/voltura-weeknumber/blob/main/docs/validation.md">Validation guide</a>
+      <a href="https://github.com/voltura/voltura-weeknumber/blob/main/SECURITY.md">Security policy</a>
+      <a href="https://github.com/voltura/voltura-weeknumber/blob/main/LICENSE">MIT License and third-party notices</a>
     </div>
   </details>
 </section>
