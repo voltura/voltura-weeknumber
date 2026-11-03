@@ -32,6 +32,6 @@
     <None Include="../../docs/licenses/*" Link="ThirdPartyNotices/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ical.Net" Version="5.2.3" />
+    <PackageReference Include="Ical.Net" Version="5.2.4" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 # Third-party software notices
 
-Voltura WeekNumber is distributed under the [MIT License](https://github.com/voltura/voltura-weeknumber/blob/master/LICENSE). Third-party components retain their own licenses and notices.
+Voltura WeekNumber is distributed under the [MIT License](https://github.com/voltura/voltura-weeknumber/blob/main/LICENSE). Third-party components retain their own licenses and notices.
 
 ## Microsoft .NET runtime
 
@@ -15,7 +15,7 @@ The standard installer uses a separately installed Microsoft .NET Desktop Runtim
 
 ## Application dependencies and build tools
 
-The application ships Ical.Net 5.2.3 (MIT) for iCalendar parsing and recurrence, and its NodaTime 3.2.2 dependency (Apache-2.0) for time-zone handling. Their full licenses and required notices are included in `ThirdPartyNotices/` in the distribution and in [docs/licenses](docs/licenses) in the source repository:
+The application ships Ical.Net 5.2.4 (MIT) for iCalendar parsing and recurrence, and its NodaTime 3.2.2 dependency (Apache-2.0) for time-zone handling. Their full licenses and required notices are included in `ThirdPartyNotices/` in the distribution and in [docs/licenses](docs/licenses) in the source repository:
 
 - `Ical.Net-LICENSE.md` — copyright Douglas Day, Rian Stockbower, and the ical-org Project.
 - `NodaTime-LICENSE.txt` and `NodaTime-NOTICE.txt` — includes attribution for code derived from Joda Time.
