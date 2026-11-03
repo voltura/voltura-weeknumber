@@ -20,7 +20,7 @@ function git
     }
     elseif ($args -contains 'branch')
     {
-        'master'
+        'main'
     }
     elseif ($args -contains 'add') { }
     elseif ($args -contains 'diff')
