@@ -43,6 +43,10 @@ try
         throw 'NSIS is required.'
     }
 
+    $signingConfig = Join-Path $root 'installer/signing.json'
+
+    & "$PSScriptRoot\sign-installer.ps1" -SigningConfig $signingConfig -Path 'preflight.exe' -ValidateOnly
+
     & "$PSScriptRoot\build-installer-art.ps1"
 
     if (-not $SkipTests)
@@ -142,6 +146,8 @@ try
         {
             throw 'NSIS compilation failed.'
         }
+
+        & "$PSScriptRoot\sign-installer.ps1" -SigningConfig $signingConfig -Path $output
     }
 
     $portable = Join-Path $root 'artifacts\portable'
