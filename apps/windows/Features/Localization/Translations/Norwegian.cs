@@ -55,6 +55,7 @@ internal static class Norwegian
             ["ChooseMonth"] = "Velg en måned for å se kalenderen.",
             ["ChooseWeek"] = "Velg en uke for å se datoene.",
             ["CurrentWeek"] = "Inneværende uke",
+            ["CopyCurrentWeek"] = "Kopier gjeldende uke",
             ["CalendarUnavailable"] = "Perioden er ikke tilgjengelig med de valgte kalenderreglene.",
             ["CopyWeekReference"] = "Kopier ukereferanse",
             ["CopyFormats"] = "Kopieringsformater",

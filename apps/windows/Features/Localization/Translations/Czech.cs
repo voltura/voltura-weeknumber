@@ -55,6 +55,7 @@ internal static class Czech
             ["ChooseMonth"] = "Vyberte měsíc a zobrazí se jeho kalendář.",
             ["ChooseWeek"] = "Vyberte týden a zobrazí se jeho data.",
             ["CurrentWeek"] = "Aktuální týden",
+            ["CopyCurrentWeek"] = "Kopírovat aktuální týden",
             ["CalendarUnavailable"] = "Toto období není se zvolenými pravidly kalendáře dostupné.",
             ["CopyWeekReference"] = "Kopírovat označení týdne",
             ["CopyFormats"] = "Formáty kopírování",

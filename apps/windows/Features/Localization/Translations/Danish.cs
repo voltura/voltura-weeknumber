@@ -55,6 +55,7 @@ internal static class Danish
             ["ChooseMonth"] = "Vælg en måned for at se kalenderen.",
             ["ChooseWeek"] = "Vælg en uge for at se dens datoer.",
             ["CurrentWeek"] = "Aktuel uge",
+            ["CopyCurrentWeek"] = "Kopiér den aktuelle uge",
             ["CalendarUnavailable"] = "Perioden er ikke tilgængelig med de valgte kalenderregler.",
             ["CopyWeekReference"] = "Kopiér ugereference",
             ["CopyFormats"] = "Kopieringsformater",

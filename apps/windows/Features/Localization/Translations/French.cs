@@ -55,6 +55,7 @@ internal static class French
             ["ChooseMonth"] = "Choisissez un mois pour afficher son calendrier.",
             ["ChooseWeek"] = "Choisissez une semaine pour afficher ses dates.",
             ["CurrentWeek"] = "Semaine en cours",
+            ["CopyCurrentWeek"] = "Copier la semaine en cours",
             ["CalendarUnavailable"] = "Cette période n’est pas disponible avec les règles de calendrier sélectionnées.",
             ["CopyWeekReference"] = "Copier la référence de semaine",
             ["CopyFormats"] = "Formats de copie",

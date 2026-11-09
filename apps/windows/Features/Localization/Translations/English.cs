@@ -55,6 +55,7 @@ internal static class English
             ["ChooseMonth"] = "Choose a month to see its calendar.",
             ["ChooseWeek"] = "Choose a week to see its dates.",
             ["CurrentWeek"] = "Current week",
+            ["CopyCurrentWeek"] = "Copy current week",
             ["CalendarUnavailable"] = "This period is unavailable with the selected calendar rules.",
             ["CopyWeekReference"] = "Copy week reference",
             ["CopyFormats"] = "Copy formats",

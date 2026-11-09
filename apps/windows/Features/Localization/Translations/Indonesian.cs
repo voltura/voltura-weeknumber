@@ -55,6 +55,7 @@ internal static class Indonesian
             ["ChooseMonth"] = "Pilih bulan untuk melihat kalender.",
             ["ChooseWeek"] = "Pilih minggu untuk melihat tanggalnya.",
             ["CurrentWeek"] = "Minggu ini",
+            ["CopyCurrentWeek"] = "Salin minggu ini",
             ["CalendarUnavailable"] = "Periode ini tidak tersedia dengan aturan kalender yang dipilih.",
             ["CopyWeekReference"] = "Salin referensi minggu",
             ["CopyFormats"] = "Format salinan",

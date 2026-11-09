@@ -55,6 +55,7 @@ internal static class Russian
             ["ChooseMonth"] = "Выберите месяц, чтобы увидеть календарь.",
             ["ChooseWeek"] = "Выберите неделю, чтобы увидеть даты.",
             ["CurrentWeek"] = "Текущая неделя",
+            ["CopyCurrentWeek"] = "Копировать текущую неделю",
             ["CalendarUnavailable"] = "Этот период недоступен при выбранных правилах календаря.",
             ["CopyWeekReference"] = "Копировать сведения о неделе",
             ["CopyFormats"] = "Форматы копирования",

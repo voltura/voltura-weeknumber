@@ -55,6 +55,7 @@ internal static class TraditionalChinese
             ["ChooseMonth"] = "選取月份以查看月曆。",
             ["ChooseWeek"] = "選取週以查看日期。",
             ["CurrentWeek"] = "本週",
+            ["CopyCurrentWeek"] = "複製本週",
             ["CalendarUnavailable"] = "所選日曆規則不支援此期間。",
             ["CopyWeekReference"] = "複製週次資訊",
             ["CopyFormats"] = "複製格式",

@@ -21,6 +21,7 @@ internal sealed class AppRuntime : IAsyncDisposable
     private readonly ImportedCalendarStore _calendars;
     private readonly ApplicationLog _log;
     private readonly UpdateService _updates;
+    private readonly IClipboardWriter _clipboard;
     private readonly WeekTracker _tracker = new();
     private readonly DispatcherTimer _midnight;
     private readonly NativeTray _tray;
@@ -39,7 +40,7 @@ internal sealed class AppRuntime : IAsyncDisposable
     internal uint CurrentDpi => _tray.CurrentDpi;
     internal int IconRenderCount => _tray.RenderCount;
 
-    public AppRuntime(AppPaths paths, bool traceDpi = false)
+    public AppRuntime(AppPaths paths, bool traceDpi = false, IClipboardWriter? clipboard = null)
     {
         _paths = paths;
         _traceDpi = paths.Isolated && traceDpi;
@@ -47,7 +48,8 @@ internal sealed class AppRuntime : IAsyncDisposable
         _calendars = new ImportedCalendarStore(paths.Data);
         _log = new ApplicationLog(paths.Data);
         _updates = new UpdateService(paths, log: _log);
-        Window = new MainWindow(Model);
+        _clipboard = clipboard ?? new ClipboardWriter();
+        Window = new MainWindow(Model, _clipboard);
         Window.SetValue(CalendarImportActions.StoreProperty, _calendars);
 
         if (_traceDpi)
@@ -65,6 +67,7 @@ internal sealed class AppRuntime : IAsyncDisposable
         _midnight = new DispatcherTimer(DispatcherPriority.Background, Window.Dispatcher);
         _midnight.Tick += OnMidnight;
         _tray.OpenRequested += Open;
+        _tray.CopyCurrentWeekRequested += CopyCurrentWeek;
         _tray.CalendarToggleRequested += ToggleCalendar;
         _tray.CalendarPointerIdle += ResetCalendarDismissal;
         _tray.PreferencesRequested += Preferences;
@@ -287,6 +290,43 @@ internal sealed class AppRuntime : IAsyncDisposable
             },
             DispatcherPriority.ContextIdle
         );
+    }
+
+    private void CopyCurrentWeek()
+    {
+        var strings = Strings.Current;
+        var settings = _settings.Current;
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var copied = false;
+
+        try
+        {
+            var week = WeekCalculator.Calculate(today, settings.Calendar, CultureInfo.CurrentCulture);
+            var reference = new WeekReference(today, week.Number, WeekReferenceFormatter.RangeFromStart(week.WeekStart));
+            var text = WeekReferenceFormatter.Format(
+                [reference],
+                WeekReferenceFormat.Localized,
+                strings.Culture,
+                strings["WeekNumberFormat"]
+            );
+
+            copied = _clipboard.TryWrite(text);
+        }
+        catch (ArgumentOutOfRangeException error)
+        {
+            _log.Record("Copy current week", error);
+        }
+
+        var status = strings[copied
+            ? "Copied"
+            : "CopyFailed"];
+
+        Model.Status = status;
+
+        if (!_paths.Isolated)
+        {
+            _tray.Notify("Voltura WeekNumber", status, settings.SilentNotifications);
+        }
     }
 
     private void Refresh(bool notify) => Refresh(notify, DateTimeOffset.Now);

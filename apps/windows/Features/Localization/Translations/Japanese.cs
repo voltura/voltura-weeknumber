@@ -55,6 +55,7 @@ internal static class Japanese
             ["ChooseMonth"] = "月を選ぶとカレンダーを表示します。",
             ["ChooseWeek"] = "週を選ぶと日付を表示します。",
             ["CurrentWeek"] = "今週",
+            ["CopyCurrentWeek"] = "今週をコピー",
             ["CalendarUnavailable"] = "選択したカレンダーの規則では、この期間を表示できません。",
             ["CopyWeekReference"] = "週の情報をコピー",
             ["CopyFormats"] = "コピー形式",

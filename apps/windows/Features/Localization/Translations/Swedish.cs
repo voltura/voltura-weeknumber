@@ -55,6 +55,7 @@ internal static class Swedish
             ["ChooseMonth"] = "Välj en månad för att visa kalendern.",
             ["ChooseWeek"] = "Välj en vecka för att visa dess datum.",
             ["CurrentWeek"] = "Aktuell vecka",
+            ["CopyCurrentWeek"] = "Kopiera aktuell vecka",
             ["CalendarUnavailable"] = "Perioden är inte tillgänglig med de valda kalenderreglerna.",
             ["CopyWeekReference"] = "Kopiera veckoreferens",
             ["CopyFormats"] = "Kopieringsformat",

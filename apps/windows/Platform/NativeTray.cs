@@ -23,6 +23,7 @@ internal sealed partial class NativeTray : IDisposable
     private (int? Week, int Size, IconAppearance Appearance)? _rendered;
     private (string Language, bool Dark)? _menuAppearance;
     public event Action? OpenRequested;
+    public event Action? CopyCurrentWeekRequested;
     public event Action? PreferencesRequested;
     public event Action? ExitRequested;
     public event Action? DisplayChanged;
@@ -79,6 +80,7 @@ internal sealed partial class NativeTray : IDisposable
 
         _menu.Items.Clear();
         _menu.Items.Add(text["WeekTab"], null, (_, _) => OpenRequested?.Invoke());
+        _menu.Items.Add(text["CopyCurrentWeek"], null, (_, _) => CopyCurrentWeekRequested?.Invoke());
         _menu.Items.Add(text["Preferences"], null, (_, _) => PreferencesRequested?.Invoke());
         _menu.Items.Add(new Forms.ToolStripSeparator());
 

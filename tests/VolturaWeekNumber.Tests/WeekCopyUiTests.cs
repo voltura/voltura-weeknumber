@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -17,6 +18,63 @@ public sealed class WeekCopyUiTests(WpfTestFixture fixture)
 {
     private static readonly string[] ControlNames = ["SelectedWeekCopy", "LookupWeekCopy"];
     private static readonly string[] Themes = ["light", "dark"];
+
+    [Fact]
+    public async Task TrayCopiesTodaysWeekWithoutOpeningMainWindow()
+    {
+        AppRuntime? runtime = null;
+        Task cleanup = Task.CompletedTask;
+
+        try
+        {
+            fixture.Run(() =>
+            {
+                Strings.Current.SetLanguage("en");
+
+                var clipboard = new FakeClipboard();
+
+                runtime = new AppRuntime(
+                    new(Path.Combine(Path.GetTempPath(), "VolturaWeekNumber-tests", Guid.NewGuid().ToString("N")), false, true),
+                    clipboard: clipboard
+                );
+
+                var today = DateTime.Today;
+                var otherDate = today.AddDays(-14);
+
+                runtime.Model.Refresh(today);
+
+                var expected = runtime.Model.CopyText(WeekReferenceFormat.Localized);
+
+                Assert.NotEmpty(expected);
+                runtime.Model.SelectedDate = otherDate;
+                Assert.NotEqual(expected, runtime.Model.CopyText(WeekReferenceFormat.Localized));
+                runtime.Window.Open();
+                runtime.Window.Hide();
+
+                var tray = typeof(AppRuntime).GetField("_tray", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(runtime);
+                var menu = (System.Windows.Forms.ContextMenuStrip)typeof(NativeTray)
+                    .GetField("_menu", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(tray)!;
+                var copy = Assert.Single(menu.Items.Cast<System.Windows.Forms.ToolStripItem>(), item => item.Text == "Copy current week");
+
+                copy.PerformClick();
+
+                Assert.Equal(expected, clipboard.Text);
+                Assert.Equal("Copied to clipboard.", runtime.Model.Status);
+                Assert.Equal(otherDate, runtime.Model.SelectedDate);
+                Assert.False(runtime.Window.IsVisible);
+            });
+        }
+        finally
+        {
+            if (runtime is not null)
+            {
+                fixture.Run(() => cleanup = runtime.DisposeAsync().AsTask());
+            }
+
+            await cleanup;
+        }
+    }
+
     [Fact]
     public void BothControlsCopyEachFormatAndReportSuccessOrFailure() => fixture.Run(() =>
     {

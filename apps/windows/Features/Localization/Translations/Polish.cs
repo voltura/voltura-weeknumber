@@ -55,6 +55,7 @@ internal static class Polish
             ["ChooseMonth"] = "Wybierz miesiąc, aby zobaczyć kalendarz.",
             ["ChooseWeek"] = "Wybierz tydzień, aby zobaczyć jego daty.",
             ["CurrentWeek"] = "Bieżący tydzień",
+            ["CopyCurrentWeek"] = "Kopiuj bieżący tydzień",
             ["CalendarUnavailable"] = "Ten okres jest niedostępny przy wybranych regułach kalendarza.",
             ["CopyWeekReference"] = "Kopiuj odniesienie do tygodnia",
             ["CopyFormats"] = "Formaty kopiowania",

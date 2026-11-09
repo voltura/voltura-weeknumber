@@ -55,6 +55,7 @@ internal static class Icelandic
             ["ChooseMonth"] = "Veldu mánuð til að sjá dagatalið.",
             ["ChooseWeek"] = "Veldu viku til að sjá dagsetningar hennar.",
             ["CurrentWeek"] = "Núverandi vika",
+            ["CopyCurrentWeek"] = "Afrita núverandi viku",
             ["CalendarUnavailable"] = "Tímabilið er ekki tiltækt með völdum dagatalsreglum.",
             ["CopyWeekReference"] = "Afrita vikutilvísun",
             ["CopyFormats"] = "Afritunarsnið",

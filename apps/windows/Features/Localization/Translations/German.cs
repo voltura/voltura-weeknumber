@@ -55,6 +55,7 @@ internal static class German
             ["ChooseMonth"] = "Wählen Sie einen Monat, um den Kalender anzuzeigen.",
             ["ChooseWeek"] = "Wählen Sie eine Woche, um ihre Daten anzuzeigen.",
             ["CurrentWeek"] = "Aktuelle Woche",
+            ["CopyCurrentWeek"] = "Aktuelle Woche kopieren",
             ["CalendarUnavailable"] = "Dieser Zeitraum ist mit den gewählten Kalenderregeln nicht verfügbar.",
             ["CopyWeekReference"] = "Wochenreferenz kopieren",
             ["CopyFormats"] = "Kopierformate",

@@ -55,6 +55,7 @@ internal static class Portuguese
             ["ChooseMonth"] = "Escolha um mês para ver o calendário.",
             ["ChooseWeek"] = "Escolha uma semana para ver as datas.",
             ["CurrentWeek"] = "Semana atual",
+            ["CopyCurrentWeek"] = "Copiar a semana atual",
             ["CalendarUnavailable"] = "Este período não está disponível com as regras de calendário selecionadas.",
             ["CopyWeekReference"] = "Copiar referência da semana",
             ["CopyFormats"] = "Formatos de cópia",

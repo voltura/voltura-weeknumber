@@ -55,6 +55,7 @@ internal static class Dutch
             ["ChooseMonth"] = "Kies een maand om de kalender te bekijken.",
             ["ChooseWeek"] = "Kies een week om de datums te bekijken.",
             ["CurrentWeek"] = "Huidige week",
+            ["CopyCurrentWeek"] = "Huidige week kopiëren",
             ["CalendarUnavailable"] = "Deze periode is niet beschikbaar met de geselecteerde kalenderregels.",
             ["CopyWeekReference"] = "Weekverwijzing kopiëren",
             ["CopyFormats"] = "Kopieerindelingen",

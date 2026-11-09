@@ -55,6 +55,7 @@ internal static class Cantonese
             ["ChooseMonth"] = "揀一個月，睇下月曆。",
             ["ChooseWeek"] = "揀一週，睇下日期。",
             ["CurrentWeek"] = "今週",
+            ["CopyCurrentWeek"] = "複製今個星期",
             ["CalendarUnavailable"] = "所選日曆規則唔支援呢段期間。",
             ["CopyWeekReference"] = "複製週次資料",
             ["CopyFormats"] = "複製格式",

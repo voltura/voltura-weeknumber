@@ -55,6 +55,7 @@ internal static class Italian
             ["ChooseMonth"] = "Scegli un mese per visualizzare il calendario.",
             ["ChooseWeek"] = "Scegli una settimana per visualizzare le date.",
             ["CurrentWeek"] = "Settimana corrente",
+            ["CopyCurrentWeek"] = "Copia la settimana corrente",
             ["CalendarUnavailable"] = "Questo periodo non è disponibile con le regole del calendario selezionate.",
             ["CopyWeekReference"] = "Copia riferimento settimana",
             ["CopyFormats"] = "Formati di copia",

@@ -55,6 +55,7 @@ internal static class Turkish
             ["ChooseMonth"] = "Takvimi görmek için bir ay seçin.",
             ["ChooseWeek"] = "Tarihleri görmek için bir hafta seçin.",
             ["CurrentWeek"] = "Geçerli hafta",
+            ["CopyCurrentWeek"] = "Bu haftayı kopyala",
             ["CalendarUnavailable"] = "Bu dönem seçilen takvim kurallarıyla kullanılamıyor.",
             ["CopyWeekReference"] = "Hafta bilgisini kopyala",
             ["CopyFormats"] = "Kopyalama biçimleri",

@@ -55,6 +55,7 @@ internal static class SimplifiedChinese
             ["ChooseMonth"] = "选择月份以查看月历。",
             ["ChooseWeek"] = "选择周以查看日期。",
             ["CurrentWeek"] = "本周",
+            ["CopyCurrentWeek"] = "复制本周",
             ["CalendarUnavailable"] = "所选日历规则不支持此时间段。",
             ["CopyWeekReference"] = "复制周信息",
             ["CopyFormats"] = "复制格式",

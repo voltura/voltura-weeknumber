@@ -55,6 +55,7 @@ internal static class Korean
             ["ChooseMonth"] = "월을 선택하면 달력이 표시됩니다.",
             ["ChooseWeek"] = "주를 선택하면 날짜가 표시됩니다.",
             ["CurrentWeek"] = "이번 주",
+            ["CopyCurrentWeek"] = "이번 주 복사",
             ["CalendarUnavailable"] = "선택한 달력 규칙으로는 이 기간을 표시할 수 없습니다.",
             ["CopyWeekReference"] = "주 정보 복사",
             ["CopyFormats"] = "복사 형식",

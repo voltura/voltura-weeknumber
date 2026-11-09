@@ -55,6 +55,7 @@ internal static class Finnish
             ["ChooseMonth"] = "Näytä kalenteri valitsemalla kuukausi.",
             ["ChooseWeek"] = "Näytä päivämäärät valitsemalla viikko.",
             ["CurrentWeek"] = "Kuluva viikko",
+            ["CopyCurrentWeek"] = "Kopioi nykyinen viikko",
             ["CalendarUnavailable"] = "Jakso ei ole käytettävissä valituilla kalenterisäännöillä.",
             ["CopyWeekReference"] = "Kopioi viikkoviite",
             ["CopyFormats"] = "Kopiointimuodot",
